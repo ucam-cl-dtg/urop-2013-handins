@@ -1,17 +1,12 @@
 package uk.ac.cam.sup.modelTests;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class DemoModelTest {
