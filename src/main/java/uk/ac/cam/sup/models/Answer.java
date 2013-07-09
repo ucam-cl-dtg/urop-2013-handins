@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Answer")
 public class Answer {
+    private String PDFpath;
     private String question;
     private int id;
 
@@ -39,5 +40,13 @@ public class Answer {
 
     public void setQuestion(String q) {
         question = q;
+    }
+
+    public String getFilePath() {
+        return PDFpath;
+    }
+
+    public void setFilePath(String path) {
+        PDFpath = path;
     }
 }

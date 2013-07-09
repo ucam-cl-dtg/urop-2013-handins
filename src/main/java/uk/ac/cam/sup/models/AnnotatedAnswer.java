@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "AnnotatedAnswer")
 public class AnnotatedAnswer {
+    private String PDFpath;
     private String question;
     private int id;
 
@@ -39,5 +40,13 @@ public class AnnotatedAnswer {
 
     public void setQuestion(String q) {
         question = q;
+    }
+
+    public String getFilePath() {
+        return PDFpath;
+    }
+
+    public void setFilePath(String path) {
+        PDFpath = path;
     }
 }
