@@ -1,0 +1,19 @@
+{namespace main}
+
+/**
+ * This is a quick demo-template, which will display a demo-page with only some demo-data...
+ * @param userID This is the user's CRSID as passed on by raven (retrieved from the request.getSession())
+ * @param data This is some demo data read out from the hibernate data base
+ */
+{template .index}
+	<html><body>
+		<h1>Demo page</h1>
+		The CRSID of the current user is {$userID}
+		
+		<p>
+		{foreach $element in $data}
+			<br>{$element.name} has id '{$element.id}'
+		{/foreach}
+		</p>
+	</body></html>
+{/template}
