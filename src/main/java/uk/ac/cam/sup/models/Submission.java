@@ -12,7 +12,7 @@ public class Submission {
     private long id;
     private String filepath;
     private String user;
-    //private Set<Answer> answers;
+    private Set<Answer> answers;
 
 
     //Getters
@@ -21,8 +21,8 @@ public class Submission {
     @GenericGenerator(name="increment", strategy="increment")
     public long getId() { return id; }
 
-    /*@OneToMany(mappedBy="bin")
-    public Set<BinPermission> getPermissions(){ return permissions; } */
+    @OneToMany(mappedBy="submission")
+    public Set<Answer> getAnswers(){ return answers; }
 
     public String getQFilepath() { return filepath; }
     public String getUser() { return user; }
@@ -30,9 +30,9 @@ public class Submission {
 
     //Setters
     public void setId(long id) { this.id = id; }
-    /*public void setPermissions(Set<BinPermission> permissions) {
-        this.permissions = permissions;
-    } */
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
+    }
     public void setFilepath(String filepath) { this.filepath = filepath; }
     public void setUser(String user) { this.user = user; }
 

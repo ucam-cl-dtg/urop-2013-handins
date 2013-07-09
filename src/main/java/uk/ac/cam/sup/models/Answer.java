@@ -2,10 +2,7 @@ package uk.ac.cam.sup.models;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Answer")
@@ -13,6 +10,7 @@ public class Answer {
     private String PDFpath;
     private String question;
     private int id;
+    private Submission submission;
 
     Answer() {
 
@@ -25,7 +23,6 @@ public class Answer {
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-
     public int getId() {
         return id;
     }
@@ -49,4 +46,14 @@ public class Answer {
     public void setFilePath(String path) {
         PDFpath = path;
     }
+
+    @ManyToOne
+    public Submission getSubmission() {
+       return submission;
+    }
+
+    public void setSubmission(Submission submission) {
+      this.submission = submission;
+    }
+
 }
