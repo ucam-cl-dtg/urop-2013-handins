@@ -6,7 +6,7 @@
 	<artifactId>handins</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Method Demos</name>
+	<name>Handins</name>
 
 	<properties>
 		<jettyVersion>7.2.0.v20101020</jettyVersion>
@@ -24,29 +24,46 @@
 	</repositories>
 
 	<dependencies>
+        <!-- Jetty -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>${jettyVersion}</version>
 		</dependency>
 
+        <!-- HtmlEasy -->
 		<dependency>
 			<groupId>com.googlecode.htmleasy</groupId>
 			<artifactId>htmleasy</artifactId>
 			<version>0.7</version>
 		</dependency>
 
+        <!-- resteasy  -->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
-			<version>2.2.1.GA</version>
+			<version>3.0.1.Final</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+            <version>3.0.1.Final</version>
+        </dependency>
+
+        <!-- Soy -->
 		<dependency>
 			<groupId>com.papercut.silken</groupId>
 			<artifactId>silken</artifactId>
 			<version>2013-03-05</version>
 		</dependency>
+
+        <!-- pdfBox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>1.8.2</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
