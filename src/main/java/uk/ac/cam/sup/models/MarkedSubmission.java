@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "MarkedSubmission")
 public class MarkedSubmission {
+    // Fields
     private String PDFpath;
     private int id;
 

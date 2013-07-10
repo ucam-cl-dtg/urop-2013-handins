@@ -10,16 +10,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "AnnotatedAnswer")
 public class AnnotatedAnswer {
+    // Fields
     private String PDFpath;
     private String question;
     private int id;
 
     // Class
-    AnnotatedAnswer() {
+    public AnnotatedAnswer() {
 
     }
 
-    AnnotatedAnswer(String q) {
+    public AnnotatedAnswer(String q) {
         question = q;
     }
 

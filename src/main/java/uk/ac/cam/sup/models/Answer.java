@@ -7,18 +7,19 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Answer")
 public class Answer {
+    // Fields
     private String PDFpath;
     private String question;
     private int id;
     private Submission submission;
     private boolean finalState;
 
-    // Class
-    Answer() {
+    // Constructors
+    public Answer() {
 
     }
 
-    Answer(String q) {
+    public Answer(String q) {
         question = q;
     }
 
