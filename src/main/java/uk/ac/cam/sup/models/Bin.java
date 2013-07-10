@@ -1,13 +1,14 @@
 package uk.ac.cam.sup.models;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.helpers.UserHelper;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,8 +19,14 @@ public class Bin {
     private Set<BinPermission> permissions;
     private String question;
     private String owner;
+    private String token;
 
     public Bin() {}
+    public Bin(String owner, String question) {
+        setQuestion(question);
+        setOwner(owner);
+        setToken(generateToken());
+    }
 
     //Getters
     @Id
@@ -32,6 +39,7 @@ public class Bin {
 
     public String getQuestion() { return question; }
     public String getOwner() { return owner; }
+    public String getToken() { return token; }
 
 
     //Setters
@@ -40,16 +48,15 @@ public class Bin {
         this.permissions = permissions;
     }
     public void setQuestion(String question) { this.question = question; }
-    public void setOwner(String user) { this.question = question; }
+    public void setOwner(String owner) { this.owner = owner; }
+    public void setToken(String token) { this.token = token; }
 
 
     // Actual useful functions
-    public boolean isDos(String user) {
-        return false;
-    }
 
-    public boolean isAdmin(String user) {
-        return false;
+    public static String generateToken() {
+        String res = RandomStringUtils.randomAlphabetic(35);
+        return res;
     }
 
     public boolean isOwner(String user) {
@@ -62,7 +69,7 @@ public class Bin {
     */
 
     public boolean canSeeAll(String user) {
-        return isDos(user) || isAdmin(user) || isOwner(user);
+        return UserHelper.isDos(user) || UserHelper.isAdmin(user) || isOwner(user);
     }
 
     /*
@@ -88,7 +95,7 @@ public class Bin {
      */
 
     public boolean canSeeSubmission(String user, Submission submission) {
-        if (isOwner(user) || isAdmin(user) || isDos(user)) {
+        if (isOwner(user) || UserHelper.isAdmin(user) || UserHelper.isDos(user)) {
             return true;
         }
         return submission.getUser() == user;
@@ -101,7 +108,7 @@ public class Bin {
     The User who uploaded the submission should be able to delete it
      */
     public boolean canDeleteSubmission(String user, Submission submission) {
-        if (isAdmin(user)) {
+        if (UserHelper.isAdmin(user)) {
             return true;
         }
 
