@@ -32,26 +32,16 @@ public class HibernateSessionRequestFilter implements Filter {
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		log.debug("Initializing filter...");
-		sf = configureSessionFactory();
-	}
-
-	private static SessionFactory configureSessionFactory()
-			throws HibernateException {
-		Configuration configuration = new Configuration();
-		configuration.configure();
-		ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
-				.applySettings(configuration.getProperties())
-				.buildServiceRegistry();
-		SessionFactory sessionFactory = configuration
-				.buildSessionFactory(serviceRegistry);
-		return sessionFactory;
+        sf = HibernateUtil.getSF();
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		request.setAttribute(SESSION_FACTORY, sf);
+		//request.setAttribute(SESSION_FACTORY, sf);
+        sf.getCurrentSession().beginTransaction();
 		chain.doFilter(request, response);
+        sf.getCurrentSession().getTransaction().commit();
 	}
 
 	@Override
