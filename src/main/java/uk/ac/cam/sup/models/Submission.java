@@ -24,7 +24,7 @@ public class Submission {
     @OneToMany(mappedBy="submission")
     public Set<Answer> getAnswers(){ return answers; }
 
-    public String getQFilepath() { return filepath; }
+    public String getFilepath() { return filepath; }
     public String getUser() { return user; }
 
 
