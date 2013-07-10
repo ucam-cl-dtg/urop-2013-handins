@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap;
 import com.googlecode.htmleasy.ViewWith;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import uk.ac.cam.sup.models.DemoModel;
 
 // Import the following for logging
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.servlet.http.HttpServletRequest;
 
 
-@Path("/")
+//@Path("/")
 public class MainController {
 
 	/*
@@ -30,13 +29,14 @@ public class MainController {
 	 * session and also for getting the current user, which is passed as a session
 	 * attribute (the session being contained in the request).
 	 */
-	@Context
-	HttpServletRequest request;
+	//@Context
+	//HttpServletRequest request;
 
 	/* 
 	 * You could also declare the following in a method locally; you might as well
 	 * have one logger for the entire class. Make sure it is static if you do.  
 	 */
+    /*
 	private static Logger log = LoggerFactory.getLogger(MainController.class);
 	
 	
@@ -58,7 +58,7 @@ public class MainController {
 		 * Download all the files necessary for the raven authentication from:
 		 * https://github.com/ucam-cl-dtg/ucam-webauth/tree/master/src/main/java
 		 */
-		String CRSID = ravenDemo();
+	/*	String CRSID = ravenDemo();
 		
 		
 		return ImmutableMap.of("userID", CRSID, "data", allDemoModels);
@@ -93,17 +93,20 @@ public class MainController {
 		 * Some of the levels are: debug, info, warn, error.
 		 * See example for logging below.
 		 */
-		
+	/*
 		log.debug("This will print out a debug-message into the log");
 		log.info("Use this for printing info-messages to the log");
 		log.warn("This one for warning...");
 		log.error("You can see logging is easy...");
 		
 	}
-
+                          server 0.pool.ntp.org iburst
+server 1.pool.ntp.org iburst
+server 2.pool.ntp.org iburst
+server 3.pool.ntp.org iburst
 	public String ravenDemo() {
 		// This will extract the CRSID of the current user and return it:
 		return (String) request.getSession().getAttribute("RavenRemoteUser");
 	}
-
+*/
 }

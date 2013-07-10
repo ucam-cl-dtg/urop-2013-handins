@@ -52,7 +52,6 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
 
-        <mapping class="uk.ac.cam.sup.models.DemoModel" />
 
     </session-factory>
 

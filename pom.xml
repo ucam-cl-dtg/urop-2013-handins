@@ -51,6 +51,12 @@
             <version>3.0.1.Final</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>3.0.1.Final</version>
+        </dependency>
+
         <!-- Soy -->
 		<dependency>
 			<groupId>com.papercut.silken</groupId>
