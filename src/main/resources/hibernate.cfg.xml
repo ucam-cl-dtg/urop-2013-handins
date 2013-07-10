@@ -52,7 +52,12 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
 
-        <mapping class="uk.ac.cam.sup.models.DemoModel" />
+        <mapping class="uk.ac.cam.sup.models.Answer" />
+        <mapping class="uk.ac.cam.sup.models.AnnotatedAnswer" />
+        <mapping class="uk.ac.cam.sup.models.Bin" />
+        <mapping class="uk.ac.cam.sup.models.BinPermission" />
+        <mapping class="uk.ac.cam.sup.models.Submission" />
+        <mapping class="uk.ac.cam.sup.models.MarkedSubmission" />
 
     </session-factory>
 

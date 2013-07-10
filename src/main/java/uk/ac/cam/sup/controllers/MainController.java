@@ -6,7 +6,8 @@ import com.google.common.collect.ImmutableMap;
 import com.googlecode.htmleasy.ViewWith;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import uk.ac.cam.sup.models.DemoModel;
+
+import uk.ac.cam.sup.models.Answer;
 
 // Import the following for logging
 import org.slf4j.Logger;
@@ -71,9 +72,9 @@ public class MainController {
 		// openSession() method in HibernateSessionRequestfilter. 
 		Session s = HibernateSessionRequestFilter.openSession(request);
 		s.beginTransaction();
-		s.save(new DemoModel("model1"));
-		s.save(new DemoModel("some name"));
-		s.save(new DemoModel("Bob :)"));
+		s.save(new Answer("model1"));
+		s.save(new Answer("some name"));
+		s.save(new Answer("Bob :)"));
 		s.getTransaction().commit();
 		s.close();
 		
