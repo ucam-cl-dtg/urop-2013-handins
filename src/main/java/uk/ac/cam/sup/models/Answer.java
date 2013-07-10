@@ -7,19 +7,23 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Answer")
 public class Answer {
+    // Fields
     private String PDFpath;
     private String question;
     private int id;
     private Submission submission;
+    private boolean finalState;
 
-    Answer() {
+    // Constructors
+    public Answer() {
 
     }
 
-    Answer(String q) {
+    public Answer(String q) {
         question = q;
     }
 
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
@@ -31,6 +35,7 @@ public class Answer {
         id = i;
     }
 
+    // Question
     public String getQuestion() {
         return question;
     }
@@ -39,6 +44,7 @@ public class Answer {
         question = q;
     }
 
+    // FilePath
     public String getFilePath() {
         return PDFpath;
     }
@@ -47,6 +53,7 @@ public class Answer {
         PDFpath = path;
     }
 
+    // Submission
     @ManyToOne
     public Submission getSubmission() {
        return submission;
@@ -56,4 +63,12 @@ public class Answer {
       this.submission = submission;
     }
 
+    // FinalState
+    public boolean getFinalState() {
+        return finalState;
+    }
+
+    public void setFinalState(boolean f) {
+        finalState = f;
+    }
 }

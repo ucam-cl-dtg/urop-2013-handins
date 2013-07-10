@@ -10,22 +10,24 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "AnnotatedAnswer")
 public class AnnotatedAnswer {
+    // Fields
     private String PDFpath;
     private String question;
     private int id;
 
-    AnnotatedAnswer() {
+    // Class
+    public AnnotatedAnswer() {
 
     }
 
-    AnnotatedAnswer(String q) {
+    public AnnotatedAnswer(String q) {
         question = q;
     }
 
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-
     public int getId() {
         return id;
     }
@@ -34,6 +36,7 @@ public class AnnotatedAnswer {
         id = i;
     }
 
+    // Question
     public String getQuestion() {
         return question;
     }
@@ -42,6 +45,7 @@ public class AnnotatedAnswer {
         question = q;
     }
 
+    // FilePath
     public String getFilePath() {
         return PDFpath;
     }

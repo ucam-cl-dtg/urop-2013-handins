@@ -14,12 +14,12 @@ public class Submission {
     private String user;
     private Set<Answer> answers;
 
-
-    //Getters
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-    public long getId() { return id; }
+    public long getId() {
+        return id;
+    }
 
     @OneToMany(mappedBy="submission")
     public Set<Answer> getAnswers(){ return answers; }
