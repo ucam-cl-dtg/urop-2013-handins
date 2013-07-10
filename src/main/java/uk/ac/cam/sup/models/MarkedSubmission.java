@@ -13,6 +13,7 @@ public class MarkedSubmission {
     private String PDFpath;
     private int id;
 
+    // Class
     MarkedSubmission() {
 
     }
@@ -21,10 +22,10 @@ public class MarkedSubmission {
         PDFpath = path;
     }
 
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-
     public int getId() {
         return id;
     }
@@ -33,6 +34,7 @@ public class MarkedSubmission {
         id = i;
     }
 
+    // FilePath
     public String getFilePath() {
         return PDFpath;
     }

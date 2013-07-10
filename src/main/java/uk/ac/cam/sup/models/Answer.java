@@ -12,6 +12,7 @@ public class Answer {
     private int id;
     private Submission submission;
 
+    // Class
     Answer() {
 
     }
@@ -20,6 +21,7 @@ public class Answer {
         question = q;
     }
 
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
@@ -31,6 +33,7 @@ public class Answer {
         id = i;
     }
 
+    // Question
     public String getQuestion() {
         return question;
     }
@@ -39,6 +42,7 @@ public class Answer {
         question = q;
     }
 
+    // FilePath
     public String getFilePath() {
         return PDFpath;
     }
@@ -47,6 +51,7 @@ public class Answer {
         PDFpath = path;
     }
 
+    // Submission
     @ManyToOne
     public Submission getSubmission() {
        return submission;
@@ -55,5 +60,4 @@ public class Answer {
     public void setSubmission(Submission submission) {
       this.submission = submission;
     }
-
 }

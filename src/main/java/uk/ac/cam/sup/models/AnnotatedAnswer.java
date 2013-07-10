@@ -14,6 +14,7 @@ public class AnnotatedAnswer {
     private String question;
     private int id;
 
+    // Class
     AnnotatedAnswer() {
 
     }
@@ -22,10 +23,10 @@ public class AnnotatedAnswer {
         question = q;
     }
 
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-
     public int getId() {
         return id;
     }
@@ -34,6 +35,7 @@ public class AnnotatedAnswer {
         id = i;
     }
 
+    // Question
     public String getQuestion() {
         return question;
     }
@@ -42,6 +44,7 @@ public class AnnotatedAnswer {
         question = q;
     }
 
+    // FilePath
     public String getFilePath() {
         return PDFpath;
     }
