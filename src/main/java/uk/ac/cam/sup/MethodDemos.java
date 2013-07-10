@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import uk.ac.cam.sup.controllers.BinController;
-import uk.ac.cam.sup.controllers.MainController;
 
 import com.googlecode.htmleasy.HtmleasyProviders;
 
