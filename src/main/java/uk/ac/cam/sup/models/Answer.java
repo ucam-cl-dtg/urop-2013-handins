@@ -11,6 +11,7 @@ public class Answer {
     private String question;
     private int id;
     private Submission submission;
+    private boolean finalState;
 
     // Class
     Answer() {
@@ -59,5 +60,14 @@ public class Answer {
 
     public void setSubmission(Submission submission) {
       this.submission = submission;
+    }
+
+    // FinalState
+    public boolean getFinalState() {
+        return finalState;
+    }
+
+    public void setFinalState(boolean f) {
+        finalState = f;
     }
 }
