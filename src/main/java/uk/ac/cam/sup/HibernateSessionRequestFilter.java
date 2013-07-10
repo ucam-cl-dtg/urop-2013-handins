@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
@@ -41,7 +42,11 @@ public class HibernateSessionRequestFilter implements Filter {
 		//request.setAttribute(SESSION_FACTORY, sf);
         sf.getCurrentSession().beginTransaction();
 		chain.doFilter(request, response);
-        sf.getCurrentSession().getTransaction().commit();
+
+        Transaction transaction = sf.getCurrentSession().getTransaction();
+
+        if (transaction.isActive())
+            sf.getCurrentSession().getTransaction().commit();
 	}
 
 	@Override

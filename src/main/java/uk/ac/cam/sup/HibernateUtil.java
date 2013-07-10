@@ -1,6 +1,7 @@
 package uk.ac.cam.sup;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
@@ -19,7 +20,18 @@ public class HibernateUtil {
                 .buildSessionFactory(serviceRegistry);
         return sessionFactory;
     }
+
     public static SessionFactory getSF() {
         return sf;
+    }
+
+    public static Session getSession() {
+        return sf.getCurrentSession();
+    }
+
+    public static Session getTransaction() {
+        Session session = sf.getCurrentSession();
+        session.beginTransaction();
+        return session;
     }
 }
