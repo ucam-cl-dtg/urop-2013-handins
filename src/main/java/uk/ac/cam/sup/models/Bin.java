@@ -82,7 +82,10 @@ public class Bin {
     }
 
     public boolean canDelete(String token) {
-        return token.equals(this.token);
+
+        // return token.equals(this.token);
+        // FIXME Is there any reason to allow deletion of bins?
+        return false;
     }
     /*
     A dos can see anything

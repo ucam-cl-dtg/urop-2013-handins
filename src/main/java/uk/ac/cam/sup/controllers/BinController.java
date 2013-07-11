@@ -47,7 +47,6 @@ public class BinController {
     @Path("{id}/")
     public Response deleteBin(@PathParam("id") long id,
                               @QueryParam("token") String token) {
-        System.out.println(">>>>>>" + token+"<<<<");
         Bin bin = getBin(id);
         if (bin == null)
             return Response.status(404).build();
@@ -80,13 +79,13 @@ public class BinController {
 
     @POST
     @Path("{id}/permission/")
-    public Response addPermission(@PathParam("id") long id,
-                              @FormParam("users") String[] users,
+    public Response addPermissions(@PathParam("id") long id,
+                              @FormParam("users[]") String[] users,
                               @FormParam("token") String token) {
         Bin bin = getBin(id);
 
         if (bin == null)
-            throw new NotFoundException();
+            return Response.status(404).build();
 
         if (!bin.canAddPermission(token))
             return Response.status(401).build();
@@ -96,10 +95,38 @@ public class BinController {
             usersWithPermission.add(perm.getUser());
         }
 
+        Session session = HibernateUtil.getSession();
         for (String user: users) {
             if (usersWithPermission.contains(user))
                 continue;
-            bin.getPermissions().add(new BinPermission(bin, user));
+            session.save(new BinPermission(bin, user));
+        }
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("{id}/permission")
+    public Response removePermissions(@PathParam("id") long id,
+                                      @QueryParam("users[]") String[] users,
+                                      @QueryParam("token") String token) {
+        Bin bin = getBin(id);
+
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.canDeletePermission(token))
+            return Response.status(401).build();
+
+        Session session = HibernateUtil.getSession();
+
+        List permissions = session.createCriteria(BinPermission.class)
+                                  .add(Restrictions.in("user", users))
+                                  .add(Restrictions.eq("bin", bin))
+                                  .list();
+
+        for (Object perm: permissions) {
+            session.delete(perm);
         }
 
         return Response.ok().build();
