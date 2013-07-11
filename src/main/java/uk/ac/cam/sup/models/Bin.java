@@ -1,5 +1,6 @@
 package uk.ac.cam.sup.models;
 
+import com.sun.istack.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
@@ -17,13 +18,13 @@ public class Bin {
     // Fields
     private long id;
     private Set<BinPermission> permissions;
-    private String question;
+    private String questionSet;
     private String owner;
     private String token;
 
     public Bin() {}
-    public Bin(String owner, String question) {
-        setQuestion(question);
+    public Bin(String owner, String questionSet) {
+        setQuestionSet(questionSet);
         setOwner(owner);
         setToken(generateToken());
     }
@@ -37,7 +38,13 @@ public class Bin {
     @OneToMany(mappedBy="bin")
     public Set<BinPermission> getPermissions(){ return permissions; }
 
-    public String getQuestion() { return question; }
+    public String getQuestionSet() {
+        if (questionSet == null)
+            return "";
+        return questionSet;
+    }
+
+    @NotNull
     public String getOwner() { return owner; }
     public String getToken() { return token; }
 
@@ -47,7 +54,7 @@ public class Bin {
     public void setPermissions(Set<BinPermission> permissions) {
         this.permissions = permissions;
     }
-    public void setQuestion(String question) { this.question = question; }
+    public void setQuestionSet(String questionSet) { this.questionSet = questionSet; }
     public void setOwner(String owner) { this.owner = owner; }
     public void setToken(String token) { this.token = token; }
 
@@ -61,6 +68,10 @@ public class Bin {
 
     public boolean isOwner(String user) {
         return user.equals(owner);
+    }
+
+    public boolean canDelete(String token) {
+        return token.equals(this.token);
     }
     /*
     A dos can see anything

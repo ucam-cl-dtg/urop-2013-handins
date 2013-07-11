@@ -33,14 +33,31 @@ public class BinController {
     @POST
     @Path("")
     public Map<String, ?> createBin(@FormParam("owner") String owner,
-                                    @FormParam("question") String question ) {
+                                    @FormParam("questionSet") String questionSet ) {
         Session session = HibernateUtil.getSession();
 
-        Bin bin = new Bin(owner, question);
+        Bin bin = new Bin(owner, questionSet);
         session.save(bin);
 
         return ImmutableMap.of("id", bin.getId(),
                                "token", bin.getToken());
+    }
+
+    @DELETE
+    @Path("{id}/")
+    public Response deleteBin(@PathParam("id") long id,
+                              @QueryParam("token") String token) {
+        System.out.println(">>>>>>" + token+"<<<<");
+        Bin bin = getBin(id);
+        if (bin == null)
+            return Response.status(404).build();
+        if (! bin.canDelete(token)) {
+            return Response.status(401).build();
+        }
+
+        Session session = HibernateUtil.getSession();
+        session.delete(bin);
+        return Response.ok().build();
     }
 
     @GET
@@ -102,7 +119,7 @@ public class BinController {
 
             Map<String,?> obj = ImmutableMap.of("id", bin.getId(),
                                     "token", bin.getToken(),
-                                    "question", bin.getQuestion(),
+                                    "questionSet", bin.getQuestionSet(),
                                     "owner", bin.getOwner());
             res.add(obj);
         }
