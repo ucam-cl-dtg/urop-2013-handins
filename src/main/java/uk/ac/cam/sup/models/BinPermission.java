@@ -12,6 +12,12 @@ public class BinPermission {
     private Bin bin;
     private String user;
 
+    public BinPermission() {}
+    public BinPermission(Bin bin, String user) {
+        setBin(bin);
+        setUser(user);
+    }
+
     //Getters
     @Id
     @GeneratedValue(generator="increment")
