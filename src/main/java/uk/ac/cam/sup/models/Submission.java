@@ -10,9 +10,18 @@ import java.util.Set;
 public class Submission {
     // Fields
     private long id;
-    private String filepath;
+    private String filePath;
     private String user;
     private Set<Answer> answers;
+
+    // Constructors
+    public Submission() {
+
+    }
+
+    public Submission(String user) {
+        this.user = user;
+    }
 
     @Id
     @GeneratedValue(generator="increment")
@@ -24,7 +33,7 @@ public class Submission {
     @OneToMany(mappedBy="submission")
     public Set<Answer> getAnswers(){ return answers; }
 
-    public String getFilepath() { return filepath; }
+    public String getFilePath() { return filePath; }
     public String getUser() { return user; }
 
 
@@ -33,7 +42,7 @@ public class Submission {
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
     }
-    public void setFilepath(String filepath) { this.filepath = filepath; }
+    public void setFilePath(String filePath) { this.filePath = filePath; }
     public void setUser(String user) { this.user = user; }
 
 

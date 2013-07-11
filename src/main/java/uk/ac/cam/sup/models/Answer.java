@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Table(name = "Answer")
 public class Answer {
     // Fields
-    private String PDFpath;
+    private String filePath;
     private String question;
     private int id;
     private Submission submission;
@@ -31,8 +31,8 @@ public class Answer {
         return id;
     }
 
-    public void setId(int i) {
-        id = i;
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Question
@@ -40,17 +40,17 @@ public class Answer {
         return question;
     }
 
-    public void setQuestion(String q) {
-        question = q;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     // FilePath
     public String getFilePath() {
-        return PDFpath;
+        return filePath;
     }
 
     public void setFilePath(String path) {
-        PDFpath = path;
+        this.filePath = filePath;
     }
 
     // Submission
@@ -68,7 +68,7 @@ public class Answer {
         return finalState;
     }
 
-    public void setFinalState(boolean f) {
-        finalState = f;
+    public void setFinalState(boolean finalState) {
+        this.finalState = finalState;
     }
 }
