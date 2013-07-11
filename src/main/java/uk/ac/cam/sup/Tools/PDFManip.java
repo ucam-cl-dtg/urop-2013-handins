@@ -1,4 +1,4 @@
-package uk.ac.cam.PDFTools;
+package uk.ac.cam.tools;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
@@ -84,9 +84,11 @@ public class PDFManip {
         stamper.close();*/
     }
 
-    /* The metadata query function takes a key value and the file path
-     of the PDF and returns the value contained in the queried key or
-     throws Exception MetadataNotFound otherwise. */
+    /*
+    The metadata query function takes a key value and the file path
+    of the PDF and returns the value contained in the queried key or
+    throws Exception MetadataNotFound otherwise.
+     */
     public static String PdfMetadataQuery(String key, String filePath) throws MetadataNotFoundException {
 
         try {
@@ -105,8 +107,10 @@ public class PDFManip {
         }
     }
 
-    /* The injecter takes the pair (key, value) of strings and the path for
-     the PDF and inserts metadata according to the input pair. */
+    /*
+    The injecter takes the pair (key, value) of strings and the path for
+    the PDF and inserts metadata according to the input pair.
+     */
     public static boolean PdfMetadataInject(String key, String value, String filePath) {
         try {
             PdfReader reader = new PdfReader(filePath);
@@ -125,9 +129,11 @@ public class PDFManip {
         }
     }
 
-    /* The merger takes a list of strings representing the file paths of the
-     Pdf files with the destination file path and returns the page intervals
-     which should be used as metadata. */
+    /*
+    The merger takes a list of strings representing the file paths of the
+    Pdf files with the destination file path and returns the page intervals
+    which should be used as metadata.
+     */
     public static List<String> PdfMerge(String[] filePaths, String destination) {
 
         List<String> pageIntervals = new LinkedList<String>();

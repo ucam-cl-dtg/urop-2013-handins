@@ -24,25 +24,29 @@ public class SubmissionController {
     @Consumes("application/pdf")
     public Object createSubmission(@MultipartForm FileUploadForm uploadForm) {
 
-        Session session = HibernateUtil.getSession();
-        System.out.println ("Muie");
+        // Get user
+        String user = UserHelper.getCurrentUser();
 
-        Submission submission = new Submission(UserHelper.getCurrentUser());
+        Submission submission = new Submission(user);
 
-        if (!submission.getBin().canAddSubmission(UserHelper.getCurrentUser()))
+        if (!submission.getBin().canAddSubmission(user)
             return Response.status(401).build();
+
+        saveFile(uploadForm.file, File.createTempFile(fileName, "." + "pdf", new File("temp/" + "submissions/" + user)));
+
+        // TODO: convert the received file;
+
+        // TODO: split the received file;
+
         try {
-            String fileName = UserHelper.getCurrentUser() + "_" + submission.getId();
+            String fileName = user + "_" + submission.getId();
             submission.setFilePath(fileName);
-
-            File destinationFile = File.createTempFile(fileName, "." + "pdf", new File("temp/"));
-
-            OutputStream op = new FileOutputStream(destinationFile);
-            op.write(uploadForm.file);
-            op.close();
         } catch (Exception e) {
                 e.printStackTrace();
         }
+
+        // Start Hibernating
+        Session session = HibernateUtil.getSession();
 
         session.save(submission);
 
@@ -52,7 +56,7 @@ public class SubmissionController {
     @GET
     @Path("")
     @Produces("application/json")
-    public Map<String, ?> listSubmissions(@FormParam("user") String user) {
+    public Map<String, ?> listSubmissions() {
         Session session = HibernateUtil.getSession();
 
         Submission bin = new Submission(user);
