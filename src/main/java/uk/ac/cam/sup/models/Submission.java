@@ -12,6 +12,7 @@ public class Submission {
     private long id;
     private String filePath;
     private String user;
+    private Bin bin;
     private Set<Answer> answers;
 
     // Constructors
@@ -31,20 +32,42 @@ public class Submission {
     }
 
     @OneToMany(mappedBy="submission")
-    public Set<Answer> getAnswers(){ return answers; }
+    public Set<Answer> getAnswers() {
+        return answers;
+    }
 
-    public String getFilePath() { return filePath; }
-    public String getUser() { return user; }
+    @ManyToOne
+    public Bin getBin() {
+        return bin;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getUser() {
+        return user;
+    }
 
 
     //Setters
-    public void setId(long id) { this.id = id; }
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
     }
-    public void setFilePath(String filePath) { this.filePath = filePath; }
-    public void setUser(String user) { this.user = user; }
 
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
 
+    public void setBin(Bin bin) {
+        this.bin = bin;
+    }
 }

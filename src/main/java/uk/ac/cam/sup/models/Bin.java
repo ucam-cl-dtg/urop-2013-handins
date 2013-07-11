@@ -17,6 +17,7 @@ public class Bin {
     // Fields
     private long id;
     private Set<BinPermission> permissions;
+    private Set<Submission> submissions;
     private String question;
     private String owner;
     private String token;
@@ -37,6 +38,9 @@ public class Bin {
     @OneToMany(mappedBy="bin")
     public Set<BinPermission> getPermissions(){ return permissions; }
 
+    @OneToMany(mappedBy="bin")
+    public Set<Submission> getSubmissions(){ return submissions; }
+
     public String getQuestion() { return question; }
     public String getOwner() { return owner; }
     public String getToken() { return token; }
@@ -46,6 +50,9 @@ public class Bin {
     public void setId(long id) { this.id = id; }
     public void setPermissions(Set<BinPermission> permissions) {
         this.permissions = permissions;
+    }
+    public void setSubmissions(Set<Submission> submissions) {
+        this.submissions = submissions;
     }
     public void setQuestion(String question) { this.question = question; }
     public void setOwner(String owner) { this.owner = owner; }
@@ -60,7 +67,7 @@ public class Bin {
     }
 
     public boolean isOwner(String user) {
-        return user == owner;
+        return user.equals(owner);
     }
     /*
     A dos can see anything
