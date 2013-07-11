@@ -60,7 +60,7 @@ public class Bin {
     }
 
     public boolean isOwner(String user) {
-        return user == owner;
+        return user.equals(owner);
     }
     /*
     A dos can see anything
@@ -78,7 +78,7 @@ public class Bin {
     */
 
     public boolean canAddSubmission(String user) {
-        Session session = HibernateUtil.getSF().getCurrentSession();
+        Session session = HibernateUtil.getSession();
         Integer permission = (Integer) session.createCriteria(BinPermission.class)
                .add(Restrictions.eq("user", user))
                .setProjection(Projections.rowCount())
@@ -98,7 +98,7 @@ public class Bin {
         if (isOwner(user) || UserHelper.isAdmin(user) || UserHelper.isDos(user)) {
             return true;
         }
-        return submission.getUser() == user;
+        return submission.getUser().equals(user);
     }
 
     /*
@@ -112,7 +112,19 @@ public class Bin {
             return true;
         }
 
-        return submission.getUser() == user;
+        return submission.getUser().equals(user);
+    }
+
+    /*
+     Only by using a valid token can people modify the bin permissions
+     */
+
+    public boolean canAddPermission(String token) {
+        return this.token.equals(token);
+    }
+
+    public boolean canDeletePermission(String token) {
+        return this.token.equals(token);
     }
 
 
