@@ -62,6 +62,7 @@ public class SubmissionController {
             return Response.status(500).build();
         }
 
+
         PdfMetadataInject("users", "1", directory + fileName);
         PdfMetadataInject("user.1", user, directory + fileName);
         PdfMetadataInject("bin", Long.toString(binId), directory + fileName);
