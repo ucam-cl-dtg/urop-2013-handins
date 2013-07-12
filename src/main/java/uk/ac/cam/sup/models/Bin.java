@@ -104,7 +104,7 @@ public class Bin {
 
     public boolean canAddSubmission(String user) {
         Session session = HibernateUtil.getSession();
-        Integer permission = (Integer) session.createCriteria(BinPermission.class)
+        Long permission = (Long) session.createCriteria(BinPermission.class)
                .add(Restrictions.eq("user", user))
                .setProjection(Projections.rowCount())
                .list().get(0);
