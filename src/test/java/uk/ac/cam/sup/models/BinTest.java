@@ -23,7 +23,7 @@ public class BinTest {
 
     @Before
     public void setUp() throws Exception {
-        submission = new Submission(setUp);
+        submission = new Submission();
 
         testBin = new Bin(testOwner,testQuestionSet);
         session = HibernateUtil.getSession();

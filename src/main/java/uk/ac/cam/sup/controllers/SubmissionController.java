@@ -34,7 +34,11 @@ public class SubmissionController {
 
         Submission submission = new Submission(user);
 
-        submission.setBin(BinController.getBin(id));
+        Bin bin = BinController.getBin(id);
+
+        if (bin == null)
+            return Response.status(404).build();
+        submission.setBin(bin);
 
         // Start Hibernating
         Session session = HibernateUtil.getSession();
@@ -53,7 +57,8 @@ public class SubmissionController {
         try {
             fileSave(uploadForm.file, new File("temp/" + user + "/submissions/" + submission.getId() + ".pdf"));
         } catch (IOException e) {
-            // Didn't save?
+            e.printStackTrace();
+            return Response.status(500).build();
         }
 
         // todo: convert the received file;
@@ -62,13 +67,13 @@ public class SubmissionController {
 
         // todo: Inject file;
 
-        submission.setFilePath("temp/" + user + "submission/" + submission.getId() + ".pdf");
+        submission.setFilePath("temp/" + user + "/submission/" + submission.getId() + ".pdf");
 
-
-        session.save(submission);
+        session.update(submission);
 
         return ImmutableMap.of("id", submission.getId(), "filepath", submission.getFilePath());
     }
+
     /*
     @GET
     @Path("")
