@@ -23,7 +23,8 @@ public class BinTest {
 
     @Before
     public void setUp() throws Exception {
-        submission = new Submission();
+        submission = new Submission(perm1u);
+
 
         testBin = new Bin(testOwner,testQuestionSet);
         session = HibernateUtil.getSession();
@@ -79,22 +80,30 @@ public class BinTest {
 
     @Test
     public void testCanSeeSubmission() throws Exception {
-
-
+        Assert.assertTrue(testBin.canSeeSubmission(testOwner, submission));
+        Assert.assertTrue(testBin.canSeeSubmission(perm1u, submission));
+        Assert.assertFalse(testBin.canSeeSubmission(perm2u, submission));
+        Assert.assertFalse(testBin.canSeeSubmission(randomUser, submission));
     }
 
     @Test
     public void testCanDeleteSubmission() throws Exception {
-
+        Assert.assertFalse(testBin.canDeleteSubmission(testOwner, submission));
+        Assert.assertTrue(testBin.canDeleteSubmission(perm1u, submission));
+        Assert.assertFalse(testBin.canDeleteSubmission(perm2u, submission));
+        Assert.assertFalse(testBin.canDeleteSubmission(randomUser, submission));
     }
 
     @Test
     public void testCanAddPermission() throws Exception {
+        Assert.assertTrue(testBin.canAddPermission(testBin.getToken()));
+        Assert.assertFalse(testBin.canAddPermission("asdadas"));
 
     }
 
     @Test
     public void testCanDeletePermission() throws Exception {
-
+        Assert.assertTrue(testBin.canDeletePermission(testBin.getToken()));
+        Assert.assertFalse(testBin.canDeletePermission("asdadas"));
     }
 }
