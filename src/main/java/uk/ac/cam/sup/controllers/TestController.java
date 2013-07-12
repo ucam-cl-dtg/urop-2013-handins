@@ -13,10 +13,9 @@ import javax.ws.rs.Path;
  * Time: 12:45
  * To change this template use File | Settings | File Templates.
  */
-@Path("/")
+@Path("/test")
 public class TestController {
     @GET
-    @Path("/test")
     @ViewWith("/soy/main.index")
     public Object bla(){
         return ImmutableMap.of();

@@ -12,82 +12,49 @@ import java.util.List;
 import java.util.Map;
 
 public class PDFManip {
-    private static String root = "";
+    /*
+    Fixme: This function should be rewritten because it behaves badly in general
+     */
+    public static boolean PdfAddHeader(String sourceFilePath, String destinationFilePath) {
 
-    public static PdfPTable getHeaderTable(int x, int y) {
+        try {
+            PdfReader reader = new PdfReader(sourceFilePath);
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(destinationFilePath));
+
+            int n = reader.getNumberOfPages();
+            for (int i = 1; i <= n; i++)
+                getHeaderTable(i, n).writeSelectedRows(0, -1, 30, 795, stamper.getOverContent(i));
+
+            stamper.close();
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /*
+    Don't mind this... trust me
+     */
+    private static PdfPTable getHeaderTable(int x, int y) {
         PdfPTable table = new PdfPTable(2);
         table.setTotalWidth(530);
         table.setLockedWidth(true);
         table.getDefaultCell().setFixedHeight(20);
         table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-        table.addCell("Student Name");
+        table.addCell("Constant XYZ");
         table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-        table.addCell(String.format("Question X out of Y"));
+        table.addCell(String.format("Question XYZ out of ABC"));
 
         return table;
     }
 
-    public static void main(String[] args) throws IOException, DocumentException {
-/*
-        String finalFileName = "q1.pdf";
-        String filePath = "temp/";
-
-        // Hibernating
-        Session session = HibernateUtil.getSF().getCurrentSession();
-        session.beginTransaction();
-
-        Answer x1 = new Answer("q1");
-        x1.setFilePath("q1.pdf");
-        Answer x2 = new Answer("q2");
-        x2.setFilePath("q2.pdf");
-
-        session.save(x1);
-        session.save(x2);
-
-        session.getTransaction().commit();
-
-        session = HibernateUtil.getSF().getCurrentSession();
-        session.beginTransaction();
-
-        List<Answer> pulaMea = session.createCriteria(Answer.class).list();
-
-        session.getTransaction().commit();
-
-        Document document = new Document();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        PdfCopy copy = new PdfCopy(document, baos);
-        document.open();
-
-        for (Answer p : pulaMea) {
-            String fileName = p.getFilePath();
-
-            PdfReader reader = new PdfReader(root + filePath + fileName);
-            int n = reader.getNumberOfPages();
-
-            for (int pn = 0; pn < n; )
-                copy.addPage(copy.getImportedPage(reader, ++pn));
-        }
-
-        document.close();
-
-        document = new Document();
-
-        PdfReader reader = new PdfReader(baos.toByteArray());
-        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(root + filePath + finalFileName));
-
-        int n = reader.getNumberOfPages();
-        for (int i = 1; i <= n; i++) {
-            getHeaderTable(i, n).writeSelectedRows(
-                        0, -1, 30, 795, stamper.getOverContent(i));
-        }
-        stamper.close();*/
-    }
 
     /*
     The metadata query function takes a key value and the file path
     of the PDF and returns the value contained in the queried key or
     throws Exception MetadataNotFound otherwise.
+    Done
      */
     public static String PdfMetadataQuery(String key, String filePath) throws MetadataNotFoundException {
 
@@ -110,6 +77,7 @@ public class PDFManip {
     /*
     The injecter takes the pair (key, value) of strings and the path for
     the PDF and inserts metadata according to the input pair.
+    Done
      */
     public static boolean PdfMetadataInject(String key, String value, String filePath) {
         try {
@@ -133,6 +101,7 @@ public class PDFManip {
     The merger takes a list of strings representing the file paths of the
     Pdf files with the destination file path and returns the page intervals
     which should be used as metadata.
+    Done
      */
     public static List<String> PdfMerge(String[] filePaths, String destination) {
 
