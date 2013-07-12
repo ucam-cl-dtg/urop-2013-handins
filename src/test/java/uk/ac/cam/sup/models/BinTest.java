@@ -27,8 +27,7 @@ public class BinTest {
 
 
         testBin = new Bin(testOwner,testQuestionSet);
-        session = HibernateUtil.getSession();
-        session.beginTransaction();
+        session = HibernateUtil.getTransaction();
         session.save(testBin);
 
         session.save(perm1 = new BinPermission(testBin, perm1u));
@@ -45,10 +44,10 @@ public class BinTest {
             session.getTransaction().commit();
 
         session = HibernateUtil.getSession();
+
         session.beginTransaction();
-        session.delete(perm1);
-        session.delete(perm2);
-        session.delete(testBin);
+        session.createQuery("delete from BinPermission").executeUpdate();
+        session.createQuery("delete from Bin").executeUpdate();
         session.getTransaction().commit();
     }
 

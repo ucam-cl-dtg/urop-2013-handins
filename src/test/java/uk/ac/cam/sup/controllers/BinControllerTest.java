@@ -1,6 +1,7 @@
 package uk.ac.cam.sup.controllers;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.util.ajax.JSON;
 import org.hibernate.Session;
@@ -19,6 +20,8 @@ import uk.ac.cam.sup.models.BinPermission;
 import uk.ac.cam.sup.models.Submission;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,8 +56,7 @@ public class BinControllerTest {
         session.save(perm2 = new BinPermission(testBin, perm2u));
         session.getTransaction().commit();
 
-        session = HibernateUtil.getSession();
-        session.beginTransaction();
+        session = HibernateUtil.getTransaction();
 
         response = new MockHttpResponse();
         mapper = new ObjectMapper();
@@ -66,9 +68,8 @@ public class BinControllerTest {
             session.getTransaction().commit();
 
         session = HibernateUtil.getTransaction();
-        session.delete(perm1);
-        session.delete(perm2);
-        session.delete(testBin);
+        session.createQuery("delete from BinPermission").executeUpdate();
+        session.createQuery("delete from Bin").executeUpdate();
         session.getTransaction().commit();
     }
 
@@ -99,8 +100,8 @@ public class BinControllerTest {
         Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
     }
 
-    @Test
-    public void testListPermissions() throws Exception {
+    private List<String> getPermissions(long id) throws IOException, URISyntaxException {
+
         request = MockHttpRequest.get("/bin/" + testBin.getId() + "/permission");
 
         dispatcher.invoke(request, response);
@@ -111,9 +112,16 @@ public class BinControllerTest {
 
         List<String> permissions = new LinkedList<String>();
         for (JsonNode perm : resp) {
-           permissions.add(perm.asText());
+            permissions.add(perm.asText());
         }
+        return permissions;
+    }
 
+
+    @Test
+    public void testListPermissions() throws Exception {
+
+        List<String> permissions = getPermissions(testBin.getId());
         Assert.assertTrue(permissions.contains(perm1u));
         Assert.assertTrue(permissions.contains(perm2u));
     }
@@ -122,20 +130,37 @@ public class BinControllerTest {
     public void testAddPermissionsWithAuthorization () throws Exception {
         request = MockHttpRequest.post("/bin/" + testBin.getId() + "/permission");
         request.addFormHeader("token", testBin.getToken());
+        request.addFormHeader("users[]", randomUser);
 
         dispatcher.invoke(request, response);
+        session.getTransaction().commit();
+        session = HibernateUtil.getTransaction();
 
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        List<String> permissions = getPermissions(testBin.getId());
+        Assert.assertTrue(permissions.contains(perm1u));
+        Assert.assertTrue(permissions.contains(perm2u));
+        Assert.assertTrue(permissions.contains(randomUser));
+
     }
 
     @Test
     public void testAddPermissionsWithOutAuthorization () throws Exception {
         request = MockHttpRequest.post("/bin/" + testBin.getId() + "/permission");
         request.addFormHeader("token", "bAfsadaDas");
+        request.addFormHeader("users", randomUser);
 
         dispatcher.invoke(request, response);
+        session.getTransaction().commit();
+        session = HibernateUtil.getTransaction();
 
         Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+
+        List<String> permissions = getPermissions(testBin.getId());
+        Assert.assertTrue(permissions.contains(perm1u));
+        Assert.assertTrue(permissions.contains(perm2u));
+        Assert.assertFalse(permissions.contains(randomUser));
     }
 
     // Last two tests crash like hell
@@ -143,23 +168,36 @@ public class BinControllerTest {
     @Test
     public void testDeletePermissionsWithAuthorization () throws Exception {
         request = MockHttpRequest.delete("/bin/" + testBin.getId() + "/permission"
-                                       +"?token=" + testBin.getToken()
-                                       +"&users[]=" + perm1u);
+                + "?token=" + testBin.getToken()
+                + "&users[]=" + perm1u);
+
 
         dispatcher.invoke(request, response);
+        session.getTransaction().commit();
+        session = HibernateUtil.getTransaction();
 
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        List<String> permissions = getPermissions(testBin.getId());
+        Assert.assertFalse(permissions.contains(perm1u));
+        Assert.assertTrue(permissions.contains(perm2u));
     }
 
     @Test
     public void testDeletePermissionsWithOutAuthorization () throws Exception {
         request = MockHttpRequest.delete("/bin/" + testBin.getId() + "/permission"
-                                               +"?token=" + "asdasdad"
-                                               +"&users[]=" + perm1u);
+                + "?token=" + "asdasdad"
+                + "&users[]=" + perm1u);
 
         dispatcher.invoke(request, response);
+        session.getTransaction().commit();
+        session = HibernateUtil.getTransaction();
 
         Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+
+        List<String> permissions = getPermissions(testBin.getId());
+        Assert.assertTrue(permissions.contains(perm1u));
+        Assert.assertTrue(permissions.contains(perm2u));
     }
 
 }
