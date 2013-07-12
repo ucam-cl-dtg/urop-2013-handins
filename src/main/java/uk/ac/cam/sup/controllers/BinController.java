@@ -20,8 +20,7 @@ import java.util.*;
 @Produces("application/json")
 public class BinController {
 
-
-    private Bin getBin(long id) {
+    public static Bin getBin(long id) {
         Session session = HibernateUtil.getSession();
         Bin bin = (Bin) session.createCriteria(Bin.class)
                 .add(Restrictions.eq("id", id))
