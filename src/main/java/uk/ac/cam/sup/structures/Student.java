@@ -14,9 +14,9 @@ public class Student {
     }
 
     public Student(String name, boolean marked) {
-        this.name = name;
-        this.marked = marked;
-        this.questions = new LinkedList<Question>();
+        setName(name);
+        setMarked(marked);
+        setQuestions(new LinkedList<Question>());
     }
 
     // Name

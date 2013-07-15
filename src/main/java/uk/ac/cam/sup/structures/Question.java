@@ -1,8 +1,10 @@
 package uk.ac.cam.sup.structures;
 
 public class Question {
+    // Fields
     private String name;
     private String downloadPath;
+    private boolean submitted;
     private boolean marked;
 
     // Constructors
@@ -10,10 +12,11 @@ public class Question {
 
     }
 
-    public Question(String name, String downloadPath, boolean marked) {
-        this.name = name;
-        this.downloadPath = downloadPath;
-        this.marked = marked;
+    public Question(String name, String downloadPath, boolean submitted, boolean marked) {
+        setName(name);
+        setDownloadPath(downloadPath);
+        setSubmitted(submitted);
+        setMarked(marked);
     }
 
     // Name
@@ -39,7 +42,16 @@ public class Question {
         this.marked = marked;
     }
 
-    public boolean getMarked() {
+    public boolean isMarked() {
         return marked;
+    }
+
+    // Submitted
+    public void setSubmitted(boolean submitted) {
+        this.submitted = submitted;
+    }
+
+    public boolean isSubmitted() {
+        return submitted;
     }
 }
