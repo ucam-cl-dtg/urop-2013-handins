@@ -12,7 +12,7 @@ public class Submission {
     private long id;
 
     private String filePath;
-    private String user;
+    private String owner;
 
     private Bin bin;
 
@@ -64,12 +64,12 @@ public class Submission {
         this.filePath = filePath;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // Owner
+    public String getOwner() {
+        return owner;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

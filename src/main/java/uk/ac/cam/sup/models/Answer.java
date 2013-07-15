@@ -11,7 +11,7 @@ public class Answer {
     // Fields
     private long id;
 
-    private String user;
+    private String owner;
     private String filePath;
     private String question;
 
@@ -19,7 +19,7 @@ public class Answer {
 
     private Submission submission;
     private Bin bin;
-    private Set<AnnotatedAnswer> annotatedAnswers;
+    private Set<MarkedAnswer> markedAnswers;
 
     // Constructors
     public Answer() {
@@ -38,13 +38,13 @@ public class Answer {
         this.id = id;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // Owner
+    public String getOwner() {
+        return owner;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     // Question
@@ -77,12 +77,12 @@ public class Answer {
 
     // AnnotatedAnswers
     @OneToMany(mappedBy = "answer")
-    public Set<AnnotatedAnswer> getAnnotatedAnswers() {
-        return annotatedAnswers;
+    public Set<MarkedAnswer> getMarkedAnswers() {
+        return markedAnswers;
     }
 
-    public void setAnnotatedAnswers(Set annotatedAnswers) {
-        this.annotatedAnswers = annotatedAnswers;
+    public void setMarkedAnswers(Set markedAnswers) {
+        this.markedAnswers = markedAnswers;
     }
 
     // Bin

@@ -85,15 +85,16 @@ public class MarkingController {
 
         List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
 
-        List<Object> accessibleAnswers = new LinkedList<Object>();
+
 
         for (Answer answer : allAnswers) {
 
             if (bin.canSeeAnswer(user, answer))
             {
-                answer.getAnnotatedAnswers();
+                List<MarkedAnswer> markedAnswers = new LinkedList<MarkedAnswer>(answer.getMarkedAnswers());
+                boolean marked = markedAnswers.size() > 0;
 
-                Question q = new Question(answer.getQuestion(), answer.getFilePath(), true);
+                Question q = new Question(answer.getQuestion(), answer.getFilePath(), true, marked);
             }
         }
 

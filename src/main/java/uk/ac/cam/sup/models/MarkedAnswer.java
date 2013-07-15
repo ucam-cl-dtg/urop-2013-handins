@@ -5,12 +5,12 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "AnnotatedAnswer")
-public class AnnotatedAnswer {
+@Table(name = "MarkedAnswer")
+public class MarkedAnswer {
     // Fields
     private long id;
 
-    private String user;
+    private String owner;
     private String filePath;
     private String question;
 
@@ -18,7 +18,7 @@ public class AnnotatedAnswer {
     private Answer answer;
 
     // Constructors
-    public AnnotatedAnswer() {
+    public MarkedAnswer() {
 
     }
 
@@ -34,13 +34,13 @@ public class AnnotatedAnswer {
         this.id = id;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // Owner
+    public String getOwner() {
+        return owner;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     // Question

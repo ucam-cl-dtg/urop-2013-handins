@@ -145,7 +145,7 @@ public class BinController {
 
             Map<String,?> obj = ImmutableMap.of("id", bin.getId(),
                                     "token", bin.getToken(),
-                                    "questionSet", bin.getQuestionSet(),
+                                    "questionSet", bin.getQuestionSetName(),
                                     "owner", bin.getOwner());
             res.add(obj);
         }

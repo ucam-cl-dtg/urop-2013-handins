@@ -11,12 +11,12 @@ public class MarkedSubmission {
     // Fields
     private long id;
 
-    private String user;
+    private String owner;
     private String filePath;
 
     private Bin bin;
 
-    private Set<AnnotatedAnswer> annotatedAnswers;
+    private Set<MarkedAnswer> markedAnswers;
 
     // Constructors
     public MarkedSubmission() {
@@ -35,13 +35,13 @@ public class MarkedSubmission {
         id = i;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // Owner
+    public String getOwner() {
+        return owner;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     // FilePath
@@ -55,12 +55,12 @@ public class MarkedSubmission {
 
     // Annotated answers
     @OneToMany(mappedBy = "markedSubmission")
-    public Set<AnnotatedAnswer> getAnnotatedAnswers() {
-        return annotatedAnswers;
+    public Set<MarkedAnswer> getMarkedAnswers() {
+        return markedAnswers;
     }
 
-    public void setAnnotatedAnswers(Set annotatedAnswers) {
-        this.annotatedAnswers = annotatedAnswers;
+    public void setMarkedAnswers(Set markedAnswers) {
+        this.markedAnswers = markedAnswers;
     }
 
     @ManyToOne
