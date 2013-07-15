@@ -9,10 +9,16 @@ import javax.persistence.*;
 public class BinPermission {
     // Fields
     private long id;
-    private Bin bin;
+
     private String user;
 
-    public BinPermission() {}
+    private Bin bin;
+
+    // Constructors
+    public BinPermission() {
+
+    }
+
     public BinPermission(Bin bin, String user) {
         setBin(bin);
         setUser(user);
@@ -22,15 +28,30 @@ public class BinPermission {
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-    public long getId() { return id; }
+    public long getId() {
+        return id;
+    }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    // Bin
     @ManyToOne
-    public Bin getBin() { return bin; }
-    public String getUser() { return user; }
+    public Bin getBin() {
+        return bin;
+    }
 
-    //Setters
-    public void setId(long id) { this.id = id; }
-    public void setBin(Bin bin) { this.bin = bin; }
-    public void setUser(String user) { this.user = user; }
+    public void setBin(Bin bin) {
+        this.bin = bin;
+    }
 
+    // User
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 }

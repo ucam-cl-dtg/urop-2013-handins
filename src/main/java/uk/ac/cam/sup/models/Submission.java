@@ -10,9 +10,12 @@ import java.util.Set;
 public class Submission {
     // Fields
     private long id;
+
     private String filePath;
     private String user;
+
     private Bin bin;
+
     private Set<Answer> answers;
 
     // Constructors
@@ -20,10 +23,7 @@ public class Submission {
 
     }
 
-    public Submission(String user) {
-        this.user = user;
-    }
-
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")

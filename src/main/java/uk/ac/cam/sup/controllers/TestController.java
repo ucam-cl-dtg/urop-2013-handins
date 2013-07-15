@@ -6,13 +6,6 @@ import com.googlecode.htmleasy.ViewWith;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-/**
- * Created with IntelliJ IDEA.
- * User: ap760
- * Date: 11/07/13
- * Time: 12:45
- * To change this template use File | Settings | File Templates.
- */
 @Path("/test")
 public class TestController {
     @GET

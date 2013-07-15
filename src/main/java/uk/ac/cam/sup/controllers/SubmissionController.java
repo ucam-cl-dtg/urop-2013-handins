@@ -10,6 +10,7 @@ import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.Submission;
+import uk.ac.cam.sup.tools.FilesManip;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static uk.ac.cam.sup.tools.FilesManip.fileSave;
 import static uk.ac.cam.sup.tools.PDFManip.PdfAddHeader;
 import static uk.ac.cam.sup.tools.PDFManip.PdfMetadataInject;
 
@@ -44,36 +44,36 @@ public class SubmissionController {
             return Response.status(401).build();
 
         // New submission and get id
-        Submission submission = new Submission(user);
+        Submission submission = new Submission();
         session.save(submission);
 
         session.getTransaction().commit();
+
+        // Restart session
         session = HibernateUtil.getSession();
         session.beginTransaction();
 
-        String directory = "temp/" + user + "/submissions/";
-        String fileName = submission.getId() + ".pdf";
+        String directory = "temp/" + user + "/submissions/answer/";
+        String fileName = "submission_" + submission.getId() + ".pdf";
 
         try {
-            fileSave(uploadForm.file, new File(directory + fileName));
+            FilesManip.fileSave(uploadForm.file, directory + fileName);
         } catch (IOException e) {
             e.printStackTrace();
 
             return Response.status(500).build();
         }
 
+        // todo: convert the received file;
 
+        // todo: split the received file;
+
+        // Fixme: Proper injections
         PdfMetadataInject("users", "1", directory + fileName);
         PdfMetadataInject("user.1", user, directory + fileName);
         PdfMetadataInject("bin", Long.toString(binId), directory + fileName);
 
         PdfAddHeader(directory + fileName, directory + "Headed" + fileName);
-
-        // todo: convert the received file;
-
-        // todo: split the received file;
-
-        // todo: Inject file;
 
         submission.setBin(bin);
         submission.setUser(user);
@@ -81,7 +81,7 @@ public class SubmissionController {
 
         session.update(submission);
 
-        return ImmutableMap.of("id", submission.getId(), "filepath", submission.getFilePath());
+        return ImmutableMap.of("id", submission.getId(), "filePath", submission.getFilePath());
     }
 
     @GET

@@ -17,63 +17,91 @@ import java.util.Set;
 public class Bin {
     // Fields
     private long id;
-    private Set<BinPermission> permissions;
-
-    private Set<Submission> submissions;
-    private String questionSet;
 
     private String owner;
     private String token;
+    private String questionSet;
 
-    public Bin() {}
+    private Set<BinPermission> permissions;
+    private Set<Submission> submissions;
+
+    // Constructors
+    public Bin() {
+
+    }
+
     public Bin(String owner, String questionSet) {
         setQuestionSet(questionSet);
         setOwner(owner);
         setToken(generateToken());
     }
 
-    //Getters
+    // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-    public long getId() { return id; }
-
-    @OneToMany(mappedBy="bin")
-    public Set<BinPermission> getPermissions(){ return permissions; }
-
-    @OneToMany(mappedBy="bin")
-    public Set<Submission> getSubmissions(){ return submissions; }
-
-    public String getQuestionSet() {
-        if (questionSet == null)
-            return "";
-        return questionSet;
+    public long getId() {
+        return id;
     }
 
-    @NotNull
-    public String getOwner() { return owner; }
-    public String getToken() { return token; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
+    // Permissions
+    @OneToMany(mappedBy="bin")
+    public Set<BinPermission> getPermissions(){
+        return permissions;
+    }
 
-    //Setters
-    public void setId(long id) { this.id = id; }
     public void setPermissions(Set<BinPermission> permissions) {
         this.permissions = permissions;
+    }
+
+    // Submissions
+    @OneToMany(mappedBy="bin")
+    public Set<Submission> getSubmissions(){
+        return submissions;
     }
 
     public void setSubmissions(Set<Submission> submissions) {
         this.submissions = submissions;
     }
 
-    public void setQuestionSet(String questionSet) { this.questionSet = questionSet; }
-    public void setOwner(String owner) { this.owner = owner; }
-    public void setToken(String token) { this.token = token; }
+    // QuestionSet
+    public String getQuestionSet() {
+        if (questionSet == null)
+            return "";
+        return questionSet;
+    }
 
+    public void setQuestionSet(String questionSet) {
+        this.questionSet = questionSet;
+    }
+
+    // Owner
+    @NotNull
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    // Token
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     // Actual useful functions
-
     public static String generateToken() {
         String res = RandomStringUtils.randomAlphabetic(35);
+
         return res;
     }
 
@@ -87,12 +115,12 @@ public class Bin {
         // FIXME Is there any reason to allow deletion of bins?
         return false;
     }
+
     /*
     A dos can see anything
     An admin can see anything
     The supervisor can see anything
     */
-
     public boolean canSeeAll(String user) {
         return UserHelper.isDos(user) || UserHelper.isAdmin(user) || isOwner(user);
     }
@@ -101,7 +129,6 @@ public class Bin {
     Only users with permissions can upload files.
     TODO  Should the owner be able to upload ?!. (No atm)
     */
-
     public boolean canAddSubmission(String user) {
         Session session = HibernateUtil.getSession();
         Long permission = (Long) session.createCriteria(BinPermission.class)
@@ -118,11 +145,11 @@ public class Bin {
     The Admin should be able to see any submissions
     The User who uploaded the submission should be able to see it
      */
-
     public boolean canSeeSubmission(String user, Submission submission) {
         if (isOwner(user) || UserHelper.isAdmin(user) || UserHelper.isDos(user)) {
             return true;
         }
+
         return submission.getUser().equals(user);
     }
 
@@ -143,7 +170,6 @@ public class Bin {
     /*
      Only by using a valid token can people modify the bin permissions
      */
-
     public boolean canAddPermission(String token) {
         return this.token.equals(token);
     }
@@ -151,6 +177,4 @@ public class Bin {
     public boolean canDeletePermission(String token) {
         return this.token.equals(token);
     }
-
-
 }

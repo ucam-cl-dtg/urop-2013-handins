@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.*;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 public class PDFManip {
     /*
-    Fixme: This function should be rewritten because it behaves badly in general
+    FixMe: This function should be rewritten because it behaves badly in general
      */
     public static boolean PdfAddHeader(String sourceFilePath, String destinationFilePath) {
 
@@ -42,7 +43,7 @@ public class PDFManip {
         table.setLockedWidth(true);
         table.getDefaultCell().setFixedHeight(20);
         table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-        table.addCell("Constant XYZ");
+        table.addCell("PamParamPamPam" + " XYZ");
         table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
         table.addCell(String.format("Question XYZ out of ABC"));
 
@@ -81,7 +82,11 @@ public class PDFManip {
      */
     public static boolean PdfMetadataInject(String key, String value, String filePath) {
         try {
-            PdfReader reader = new PdfReader(filePath);
+            String temp = "temp.pdf";
+
+            FilesManip.fileMove(filePath, temp);
+
+            PdfReader reader = new PdfReader(temp);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
             Map <String, String> info = reader.getInfo();
@@ -90,6 +95,8 @@ public class PDFManip {
 
             stamper.setMoreInfo(info);
             stamper.close();
+
+            FilesManip.fileDelete(temp);
 
             return true;
         } catch (Exception e) {

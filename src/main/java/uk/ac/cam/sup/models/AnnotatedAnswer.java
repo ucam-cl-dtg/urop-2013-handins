@@ -2,33 +2,29 @@ package uk.ac.cam.sup.models;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "AnnotatedAnswer")
 public class AnnotatedAnswer {
     // Fields
+    private long id;
+
     private String filePath;
     private String question;
-    private int id;
 
-    // Class
+    private MarkedSubmission markedSubmission;
+
+    // Constructors
     public AnnotatedAnswer() {
 
-    }
-
-    public AnnotatedAnswer(String question) {
-        this.question = question;
     }
 
     // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -52,5 +48,15 @@ public class AnnotatedAnswer {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    // Submission
+    @ManyToOne
+    public MarkedSubmission getMarkedSubmission() {
+        return markedSubmission;
+    }
+
+    public void setMarkedSubmission(MarkedSubmission markedSubmission) {
+        this.markedSubmission = markedSubmission;
     }
 }

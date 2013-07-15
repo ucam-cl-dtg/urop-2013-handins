@@ -8,26 +8,25 @@ import javax.persistence.*;
 @Table(name = "Answer")
 public class Answer {
     // Fields
+    private long id;
+
     private String filePath;
     private String question;
-    private int id;
-    private Submission submission;
+
     private boolean finalState;
+
+    private Submission submission;
 
     // Constructors
     public Answer() {
 
     }
 
-    public Answer(String q) {
-        question = q;
-    }
-
     // Id
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
-    public int getId() {
+    public long getId() {
         return id;
     }
 
