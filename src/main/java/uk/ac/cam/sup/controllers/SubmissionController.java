@@ -2,8 +2,6 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
@@ -99,11 +97,8 @@ public class SubmissionController {
         if (bin == null)
             return Response.status(404).build();
 
-        List<Submission> allSubmissions = session.createCriteria(Submission.class)
-                                              .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-                                              .add(Restrictions.eq("bin", bin))
-                                              .list();
-        List <Submission> accessibleSubmissions = new LinkedList<Submission>();
+        List<Submission> allSubmissions = new LinkedList<Submission>(bin.getSubmissions());
+        List<Submission> accessibleSubmissions = new LinkedList<Submission>();
 
         for (Submission submission : allSubmissions)
             if (bin.canSeeSubmission(user, submission))
