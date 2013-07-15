@@ -3,6 +3,7 @@ package uk.ac.cam.sup.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "Answer")
@@ -10,12 +11,15 @@ public class Answer {
     // Fields
     private long id;
 
+    private String user;
     private String filePath;
     private String question;
 
     private boolean finalState;
 
     private Submission submission;
+    private Bin bin;
+    private Set<AnnotatedAnswer> annotatedAnswers;
 
     // Constructors
     public Answer() {
@@ -32,6 +36,15 @@ public class Answer {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    // User
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     // Question
@@ -60,6 +73,26 @@ public class Answer {
 
     public void setSubmission(Submission submission) {
       this.submission = submission;
+    }
+
+    // AnnotatedAnswers
+    @OneToMany(mappedBy = "answer")
+    public Set<AnnotatedAnswer> getAnnotatedAnswers() {
+        return annotatedAnswers;
+    }
+
+    public void setAnnotatedAnswers(Set annotatedAnswers) {
+        this.annotatedAnswers = annotatedAnswers;
+    }
+
+    // Bin
+    @ManyToOne
+    public Bin getBin() {
+        return bin;
+    }
+
+    public void setBin(Bin bin) {
+        this.bin = bin;
     }
 
     // FinalState

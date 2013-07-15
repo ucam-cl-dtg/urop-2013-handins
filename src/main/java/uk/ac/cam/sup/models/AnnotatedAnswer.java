@@ -10,10 +10,12 @@ public class AnnotatedAnswer {
     // Fields
     private long id;
 
+    private String user;
     private String filePath;
     private String question;
 
     private MarkedSubmission markedSubmission;
+    private Answer answer;
 
     // Constructors
     public AnnotatedAnswer() {
@@ -30,6 +32,15 @@ public class AnnotatedAnswer {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    // User
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     // Question
@@ -58,5 +69,15 @@ public class AnnotatedAnswer {
 
     public void setMarkedSubmission(MarkedSubmission markedSubmission) {
         this.markedSubmission = markedSubmission;
+    }
+
+    // Submission
+    @ManyToOne
+    public Answer getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(Answer answer) {
+        this.answer = answer;
     }
 }

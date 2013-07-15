@@ -11,7 +11,10 @@ public class MarkedSubmission {
     // Fields
     private long id;
 
+    private String user;
     private String filePath;
+
+    private Bin bin;
 
     private Set<AnnotatedAnswer> annotatedAnswers;
 
@@ -30,6 +33,15 @@ public class MarkedSubmission {
 
     public void setId(int i) {
         id = i;
+    }
+
+    // User
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     // FilePath
@@ -51,4 +63,12 @@ public class MarkedSubmission {
         this.annotatedAnswers = annotatedAnswers;
     }
 
+    @ManyToOne
+    public Bin getBin() {
+        return bin;
+    }
+
+    public void setBin(Bin bin) {
+        this.bin = bin;
+    }
 }

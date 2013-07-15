@@ -20,18 +20,20 @@ public class Bin {
 
     private String owner;
     private String token;
-    private String questionSet;
+    private String questionSetName;
 
     private Set<BinPermission> permissions;
     private Set<Submission> submissions;
+    private Set<Answer> answers;
+    private Set<MarkedSubmission> markedSubmissions;
 
     // Constructors
     public Bin() {
 
     }
 
-    public Bin(String owner, String questionSet) {
-        setQuestionSet(questionSet);
+    public Bin(String owner, String questionSetName) {
+        setQuestionSetName(questionSetName);
         setOwner(owner);
         setToken(generateToken());
     }
@@ -54,7 +56,7 @@ public class Bin {
         return permissions;
     }
 
-    public void setPermissions(Set<BinPermission> permissions) {
+    public void setPermissions(Set permissions) {
         this.permissions = permissions;
     }
 
@@ -64,19 +66,19 @@ public class Bin {
         return submissions;
     }
 
-    public void setSubmissions(Set<Submission> submissions) {
+    public void setSubmissions(Set submissions) {
         this.submissions = submissions;
     }
 
-    // QuestionSet
-    public String getQuestionSet() {
-        if (questionSet == null)
+    // QuestionSetName
+    public String getQuestionSetName() {
+        if (questionSetName == null)
             return "";
-        return questionSet;
+        return questionSetName;
     }
 
-    public void setQuestionSet(String questionSet) {
-        this.questionSet = questionSet;
+    public void setQuestionSetName(String questionSetName) {
+        this.questionSetName = questionSetName;
     }
 
     // Owner
@@ -98,11 +100,29 @@ public class Bin {
         this.token = token;
     }
 
+    // Answers
+    @OneToMany(mappedBy = "bin")
+    public Set<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(Set answers) {
+        this.answers = answers;
+    }
+
+    // MarkedSubmissions
+    @OneToMany(mappedBy = "bin")
+    public Set<MarkedSubmission> getMarkedSubmissions() {
+        return markedSubmissions;
+    }
+
+    public void setMarkedSubmissions(Set markedSubmissions) {
+        this.markedSubmissions = markedSubmissions;
+    }
+
     // Actual useful functions
     public static String generateToken() {
-        String res = RandomStringUtils.randomAlphabetic(35);
-
-        return res;
+        return RandomStringUtils.randomAlphabetic(35);
     }
 
     public boolean isOwner(String user) {
@@ -176,5 +196,19 @@ public class Bin {
 
     public boolean canDeletePermission(String token) {
         return this.token.equals(token);
+    }
+
+    /*
+    ToDo: complete the function and add the comments
+     */
+    public boolean canAddMarkedSubmission(String user) {
+        return true;
+    }
+
+    /*
+    ToDo: complete the function and add the comments
+     */
+    public boolean canSeeAnswer(String user, Answer answer) {
+        return true;
     }
 }

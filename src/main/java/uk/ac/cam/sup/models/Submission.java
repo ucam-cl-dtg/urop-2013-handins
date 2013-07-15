@@ -31,43 +31,45 @@ public class Submission {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    // Answers
     @OneToMany(mappedBy="submission")
     public Set<Answer> getAnswers() {
         return answers;
     }
 
+    public void setAnswers(Set answers) {
+        this.answers = answers;
+    }
+
+    // Bin
     @ManyToOne
     public Bin getBin() {
         return bin;
     }
 
+    public void setBin(Bin bin) {
+        this.bin = bin;
+    }
+
+    // FilePath
     public String getFilePath() {
         return filePath;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-
-    //Setters
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setAnswers(Set<Answer> answers) {
-        this.answers = answers;
     }
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    // User
+    public String getUser() {
+        return user;
     }
 
-    public void setBin(Bin bin) {
-        this.bin = bin;
+    public void setUser(String user) {
+        this.user = user;
     }
 }
