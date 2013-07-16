@@ -8,6 +8,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
+import uk.ac.cam.sup.structures.ProposedQuestion;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class Bin {
     private Set<Submission> submissions;
     private Set<Answer> answers;
     private Set<MarkedSubmission> markedSubmissions;
+    private Set<ProposedQuestion> questionSet;
 
     // Constructors
     public Bin() {

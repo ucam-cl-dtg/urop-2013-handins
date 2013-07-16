@@ -2,14 +2,13 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
-import org.hibernate.type.OrderedSetType;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
-import uk.ac.cam.sup.structures.Question;
-import uk.ac.cam.sup.structures.Student;
+import uk.ac.cam.sup.structures.AnsweredQuestion;
+import uk.ac.cam.sup.structures.StudentSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 
 import javax.ws.rs.*;
@@ -84,7 +83,7 @@ public class MarkingController {
 
         List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
 
-        Map<String, List<Question>> studentQuestions = new HashMap<String, List<Question>>();
+        Map<String, List<AnsweredQuestion>> studentQuestions = new HashMap<String, List<AnsweredQuestion>>();
         Set<String> studentSet = new TreeSet<String>();
 
         for (Answer answer : allAnswers) {
@@ -92,31 +91,31 @@ public class MarkingController {
             if (bin.canSeeAnswer(user, answer))
             {
                 if (!studentSet.contains(answer.getOwner())) {
-                    studentQuestions.put(answer.getOwner(), new LinkedList<Question>());
+                    studentQuestions.put(answer.getOwner(), new LinkedList<AnsweredQuestion>());
 
                     studentSet.add(answer.getOwner());
                 }
 
                 boolean marked = answer.getMarkedAnswers().size() > 0;
 
-                Question q = new Question(answer.getQuestion(), answer.getFilePath(), true, marked);
+                AnsweredQuestion q = new AnsweredQuestion(answer.getQuestion(), answer.getFilePath(), true, marked);
 
                 studentQuestions.get(answer.getOwner()).add(q);
             }
         }
 
-        List<Student> studentList = new LinkedList<Student>();
+        List<StudentSubmission> studentSubmissionList = new LinkedList<StudentSubmission>();
 
         for (String s : studentSet) {
-            Student student = new Student();
+            StudentSubmission studentSubmission = new StudentSubmission();
 
-            student.setName(s);
-            student.setQuestions(studentQuestions.get(s));
-            student.setMarked(student.getQuestions().size() == bin.getQuestionCount());
+            studentSubmission.setName(s);
+            studentSubmission.setAnsweredQuestions(studentQuestions.get(s));
+            studentSubmission.setMarked(studentSubmission.getAnsweredQuestions().size() == bin.getQuestionCount());
 
-            studentList.add(student);
+            studentSubmissionList.add(studentSubmission);
         }
 
-        return ImmutableMap.of("studentList", studentList);
+        return ImmutableMap.of("studentSubmissionList", studentSubmissionList);
     }
 }

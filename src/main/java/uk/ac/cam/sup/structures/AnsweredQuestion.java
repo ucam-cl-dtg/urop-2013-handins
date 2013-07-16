@@ -1,6 +1,6 @@
 package uk.ac.cam.sup.structures;
 
-public class Question {
+public class AnsweredQuestion {
     // Fields
     private String name;
     private String downloadPath;
@@ -8,11 +8,11 @@ public class Question {
     private boolean marked;
 
     // Constructors
-    public Question() {
+    public AnsweredQuestion() {
 
     }
 
-    public Question(String name, String downloadPath, boolean submitted, boolean marked) {
+    public AnsweredQuestion(String name, String downloadPath, boolean submitted, boolean marked) {
         setName(name);
         setDownloadPath(downloadPath);
         setSubmitted(submitted);
