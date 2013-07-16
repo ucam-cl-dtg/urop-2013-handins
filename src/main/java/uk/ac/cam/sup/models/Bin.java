@@ -170,7 +170,7 @@ public class Bin {
             return true;
         }
 
-        return submission.getUser().equals(user);
+        return submission.getOwner().equals(user);
     }
 
     /*
@@ -184,7 +184,7 @@ public class Bin {
             return true;
         }
 
-        return submission.getUser().equals(user);
+        return submission.getOwner().equals(user);
     }
 
     /*

@@ -74,7 +74,7 @@ public class SubmissionController {
         PdfAddHeader(directory + fileName, directory + "Headed" + fileName);
 
         submission.setBin(bin);
-        submission.setUser(user);
+        submission.setOwner(user);
         submission.setFilePath(directory + fileName);
 
         session.update(submission);
