@@ -79,7 +79,9 @@ public class SubmissionController {
 
         session.update(submission);
 
-        return ImmutableMap.of("id", submission.getId(), "filePath", submission.getFilePath());
+        return ImmutableMap.of("submission", ImmutableMap.of("id", submission.getId(),
+                                                             "link", submission.getLink(),
+                                                             "filePath", submission.getFilePath()));
     }
 
     @GET
@@ -112,12 +114,13 @@ public class SubmissionController {
             Map<String, String> map = new HashMap<String, String>();
 
             map.put("id", Long.toString(submission.getId()));
-            map.put("filePath" + p, submission.getFilePath());
+            map.put("filePath", submission.getFilePath());
+            map.put("link", submission.getLink());
 
             mapList.add(map);
         }
 
-        return mapList;
+        return ImmutableMap.of("submissions", mapList);
     }
 
     @GET
