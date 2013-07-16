@@ -211,4 +211,9 @@ public class Bin {
     public boolean canSeeAnswer(String user, Answer answer) {
         return true;
     }
+
+    @Transient
+    public int getQuestionCount() {
+        return Integer.parseInt(RandomStringUtils.randomAlphabetic(1));
+    }
 }

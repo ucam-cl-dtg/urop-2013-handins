@@ -46,7 +46,7 @@ public class Student {
         this.questions.add(question);
     }
 
-    public List getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 }
