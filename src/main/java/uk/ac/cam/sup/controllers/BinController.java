@@ -1,38 +1,55 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
-import com.googlecode.htmleasy.ViewWith;
-import org.eclipse.jetty.http.HttpFields;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinPermission;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
-@Path("/bin/")
+@Path("/bin")
 @Produces("application/json")
 public class BinController {
 
     public static Bin getBin(long id) {
+        // Set Hibernate
         Session session = HibernateUtil.getSession();
+
         Bin bin = (Bin) session.createCriteria(Bin.class)
                 .add(Restrictions.eq("id", id))
                 .setFetchMode("permissions", FetchMode.JOIN)
                 .uniqueResult();
+
         return bin;
     }
 
+    @GET
+    public Object listBins() {
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        List<Bin> binList = session.createCriteria(Bin.class).list();
+        List<Bin> finalBinList = new LinkedList<Bin>();
+
+        for (Bin bin : binList)
+            if (bin.canAddSubmission(user))
+                finalBinList.add(bin);
+
+        return ImmutableMap.of("binList", finalBinList);
+    }
+
     @POST
-    @Path("")
     public Map<String, ?> createBin(@FormParam("owner") String owner,
                                     @FormParam("questionSet") String questionSet ) {
+        // Set Hibernate
         Session session = HibernateUtil.getSession();
 
         Bin bin = new Bin(owner, questionSet);
@@ -43,13 +60,15 @@ public class BinController {
     }
 
     @DELETE
-    @Path("{id}/")
+    @Path("/{id}/")
     public Response deleteBin(@PathParam("id") long id,
                               @QueryParam("token") String token) {
+
         Bin bin = getBin(id);
+
         if (bin == null)
             return Response.status(404).build();
-        if (! bin.canDelete(token)) {
+        if (!bin.canDelete(token)) {
             return Response.status(401).build();
         }
 
@@ -59,7 +78,18 @@ public class BinController {
     }
 
     @GET
-    @Path("{id}/permission/")
+    @Path("/{id}")
+    public Object getOwner(@PathParam("id") long id) {
+        Bin bin = getBin(id);
+
+        if (bin == null)
+            throw new NotFoundException();
+
+        return bin.getOwner();
+    }
+
+    @GET
+    @Path("/{id}/permission/")
     public List listPermissions(@PathParam("id") long id) {
         Bin bin = getBin(id);
 
@@ -75,9 +105,8 @@ public class BinController {
         return res;
     }
 
-
     @POST
-    @Path("{id}/permission/")
+    @Path("/{id}/permission/")
     public Response addPermissions(@PathParam("id") long id,
                               @FormParam("users[]") String[] users,
                               @FormParam("token") String token) {
@@ -105,7 +134,7 @@ public class BinController {
     }
 
     @DELETE
-    @Path("{id}/permission")
+    @Path("/{id}/permission")
     public Response removePermissions(@PathParam("id") long id,
                                       @QueryParam("users[]") String[] users,
                                       @QueryParam("token") String token) {
@@ -130,27 +159,4 @@ public class BinController {
 
         return Response.ok().build();
     }
-
-
-    // TODO Remove this. It is a security leak. It is just used for devel
-    @GET
-    @Path("")
-    @Produces("application/json")
-    public List<Map<String, ?>> listBins() {
-        Session session = HibernateUtil.getSession();
-
-        List<Bin> l = session.createCriteria(Bin.class).list();
-        List<Map<String, ?> > res = new LinkedList<Map<String, ?> >();
-        for (Bin bin: l) {
-
-            Map<String,?> obj = ImmutableMap.of("id", bin.getId(),
-                                    "token", bin.getToken(),
-                                    "questionSet", bin.getQuestionSetName(),
-                                    "owner", bin.getOwner());
-            res.add(obj);
-        }
-        return res;
-    }
-
-
 }

@@ -9,6 +9,9 @@ import java.util.Set;
 @Table(name = "Answer")
 public class Answer {
     // Fields
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
     private String owner;
@@ -17,8 +20,13 @@ public class Answer {
 
     private boolean finalState;
 
+    @ManyToOne
     private Submission submission;
+
+    @ManyToOne
     private Bin bin;
+
+    @OneToMany(mappedBy = "answer")
     private Set<MarkedAnswer> markedAnswers;
 
     // Constructors
@@ -27,15 +35,8 @@ public class Answer {
     }
 
     // Id
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
     public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     // Owner
@@ -66,7 +67,6 @@ public class Answer {
     }
 
     // Submission
-    @ManyToOne
     public Submission getSubmission() {
        return submission;
     }
@@ -75,8 +75,7 @@ public class Answer {
       this.submission = submission;
     }
 
-    // AnnotatedAnswers
-    @OneToMany(mappedBy = "answer")
+    // MarkedAnswers
     public Set<MarkedAnswer> getMarkedAnswers() {
         return markedAnswers;
     }
@@ -86,7 +85,6 @@ public class Answer {
     }
 
     // Bin
-    @ManyToOne
     public Bin getBin() {
         return bin;
     }

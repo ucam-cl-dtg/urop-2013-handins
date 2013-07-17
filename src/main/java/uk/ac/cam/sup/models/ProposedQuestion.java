@@ -1,36 +1,43 @@
 package uk.ac.cam.sup.models;
 
+// KILL ME!
+
+
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "BinPermission")
-public class BinPermission {
+@Table(name = "ProposedQuestion")
+public class ProposedQuestion {
     // Fields
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
-    private String user;
+    private String name;
 
     @ManyToOne
     private Bin bin;
 
     // Constructors
-    public BinPermission() {
+    public ProposedQuestion() {
 
     }
 
-    public BinPermission(Bin bin, String user) {
-        setBin(bin);
-        setUser(user);
-    }
-
-    //Getters
+    // Id
     public long getId() {
         return id;
+    }
+
+    // Name
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     // Bin
@@ -40,14 +47,5 @@ public class BinPermission {
 
     public void setBin(Bin bin) {
         this.bin = bin;
-    }
-
-    // User
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
     }
 }

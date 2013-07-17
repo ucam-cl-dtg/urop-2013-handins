@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.AnsweredQuestion;
 import uk.ac.cam.sup.structures.StudentSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
+import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,10 +20,10 @@ import java.io.IOException;
 import java.util.*;
 
 @Path("/marking/{binId}")
+@Produces("application/json")
 public class MarkingController {
 
     @POST
-    @Produces("application/json")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
 
@@ -34,7 +36,7 @@ public class MarkingController {
         Bin bin = BinController.getBin(binId);
 
         if (bin == null)
-            return Response.status(404).build();
+            return Response.status(401).build();
         if (!bin.canAddMarkedSubmission(user))
             return Response.status(401).build();
 
@@ -63,11 +65,13 @@ public class MarkingController {
 
         session.update(markedSubmission);
 
-        return ImmutableMap.of("id", markedSubmission.getId(), "filePath", markedSubmission.getFilePath());
+        List<String> listOfUploads = null;
+        FilesManip.distributeMarkedSubmission(markedSubmission);
+
+        return ImmutableMap.of("id", markedSubmission.getId(), "filePath", markedSubmission.getFilePath(), "User/Question List", listOfUploads);
     }
 
     @GET
-    @Produces("application/json")
     public Object viewMarkedSubmissions(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user
@@ -79,7 +83,7 @@ public class MarkingController {
         Bin bin = BinController.getBin(binId);
 
         if (bin == null)
-            return Response.status(404).build();
+            return Response.status(401).build();
 
         List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
 

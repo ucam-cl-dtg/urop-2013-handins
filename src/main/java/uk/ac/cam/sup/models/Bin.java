@@ -8,7 +8,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
-import uk.ac.cam.sup.structures.ProposedQuestion;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -17,16 +16,29 @@ import java.util.Set;
 @Table(name = "Bin")
 public class Bin {
     // Fields
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
     private String owner;
     private String token;
     private String questionSetName;
 
+    @OneToMany(mappedBy="bin")
     private Set<BinPermission> permissions;
+
+    @OneToMany(mappedBy="bin")
     private Set<Submission> submissions;
+
+    @OneToMany(mappedBy = "bin")
     private Set<Answer> answers;
+
+    @OneToMany(mappedBy = "bin")
     private Set<MarkedSubmission> markedSubmissions;
+
+    // FixMe: Change the type
+    @OneToMany(mappedBy = "bin")
     private Set<ProposedQuestion> questionSet;
 
     // Constructors
@@ -41,19 +53,11 @@ public class Bin {
     }
 
     // Id
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     // Permissions
-    @OneToMany(mappedBy="bin")
     public Set<BinPermission> getPermissions(){
         return permissions;
     }
@@ -63,7 +67,6 @@ public class Bin {
     }
 
     // Submissions
-    @OneToMany(mappedBy="bin")
     public Set<Submission> getSubmissions(){
         return submissions;
     }
@@ -103,7 +106,6 @@ public class Bin {
     }
 
     // Answers
-    @OneToMany(mappedBy = "bin")
     public Set<Answer> getAnswers() {
         return answers;
     }
@@ -113,13 +115,21 @@ public class Bin {
     }
 
     // MarkedSubmissions
-    @OneToMany(mappedBy = "bin")
     public Set<MarkedSubmission> getMarkedSubmissions() {
         return markedSubmissions;
     }
 
     public void setMarkedSubmissions(Set markedSubmissions) {
         this.markedSubmissions = markedSubmissions;
+    }
+
+    // QuestionSet
+    public Set<ProposedQuestion> getQuestionSet() {
+        return questionSet;
+    }
+
+    public void setQuestionSet(Set questionSet) {
+        this.questionSet = questionSet;
     }
 
     // Actual useful functions
@@ -135,6 +145,9 @@ public class Bin {
 
         // return token.equals(this.token);
         // FIXME Is there any reason to allow deletion of bins?
+        // Andi: Yes, for example if it is created by mistake,
+        //       or just to check how interface works.
+
         return false;
     }
 
@@ -216,6 +229,6 @@ public class Bin {
 
     @Transient
     public int getQuestionCount() {
-        return Integer.parseInt(RandomStringUtils.randomAlphabetic(1));
+        return questionSet.size();
     }
 }

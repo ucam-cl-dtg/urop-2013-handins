@@ -8,13 +8,19 @@ import javax.persistence.*;
 @Table(name = "MarkedAnswer")
 public class MarkedAnswer {
     // Fields
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
     private String owner;
     private String filePath;
     private String question;
 
+    @ManyToOne
     private MarkedSubmission markedSubmission;
+
+    @ManyToOne
     private Answer answer;
 
     // Constructors
@@ -23,15 +29,8 @@ public class MarkedAnswer {
     }
 
     // Id
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
     public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     // Owner
@@ -62,7 +61,6 @@ public class MarkedAnswer {
     }
 
     // Submission
-    @ManyToOne
     public MarkedSubmission getMarkedSubmission() {
         return markedSubmission;
     }
@@ -72,7 +70,6 @@ public class MarkedAnswer {
     }
 
     // Submission
-    @ManyToOne
     public Answer getAnswer() {
         return answer;
     }

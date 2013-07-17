@@ -58,6 +58,8 @@
         <mapping class="uk.ac.cam.sup.models.BinPermission" />
         <mapping class="uk.ac.cam.sup.models.Submission" />
         <mapping class="uk.ac.cam.sup.models.MarkedSubmission" />
+        <mapping class="uk.ac.cam.sup.models.ProposedQuestion" />
+
 
     </session-factory>
 

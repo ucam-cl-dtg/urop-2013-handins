@@ -9,13 +9,18 @@ import java.util.Set;
 @Table(name = "Submission")
 public class Submission {
     // Fields
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
     private String filePath;
     private String owner;
 
+    @ManyToOne
     private Bin bin;
 
+    @OneToMany(mappedBy="submission")
     private Set<Answer> answers;
 
     // Constructors
@@ -23,20 +28,16 @@ public class Submission {
 
     }
 
+    public Submission(String owner) {
+        setOwner(owner);
+    }
+
     // Id
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     // Answers
-    @OneToMany(mappedBy="submission")
     public Set<Answer> getAnswers() {
         return answers;
     }
@@ -46,7 +47,6 @@ public class Submission {
     }
 
     // Bin
-    @ManyToOne
     public Bin getBin() {
         return bin;
     }

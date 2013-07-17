@@ -9,13 +9,18 @@ import java.util.Set;
 @Table(name = "MarkedSubmission")
 public class MarkedSubmission {
     // Fields
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
     private String owner;
     private String filePath;
 
+    @ManyToOne
     private Bin bin;
 
+    @OneToMany(mappedBy = "markedSubmission")
     private Set<MarkedAnswer> markedAnswers;
 
     // Constructors
@@ -24,15 +29,8 @@ public class MarkedSubmission {
     }
 
     // Id
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
     public long getId() {
         return id;
-    }
-
-    public void setId(int i) {
-        id = i;
     }
 
     // Owner
@@ -53,8 +51,7 @@ public class MarkedSubmission {
         this.filePath = filePath;
     }
 
-    // Annotated answers
-    @OneToMany(mappedBy = "markedSubmission")
+    // MarkedAnswers
     public Set<MarkedAnswer> getMarkedAnswers() {
         return markedAnswers;
     }
@@ -63,7 +60,7 @@ public class MarkedSubmission {
         this.markedAnswers = markedAnswers;
     }
 
-    @ManyToOne
+    // Bin
     public Bin getBin() {
         return bin;
     }
