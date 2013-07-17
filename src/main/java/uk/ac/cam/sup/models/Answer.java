@@ -62,7 +62,7 @@ public class Answer {
         return filePath;
     }
 
-    public void setFilePath(String path) {
+    public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 

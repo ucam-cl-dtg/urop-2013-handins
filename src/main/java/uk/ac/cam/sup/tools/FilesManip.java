@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.models.Answer;
+import uk.ac.cam.sup.models.MarkedAnswer;
 import uk.ac.cam.sup.models.MarkedSubmission;
 import uk.ac.cam.sup.models.Submission;
 import uk.ac.cam.sup.structures.Distribution;
@@ -52,7 +53,7 @@ public class FilesManip {
                 PDFManip.PdfTakePages(submission.getFilePath(), distribution.getStartPage(), distribution.getEndPage(), filePath);
                 PDFManip.PdfAddHeader(distribution.getStudent() + " " + distribution.getQuestion(), filePath);
 
-                // ToDo: Bin
+                answer.setBin(submission.getBin());
                 answer.setFilePath(filePath);
                 answer.setQuestion(distribution.getQuestion());
                 answer.setFinalState(false);
@@ -82,9 +83,9 @@ public class FilesManip {
                 String location = "temp/" + distribution.getStudent() + "/annotated/";
 
                 // New Answer and get id
-                Answer answer = new Answer();
+                MarkedAnswer markedAnswer = new MarkedAnswer();
 
-                session.save(answer);
+                session.save(markedAnswer);
 
                 session.getTransaction().commit();
 
@@ -93,7 +94,7 @@ public class FilesManip {
                 session.beginTransaction();
 
                 // Save Answer
-                String filePath = location + answer.getId() + ".pdf";
+                String filePath = location + markedAnswer.getId() + ".pdf";
                 PDFManip.PdfTakePages(markedSubmission.getFilePath(), distribution.getStartPage(), distribution.getEndPage(), filePath);
             }
         } catch (Exception e) {

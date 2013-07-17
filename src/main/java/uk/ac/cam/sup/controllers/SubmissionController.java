@@ -4,10 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
-import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.Submission;
 import uk.ac.cam.sup.tools.FilesManip;
@@ -90,9 +88,7 @@ public class SubmissionController {
     @GET
     public Object listSubmissions(@PathParam("binId") long binId) {
 
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
+        // Get user
         String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
@@ -144,8 +140,6 @@ public class SubmissionController {
 
         if (!bin.canSeeSubmission(user, submission))
             return Response.status(401).build();
-
-        System.out.println(submission.getFilePath());
 
         return Response.ok(new File(submission.getFilePath())).build();
     }
