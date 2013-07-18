@@ -21,7 +21,7 @@ public class Answer {
     private boolean finalState;
 
     @ManyToOne
-    private Submission submission;
+    private UnmarkedSubmission unmarkedSubmission;
 
     @ManyToOne
     private Bin bin;
@@ -66,13 +66,13 @@ public class Answer {
         this.filePath = filePath;
     }
 
-    // Submission
-    public Submission getSubmission() {
-       return submission;
+    // UnmarkedSubmission
+    public UnmarkedSubmission getUnmarkedSubmission() {
+       return unmarkedSubmission;
     }
 
-    public void setSubmission(Submission submission) {
-      this.submission = submission;
+    public void setUnmarkedSubmission(UnmarkedSubmission unmarkedSubmission) {
+      this.unmarkedSubmission = unmarkedSubmission;
     }
 
     // MarkedAnswers

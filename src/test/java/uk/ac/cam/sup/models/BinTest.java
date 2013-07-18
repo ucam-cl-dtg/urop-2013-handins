@@ -19,11 +19,11 @@ public class BinTest {
     Bin testBin;
     BinPermission perm1, perm2;
     Session session;
-    Submission submission;
+    UnmarkedSubmission unmarkedSubmission;
 
     @Before
     public void setUp() throws Exception {
-        submission = new Submission(perm1u);
+        unmarkedSubmission = new UnmarkedSubmission(perm1u);
 
 
         testBin = new Bin(testOwner,testQuestionSet);
@@ -79,18 +79,18 @@ public class BinTest {
 
     @Test
     public void testCanSeeSubmission() throws Exception {
-        Assert.assertTrue(testBin.canSeeSubmission(testOwner, submission));
-        Assert.assertTrue(testBin.canSeeSubmission(perm1u, submission));
-        Assert.assertFalse(testBin.canSeeSubmission(perm2u, submission));
-        Assert.assertFalse(testBin.canSeeSubmission(randomUser, submission));
+        Assert.assertTrue(testBin.canSeeSubmission(testOwner, unmarkedSubmission));
+        Assert.assertTrue(testBin.canSeeSubmission(perm1u, unmarkedSubmission));
+        Assert.assertFalse(testBin.canSeeSubmission(perm2u, unmarkedSubmission));
+        Assert.assertFalse(testBin.canSeeSubmission(randomUser, unmarkedSubmission));
     }
 
     @Test
     public void testCanDeleteSubmission() throws Exception {
-        Assert.assertFalse(testBin.canDeleteSubmission(testOwner, submission));
-        Assert.assertTrue(testBin.canDeleteSubmission(perm1u, submission));
-        Assert.assertFalse(testBin.canDeleteSubmission(perm2u, submission));
-        Assert.assertFalse(testBin.canDeleteSubmission(randomUser, submission));
+        Assert.assertFalse(testBin.canDeleteSubmission(testOwner, unmarkedSubmission));
+        Assert.assertTrue(testBin.canDeleteSubmission(perm1u, unmarkedSubmission));
+        Assert.assertFalse(testBin.canDeleteSubmission(perm2u, unmarkedSubmission));
+        Assert.assertFalse(testBin.canDeleteSubmission(randomUser, unmarkedSubmission));
     }
 
     @Test

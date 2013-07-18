@@ -7,7 +7,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
-import uk.ac.cam.sup.models.Submission;
+import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.util.*;
 
 @Path ("/submission/{binId}")
-@Produces("application/json")
 public class SubmissionController {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
     public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
 
         // Set Hibernate and get user
@@ -39,9 +39,9 @@ public class SubmissionController {
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
 
-        // New submission and get id
-        Submission submission = new Submission();
-        session.save(submission);
+        // New unmarkedSubmission and get id
+        UnmarkedSubmission unmarkedSubmission = new UnmarkedSubmission();
+        session.save(unmarkedSubmission);
 
         session.getTransaction().commit();
 
@@ -50,7 +50,7 @@ public class SubmissionController {
         session.beginTransaction();
 
         String directory = "temp/" + user + "/submissions/answers/";
-        String fileName = "submission_" + submission.getId() + ".pdf";
+        String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
 
         try {
             FilesManip.fileSave(uploadForm.file, directory + fileName);
@@ -60,32 +60,34 @@ public class SubmissionController {
             return Response.status(500).build();
         }
 
-        submission.setBin(bin);
-        submission.setOwner(user);
-        submission.setFilePath(directory + fileName);
+        unmarkedSubmission.setBin(bin);
+        unmarkedSubmission.setOwner(user);
+        unmarkedSubmission.setFilePath(directory + fileName);
 
-        session.update(submission);
+        session.update(unmarkedSubmission);
 
         // todo: convert the received file;
 
-        PDFManip.PdfMetadataInject("uploader", user, directory + fileName);
+        PDFManip pdfManip = new PDFManip(directory + fileName);
+        pdfManip.injectMetadata("uploader", user);
 
         // ToDo: Redirect to splitting screen
 
-        PDFManip.PdfMetadataInject("page.1", "qqq 1", directory + fileName);
-        PDFManip.PdfMetadataInject("page.2", "qqq 1", directory + fileName);
-        PDFManip.PdfMetadataInject("page.3", "ExampleSheet", directory + fileName);
-        PDFManip.PdfMetadataInject("page.4", "qqq 5", directory + fileName);
-        PDFManip.PdfMetadataInject("page.5", "qqq 5", directory + fileName);
+        pdfManip.injectMetadata("page.1", "qqq 1");
+        pdfManip.injectMetadata("page.2", "qqq 1");
+        pdfManip.injectMetadata("page.3", "ExampleSheet");
+        pdfManip.injectMetadata("page.4", "qqq 5");
+        pdfManip.injectMetadata("page.5", "qqq 5");
 
-        FilesManip.distributeSubmission(submission);
+        FilesManip.distributeSubmission(unmarkedSubmission);
 
-        return ImmutableMap.of("submission", ImmutableMap.of("id", submission.getId(),
-                                                             "link", submission.getLink(),
-                                                             "filePath", submission.getFilePath()));
+        return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
+                                                             "link", unmarkedSubmission.getLink(),
+                                                             "filePath", unmarkedSubmission.getFilePath()));
     }
 
     @GET
+    @Produces("application/json")
     public Object listSubmissions(@PathParam("binId") long binId) {
 
         // Get user
@@ -97,23 +99,23 @@ public class SubmissionController {
         if (bin == null)
             return Response.status(404).build();
 
-        List<Submission> allSubmissions = new LinkedList<Submission>(bin.getSubmissions());
-        List<Submission> accessibleSubmissions = new LinkedList<Submission>();
+        List<UnmarkedSubmission> allUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>(bin.getUnmarkedSubmissions());
+        List<UnmarkedSubmission> accessibleUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>();
 
-        for (Submission submission : allSubmissions)
-            if (bin.canSeeSubmission(user, submission))
-                accessibleSubmissions.add(submission);
+        for (UnmarkedSubmission unmarkedSubmission : allUnmarkedSubmissions)
+            if (bin.canSeeSubmission(user, unmarkedSubmission))
+                accessibleUnmarkedSubmissions.add(unmarkedSubmission);
 
         List<Map<String, String> > mapList = new LinkedList<Map<String, String>>();
 
         int p = 0;
-        for (Submission submission : accessibleSubmissions) {
+        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions) {
 
             Map<String, String> map = new HashMap<String, String>();
 
-            map.put("id", Long.toString(submission.getId()));
-            map.put("filePath", submission.getFilePath());
-            map.put("link", submission.getLink());
+            map.put("id", Long.toString(unmarkedSubmission.getId()));
+            map.put("filePath", unmarkedSubmission.getFilePath());
+            map.put("link", unmarkedSubmission.getLink());
 
             mapList.add(map);
         }
@@ -123,6 +125,7 @@ public class SubmissionController {
 
     @GET
     @Path("/{submissionId}")
+    @Produces("application/pdf")
     public Object seeSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
@@ -136,16 +139,17 @@ public class SubmissionController {
         if (bin == null)
             return Response.status(404).build();
 
-        Submission submission = (Submission) session.get(Submission.class, submissionId);
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
-        if (!bin.canSeeSubmission(user, submission))
+        if (!bin.canSeeSubmission(user, unmarkedSubmission))
             return Response.status(401).build();
 
-        return Response.ok(new File(submission.getFilePath())).build();
+        return Response.ok(new File(unmarkedSubmission.getFilePath())).build();
     }
 
     @DELETE
     @Path("/{submissionId}")
+    @Produces("application/json")
     public Object deleteSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
@@ -159,14 +163,14 @@ public class SubmissionController {
         if (bin == null)
             return Response.status(404).build();
 
-        Submission submission = (Submission) session.get(Submission.class, submissionId);
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
         if (session != null)
         {
-            if (!bin.canDeleteSubmission(user, submission))
+            if (!bin.canDeleteSubmission(user, unmarkedSubmission))
                 return Response.status(401).build();
 
-            session.delete(submission);
+            session.delete(unmarkedSubmission);
         }
 
         return Response.status(200).build();

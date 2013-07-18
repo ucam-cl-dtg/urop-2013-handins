@@ -6,23 +6,10 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "Submission")
-
-@MappedSuperclass
-public abstract class UnmarkedSubmission {
+@Table(name = "UnmarkedSubmission")
+public class UnmarkedSubmission extends Submission<Answer> {
     // Fields
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
-    private long id;
-
-    private String owner;
-    private String filePath;
-
-    @ManyToOne
-    private Bin bin;
-
-    @OneToMany(mappedBy="submission")
+    @OneToMany(mappedBy="unmarkedSubmission")
     private Set<Answer> answers;
 
     // Constructors
@@ -31,48 +18,16 @@ public abstract class UnmarkedSubmission {
     }
 
     public UnmarkedSubmission(String owner) {
-        setOwner(owner);
-    }
-
-    // Id
-    public long getId() {
-        return id;
+        super(owner);
     }
 
     // Answers
-    public Set<Answer> getAnswers() {
+    public Set<Answer> getAllAnswers() {
         return answers;
     }
 
-    public void setAnswers(Set answers) {
+    public void setAllAnswers(Set<Answer> answers) {
         this.answers = answers;
-    }
-
-    // Bin
-    public Bin getBin() {
-        return bin;
-    }
-
-    public void setBin(Bin bin) {
-        this.bin = bin;
-    }
-
-    // FilePath
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    // Owner
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
     }
 
     // TODO make this work when the site is mounted at a random point

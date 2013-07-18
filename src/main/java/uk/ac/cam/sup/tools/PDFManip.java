@@ -5,7 +5,7 @@ import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.models.MarkedSubmission;
-import uk.ac.cam.sup.models.Submission;
+import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.structures.Distribution;
 
 import java.io.FileOutputStream;
@@ -41,13 +41,13 @@ public class PDFManip {
     /*
 
      */
-    public static List<Distribution> getSubmissionDistribution(Submission submission) throws MetadataNotFoundException {
+    public static List<Distribution> getSubmissionDistribution(UnmarkedSubmission unmarkedSubmission) throws MetadataNotFoundException {
 
         List<Distribution> distributionList = new LinkedList<Distribution>();
 
-        PDFManip pdfManip = new PDFManip(submission.getFilePath());
+        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
 
-        String student = submission.getOwner();
+        String student = unmarkedSubmission.getOwner();
 
         int pages = pdfManip.getPageCount();
 
@@ -65,7 +65,7 @@ public class PDFManip {
 
                 distribution = new Distribution();
 
-                distribution.setSubmissionId(submission.getId());
+                distribution.setSubmissionId(unmarkedSubmission.getId());
                 distribution.setStartPage(i);
                 distribution.setEndPage(i);
                 distribution.setQuestion(question);
@@ -159,7 +159,7 @@ public class PDFManip {
     }
     /*
     Metadata table:
-        Submission:
+        UnmarkedSubmission:
             "page.X" - question solved on page X
 
         MarkedSubmission:

@@ -1,15 +1,12 @@
 package uk.ac.cam.sup.controllers;
 
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.jetty.util.ajax.JSON;
 import org.hibernate.Session;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
-import org.jboss.resteasy.plugins.server.resourcefactory.POJOResourceFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +14,6 @@ import org.junit.Test;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinPermission;
-import uk.ac.cam.sup.models.Submission;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

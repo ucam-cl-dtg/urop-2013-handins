@@ -6,7 +6,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.MarkedAnswer;
 import uk.ac.cam.sup.models.MarkedSubmission;
-import uk.ac.cam.sup.models.Submission;
+import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.structures.Distribution;
 
 import java.io.File;
@@ -20,13 +20,13 @@ public class FilesManip {
     /*
 
      */
-    public static void distributeSubmission(Submission submission) {
+    public static void distributeSubmission(UnmarkedSubmission unmarkedSubmission) {
 
         try {
             // Set Hibernate and get file to be split
             Session session = HibernateUtil.getSession();
 
-            List <Distribution> distributions = PDFManip.getSubmissionDistribution(submission);
+            List <Distribution> distributions = PDFManip.getSubmissionDistribution(unmarkedSubmission);
 
             for (Distribution distribution : distributions)
             {
@@ -46,15 +46,15 @@ public class FilesManip {
                 // Save Answer
                 String filePath = location + answer.getId() + ".pdf";
                 PDFManip pdfManip = new PDFManip(filePath);
-                new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+                new PDFManip(unmarkedSubmission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
                 pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
 
-                answer.setBin(submission.getBin());
+                answer.setBin(unmarkedSubmission.getBin());
                 answer.setFilePath(filePath);
                 answer.setQuestion(distribution.getQuestion());
                 answer.setFinalState(false);
                 answer.setOwner(distribution.getStudent());
-                answer.setSubmission(submission);
+                answer.setUnmarkedSubmission(unmarkedSubmission);
 
                 session.update(answer);
             }
@@ -99,6 +99,14 @@ public class FilesManip {
     }
 
     /*
+
+     */
+    public static void mergePdf(PDFManip pdfManip, List<String> filePaths) {
+        for (String filePath : filePaths)
+            pdfManip.add(filePath);
+    }
+
+    /*
     Takes the array of bytes representing the data to be written and the destination path
     and writes the data to the new file created.
      */
@@ -130,6 +138,4 @@ public class FilesManip {
         FileUtils.copyFile(sourceFile, destinationFile);
         sourceFile.delete();
     }
-
-
 }
