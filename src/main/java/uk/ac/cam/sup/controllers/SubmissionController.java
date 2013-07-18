@@ -9,6 +9,7 @@ import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.Submission;
 import uk.ac.cam.sup.tools.FilesManip;
+import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,14 +18,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static uk.ac.cam.sup.tools.PDFManip.PdfAddHeader;
-import static uk.ac.cam.sup.tools.PDFManip.PdfMetadataInject;
-
 @Path ("/submission/{binId}")
+@Produces("application/json")
 public class SubmissionController {
 
     @POST
-    @Produces("application/json")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
 
@@ -51,7 +49,7 @@ public class SubmissionController {
         session = HibernateUtil.getSession();
         session.beginTransaction();
 
-        String directory = "temp/" + user + "/submissions/answer/";
+        String directory = "temp/" + user + "/submissions/answers/";
         String fileName = "submission_" + submission.getId() + ".pdf";
 
         try {
@@ -62,22 +60,25 @@ public class SubmissionController {
             return Response.status(500).build();
         }
 
-        // todo: convert the received file;
-
-        // todo: split the received file;
-
-        // Fixme: Proper injections
-        PdfMetadataInject("users", "1", directory + fileName);
-        PdfMetadataInject("user.1", user, directory + fileName);
-        PdfMetadataInject("bin", Long.toString(binId), directory + fileName);
-
-        PdfAddHeader(directory + fileName, directory + "Headed" + fileName);
-
         submission.setBin(bin);
         submission.setOwner(user);
         submission.setFilePath(directory + fileName);
 
         session.update(submission);
+
+        // todo: convert the received file;
+
+        PDFManip.PdfMetadataInject("uploader", user, directory + fileName);
+
+        // ToDo: Redirect to splitting screen
+
+        PDFManip.PdfMetadataInject("page.1", "qqq 1", directory + fileName);
+        PDFManip.PdfMetadataInject("page.2", "qqq 1", directory + fileName);
+        PDFManip.PdfMetadataInject("page.3", "ExampleSheet", directory + fileName);
+        PDFManip.PdfMetadataInject("page.4", "qqq 5", directory + fileName);
+        PDFManip.PdfMetadataInject("page.5", "qqq 5", directory + fileName);
+
+        FilesManip.distributeSubmission(submission);
 
         return ImmutableMap.of("submission", ImmutableMap.of("id", submission.getId(),
                                                              "link", submission.getLink(),
@@ -85,12 +86,9 @@ public class SubmissionController {
     }
 
     @GET
-    @Produces("application/json")
     public Object listSubmissions(@PathParam("binId") long binId) {
 
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
+        // Get user
         String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
@@ -125,7 +123,6 @@ public class SubmissionController {
 
     @GET
     @Path("/{submissionId}")
-    @Produces("application/pdf")
     public Object seeSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
@@ -144,14 +141,11 @@ public class SubmissionController {
         if (!bin.canSeeSubmission(user, submission))
             return Response.status(401).build();
 
-        System.out.println(submission.getFilePath());
-
         return Response.ok(new File(submission.getFilePath())).build();
     }
 
     @DELETE
     @Path("/{submissionId}")
-    @Produces("application/json")
     public Object deleteSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
@@ -167,10 +161,13 @@ public class SubmissionController {
 
         Submission submission = (Submission) session.get(Submission.class, submissionId);
 
-        if (!bin.canDeleteSubmission(user, submission))
-            return Response.status(401).build();
+        if (session != null)
+        {
+            if (!bin.canDeleteSubmission(user, submission))
+                return Response.status(401).build();
 
-        session.delete(submission);
+            session.delete(submission);
+        }
 
         return Response.status(200).build();
     }
