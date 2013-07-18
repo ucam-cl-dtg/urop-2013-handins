@@ -39,6 +39,6 @@ public class UnmarkedSubmission extends Submission<Answer> {
     // TODO make this work when the site is mounted at a random point
     @Transient
     public String getLink() {
-        return "/submission/" + getBin().getId() + "/" + getId();
+        return "/submission/" + getId();
     }
 }

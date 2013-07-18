@@ -1,0 +1,24 @@
+{namespace shared.handins}
+
+/**
+* This is a soy doc
+* @param bin
+*/
+{template .uploadForm}
+    <h3>Upload answers to {$bin.name}</h3>
+    <div class="row upload-work-form">
+        <div class="columns large-12">
+            <form method="post" action="/submission/bin/{$bin.id}" enctype="multipart/form-data">
+                <fieldset>
+                    <legend>Upload marked work</legend>
+                    <input type="file" name="file"><input type="submit" name="submit" value="Upload">
+                </fieldset>
+            </form>
+        </div>
+    </div>
+<script type="text/javascript">
+    {literal}
+        $(".upload-work-form form").ajaxForm(uploadedSubmission);
+    {/literal}
+</script>
+{/template}
