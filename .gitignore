@@ -4,3 +4,7 @@
 .settings
 logs/
 db/
+src/main/webapp/app
+src/main/webapp/sup
+temp/
+frontend
