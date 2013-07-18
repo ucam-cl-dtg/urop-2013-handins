@@ -6,8 +6,6 @@
 * @param binId The id of the current bin
 */
 {template .index}
-<div class="test">
-<h3>Upload answers</h3>
 <div class="row">
 	<div class="columns large-12 small-12">
 		<div class="button-bar">
@@ -25,69 +23,11 @@
 		</form>
 	</div>
 </div>
-<div class="row">
 
-    <ul class="panels">
-        {foreach $submission in $submissions}
-            <li class="panel-wrapper columns large-12 delete-me">
-                <div class="list-panel">
-                    <div class="row list-inner-panel">
-                        <div class="columns large-7 small-7">{$submission.id}</div>
-                        <div class="columns large-5 small-5 text-right">
-                            <div class="icon-button-wrapper">
-                                <a class="icon-button panel-icon-button websymbols-icon icon-button-array expand-sub-panel">p</a>
-                                <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$submission.link}">X</a>
-                                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-id="{$submission.id}">'</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <ul class="sub-panel" style="display: none;">
-                    <li class="list-sub-panel">
-                        <div class="row list-inner-sub-panel">
-                            <div class="columns large-7 small-7">Question 1</div>
-                            <div class="columns large-5 small-5 text-right">
-                                <div class="icon-button-wrapper">
-                                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
-                                    <a class="icon-button panel-icon-button websymbols-icon">.</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-sub-panel">
-                        <div class="row list-inner-sub-panel">
-                            <div class="columns large-7 small-7">Question 2</div>
-                            <div class="columns large-5 small-5 text-right">
-                                <div class="icon-button-wrapper">
-                                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
-                                    <a class="icon-button panel-icon-button websymbols-icon">.</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-sub-panel">
-                        <div class="row list-inner-sub-panel">
-                            <div class="columns large-7 small-7">Question 3</div>
-                            <div class="columns large-5 small-5 text-right">
-                                <div class="icon-button-wrapper">
-                                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
-                                    <a class="icon-button panel-icon-button websymbols-icon">.</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </li>
-         {/foreach}
-    </ul>
-</div>
-<form class="file-upload" method="post" action="/answers/upload" enctype="multipart/form-data">
-	<fieldset>
-		<legend> Upload a new answer </legend>
-		<input type="file" name="file"><input type="submit" class="btn btn-primary" name="submit" value="Upload">
-	</fieldset>
-</form>
-</div>
+<h3> Already uploaded submissions: </h3>
+{call .submissions}
+    {param submissions: $submissions /}
+{/call}
 <script type="text/javascript">
     {literal}
         $(".upload-marked-work-form form").ajaxForm(uploadedSubmission);

@@ -1,0 +1,64 @@
+{namespace handins.submission}
+
+/**
+* @param submissions
+*/
+{template .submissions}
+
+    <div class="row">
+
+        <ul class="panels">
+            {foreach $submission in $submissions}
+                <li class="panel-wrapper columns large-12 delete-me">
+                    <div class="list-panel">
+                        <div class="row list-inner-panel">
+                            <div class="columns large-7 small-7">{$submission.id}</div>
+                            <div class="columns large-5 small-5 text-right">
+                                <div class="icon-button-wrapper">
+                                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array expand-sub-panel">p</a>
+                                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$submission.link}">X</a>
+                                    <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-id="{$submission.id}">'</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="sub-panel" style="display: none;">
+                        <li class="list-sub-panel">
+                            <div class="row list-inner-sub-panel">
+                                <div class="columns large-7 small-7">Question 1</div>
+                                <div class="columns large-5 small-5 text-right">
+                                    <div class="icon-button-wrapper">
+                                        <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
+                                        <a class="icon-button panel-icon-button websymbols-icon">.</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-sub-panel">
+                            <div class="row list-inner-sub-panel">
+                                <div class="columns large-7 small-7">Question 2</div>
+                                <div class="columns large-5 small-5 text-right">
+                                    <div class="icon-button-wrapper">
+                                        <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
+                                        <a class="icon-button panel-icon-button websymbols-icon">.</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-sub-panel">
+                            <div class="row list-inner-sub-panel">
+                                <div class="columns large-7 small-7">Question 3</div>
+                                <div class="columns large-5 small-5 text-right">
+                                    <div class="icon-button-wrapper">
+                                        <a class="icon-button panel-icon-button websymbols-icon icon-button-array">X</a>
+                                        <a class="icon-button panel-icon-button websymbols-icon">.</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+             {/foreach}
+        </ul>
+    </div>
+{/template}

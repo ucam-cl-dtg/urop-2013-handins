@@ -1,0 +1,24 @@
+{namespace handins.submission}
+
+/**
+* @param submissions
+*/
+{template .submissionsIncluded}
+        <ul class="sub-panel" style="display: none;">
+            {foreach $submission in $submissions}
+                <li class="list-sub-panel delete-me">
+                    <div class="row list-inner-sub-panel">
+                        <div class="columns large-7 small-7">{$submission.id}</div>
+                        <div class="columns large-5 small-5 text-right">
+                            <div class="icon-button-wrapper">
+                                <a class="icon-button panel-icon-button websymbols-icon icon-button-array expand-sub-panel">p</a>
+                                <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$submission.link}">X</a>
+                                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-id="{$submission.id}">'</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+             {/foreach}
+        </ul>
+    </div>
+{/template}
