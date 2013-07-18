@@ -29,4 +29,10 @@ public class MarkedSubmission extends Submission<MarkedAnswer> {
     public void setAllAnswers(Set<MarkedAnswer> markedAnswers) {
         this.markedAnswers = markedAnswers;
     }
+
+    // Actual useful functions
+
+    public String getFolder() {
+        return "annotated";
+    }
 }

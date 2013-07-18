@@ -67,7 +67,7 @@ public class MarkingController {
         session.update(markedSubmission);
 
         List<String> listOfUploads = null;
-        FilesManip.distributeMarkedSubmission(markedSubmission);
+        FilesManip.distributeSubmission(markedSubmission);
 
         return ImmutableMap.of("id", markedSubmission.getId(), "filePath", markedSubmission.getFilePath(), "User/Question List", listOfUploads);
     }
@@ -146,6 +146,8 @@ public class MarkingController {
                 questionPathList.add(answer.getFilePath());
 
         PDFManip pdfManip = new PDFManip("tempo.pdf");
+
+        pdfManip.injectMetadata("PuLa", "true");
 
         FilesManip.mergePdf(pdfManip, questionPathList);
 
