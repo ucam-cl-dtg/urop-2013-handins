@@ -2,6 +2,7 @@ package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.models.MarkedSubmission;
 import uk.ac.cam.sup.models.Submission;
@@ -14,17 +15,117 @@ import java.util.List;
 import java.util.Map;
 
 public class PDFManip {
+    // Fields
+    private String filePath;
+
+    // Constructors
+    public PDFManip() {
+
+    }
+
+    public PDFManip(String filePath) {
+        setFilePath(filePath);
+    }
+
+    // FilePath
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    // Actual useful functions
+
+    /*
+
+     */
+    public static List<Distribution> getSubmissionDistribution(Submission submission) throws MetadataNotFoundException {
+
+        List<Distribution> distributionList = new LinkedList<Distribution>();
+
+        PDFManip pdfManip = new PDFManip(submission.getFilePath());
+
+        String student = submission.getOwner();
+
+        int pages = pdfManip.getPageCount();
+
+        String question = "";
+        Distribution distribution = null;
+        for (int i = 1; i <= pages; i++) {
+            if (pdfManip.queryMetadata("page." + i).equals(question))
+                distribution.setEndPage(i);
+            else
+            {
+                if (distribution != null)
+                    distributionList.add(distribution);
+
+                question = pdfManip.queryMetadata("page." + i);
+
+                distribution = new Distribution();
+
+                distribution.setSubmissionId(submission.getId());
+                distribution.setStartPage(i);
+                distribution.setEndPage(i);
+                distribution.setQuestion(question);
+                distribution.setStudent(student);
+            }
+        }
+
+        distributionList.add(distribution);
+
+        return distributionList;
+    }
+
+    /*
+
+     */
+    public static List<Distribution> getMarkedSubmissionDistribution(MarkedSubmission markedSubmission) throws MetadataNotFoundException {
+
+        List<Distribution> distributionList = new LinkedList<Distribution>();
+
+        PDFManip pdfManip = new PDFManip(markedSubmission.getFilePath());
+
+        int pages = pdfManip.getPageCount();
+
+        String question = "";
+        Distribution distribution = new Distribution();
+        for (int i = 1; i <= pages; i++) {
+            if (pdfManip.queryMetadata("page.question." + i).equals(question))
+                distribution.setEndPage(i);
+            else
+            {
+                distributionList.add(distribution);
+
+                question = pdfManip.queryMetadata("page.question." + i);
+
+                distribution = new Distribution();
+
+                distribution.setSubmissionId(markedSubmission.getId());
+                distribution.setStartPage(i);
+                distribution.setEndPage(i);
+                distribution.setQuestion(question);
+                distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
+            }
+        }
+
+        distributionList.add(distribution);
+
+        return distributionList;
+    }
+
     /*
     FixMe: This function should be rewritten because it behaves badly in general
      */
-    public static boolean PdfAddHeader(String content, String filePath) {
+    public boolean addHeader(String content) {
 
         try {
-            String temp = "temp.pdf";
+            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
 
-            FilesManip.fileMove(filePath, temp);
+            FilesManip.fileMove(filePath, randomTemp);
 
-            PdfReader reader = new PdfReader(temp);
+            PdfReader reader = new PdfReader(randomTemp);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
             int n = reader.getNumberOfPages();
@@ -33,7 +134,7 @@ public class PDFManip {
 
             stamper.close();
 
-            FilesManip.fileDelete(temp);
+            FilesManip.fileDelete(randomTemp);
 
             return true;
         } catch (Exception e) {
@@ -56,85 +157,13 @@ public class PDFManip {
 
         return table;
     }
-
-    public static List<Distribution> getSubmissionDistribution(Submission submission) throws MetadataNotFoundException {
-
-        List<Distribution> distributionList = new LinkedList<Distribution>();
-
-        String filePath = submission.getFilePath();
-
-        String student = submission.getOwner();
-
-        int pages = PdfPageCount(filePath);
-
-        String question = "";
-        Distribution distribution = null;
-        for (int i = 1; i <= pages; i++) {
-            if (PdfMetadataQuery("page." + i, filePath).equals(question))
-                distribution.setEndPage(i);
-            else
-            {
-                if (distribution != null)
-                    distributionList.add(distribution);
-
-                question = PdfMetadataQuery("page." + i, filePath);
-
-                distribution = new Distribution();
-
-                distribution.setSubmissionId(submission.getId());
-                distribution.setStartPage(i);
-                distribution.setEndPage(i);
-                distribution.setQuestion(question);
-                distribution.setStudent(student);
-            }
-        }
-
-        distributionList.add(distribution);
-
-        return distributionList;
-    }
-
-    public static List<Distribution> getMarkedSubmissionDistribution(MarkedSubmission markedSubmission) throws MetadataNotFoundException {
-
-        List<Distribution> distributionList = new LinkedList<Distribution>();
-
-        String filePath = markedSubmission.getFilePath();
-
-        int pages = PdfPageCount(filePath);
-
-        String question = "";
-        Distribution distribution = new Distribution();
-        for (int i = 1; i <= pages; i++) {
-            if (PdfMetadataQuery("page.question." + i, filePath).equals(question))
-                distribution.setEndPage(i);
-            else
-            {
-                distributionList.add(distribution);
-
-                question = PdfMetadataQuery("page.question." + i, filePath);
-
-                distribution = new Distribution();
-
-                distribution.setSubmissionId(markedSubmission.getId());
-                distribution.setStartPage(i);
-                distribution.setEndPage(i);
-                distribution.setQuestion(question);
-                distribution.setStudent(PdfMetadataQuery("page.question." + i, filePath));
-            }
-        }
-
-        distributionList.add(distribution);
-
-        return distributionList;
-    }
-
     /*
     Metadata table:
         Submission:
             "page.X" - question solved on page X
 
         MarkedSubmission:
-            "page.user.X" - crsId of the solver from page X
+            "page.owner.X" - crsId of the solver from page X
             "page.question.X" - question solved on page X
      */
 
@@ -144,7 +173,7 @@ public class PDFManip {
     throws Exception MetadataNotFound otherwise.
     Done
      */
-    public static String PdfMetadataQuery(String key, String filePath) throws MetadataNotFoundException {
+    public String queryMetadata(String key) throws MetadataNotFoundException {
 
         try {
             List<String> pageDetails;
@@ -158,7 +187,7 @@ public class PDFManip {
 
             return info.get(key);
         } catch (IOException e) {
-            return null;
+            throw new MetadataNotFoundException();
         }
     }
 
@@ -167,13 +196,13 @@ public class PDFManip {
     the PDF and inserts metadata according to the input pair.
     Done
      */
-    public static boolean PdfMetadataInject(String key, String value, String filePath) {
+    public boolean injectMetadata(String key, String value) {
         try {
-            String temp = "temp.pdf";
+            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
 
-            FilesManip.fileMove(filePath, temp);
+            FilesManip.fileMove(filePath, randomTemp);
 
-            PdfReader reader = new PdfReader(temp);
+            PdfReader reader = new PdfReader(randomTemp);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
             Map <String, String> info = reader.getInfo();
@@ -183,7 +212,7 @@ public class PDFManip {
             stamper.setMoreInfo(info);
             stamper.close();
 
-            FilesManip.fileDelete(temp);
+            FilesManip.fileDelete(randomTemp);
 
             return true;
         } catch (Exception e) {
@@ -191,67 +220,74 @@ public class PDFManip {
         }
     }
 
-    public static void PdfTakePages(String source, int start, int end, String destination) {
+    /*
+    The function takes the interval of pages between start and end from the contained PDF
+    and stores them in a new PDF created at the destinationPath.
+     */
+    public boolean takePages(int start, int end, String destinationPath) {
         try {
             Document document = new Document();
 
-            PdfCopy copy = new PdfCopy(document, new FileOutputStream(destination));
+            PdfCopy copy = new PdfCopy(document, new FileOutputStream(destinationPath));
 
             document.open();
 
-            PdfReader reader = new PdfReader(source);
+            PdfReader reader = new PdfReader(filePath);
 
             for (int pn = start; pn <= end; )
                     copy.addPage(copy.getImportedPage(reader, pn++));
 
             document.close();
+
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
     /*
-    The merger takes a list of strings representing the file paths of the
-    Pdf files with the destination file path and returns the page intervals
-    which should be used as metadata.
+    The adder takes a new filePath of the source PDF which should be
+    added at the end of the initial pdf
     Done
      */
-    public static List<String> PdfMerge(List<String> filePaths, String destination) {
+    public boolean add(String sourcePath) {
 
-        List<String> pageIntervals = new LinkedList<String>();
         try {
+            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
+
             Document document = new Document();
 
-            PdfCopy copy = new PdfCopy(document, new FileOutputStream(destination));
+            PdfCopy copy = new PdfCopy(document, new FileOutputStream(randomTemp));
 
             document.open();
 
-            int actualPage = 1;
-            for (String fileName : filePaths) {
+            PdfReader reader = new PdfReader(filePath);
+            int n = reader.getNumberOfPages();
 
-                PdfReader reader = new PdfReader(fileName);
+            for (int pn = 0; pn < n; )
+                copy.addPage(copy.getImportedPage(reader, ++pn));
 
-                int n = reader.getNumberOfPages();
+            reader = new PdfReader(sourcePath);
+            n = reader.getNumberOfPages();
 
-                for (int pn = 0; pn < n; )
-                    copy.addPage(copy.getImportedPage(reader, ++pn));
-
-                pageIntervals.add(Integer.toString(actualPage) + "-" + Integer.toString(actualPage + n));
-                actualPage += n;
-            }
+            for (int pn = 0; pn < n; )
+                copy.addPage(copy.getImportedPage(reader, ++pn));
 
             document.close();
-        } catch (Exception e) {
-        }
 
-        return pageIntervals;
+            FilesManip.fileMove(randomTemp, filePath);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /*
-    The pageCount returns the number of pages of a pdf, given its path
+    The function returns the number of pages of the pdf whose path is stored.
     Done
     */
-    public static int PdfPageCount(String filePath) {
+    public int getPageCount() {
 
         try {
             PdfReader reader = new PdfReader(filePath);

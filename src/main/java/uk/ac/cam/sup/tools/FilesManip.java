@@ -1,12 +1,8 @@
 package uk.ac.cam.sup.tools;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.MarkedAnswer;
 import uk.ac.cam.sup.models.MarkedSubmission;
@@ -17,7 +13,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FilesManip {
@@ -50,8 +45,9 @@ public class FilesManip {
 
                 // Save Answer
                 String filePath = location + answer.getId() + ".pdf";
-                PDFManip.PdfTakePages(submission.getFilePath(), distribution.getStartPage(), distribution.getEndPage(), filePath);
-                PDFManip.PdfAddHeader(distribution.getStudent() + " " + distribution.getQuestion(), filePath);
+                PDFManip pdfManip = new PDFManip(filePath);
+                new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+                pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
 
                 answer.setBin(submission.getBin());
                 answer.setFilePath(filePath);
@@ -95,7 +91,7 @@ public class FilesManip {
 
                 // Save Answer
                 String filePath = location + markedAnswer.getId() + ".pdf";
-                PDFManip.PdfTakePages(markedSubmission.getFilePath(), distribution.getStartPage(), distribution.getEndPage(), filePath);
+                new PDFManip(markedSubmission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +111,7 @@ public class FilesManip {
     }
 
     /*
-
+    Takes the path of a file and deletes the file.
      */
     public static void fileDelete(String filePath) {
         File f = new File(filePath);
