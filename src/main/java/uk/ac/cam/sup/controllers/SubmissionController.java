@@ -73,11 +73,16 @@ public class SubmissionController {
 
         // ToDo: Redirect to splitting screen
 
-        pdfManip.injectMetadata("page.1", "qqq 1");
-        pdfManip.injectMetadata("page.2", "qqq 1");
-        pdfManip.injectMetadata("page.3", "ExampleSheet");
-        pdfManip.injectMetadata("page.4", "qqq 5");
-        pdfManip.injectMetadata("page.5", "qqq 5");
+        pdfManip.injectMetadata("page.owner.1", "ap760");
+        pdfManip.injectMetadata("page.owner.2", "ap760");
+        pdfManip.injectMetadata("page.owner.3", "ap760");
+        pdfManip.injectMetadata("page.owner.4", "ap760");
+        pdfManip.injectMetadata("page.owner.5", "ap760");
+        pdfManip.injectMetadata("page.question.1", "qqq 2");
+        pdfManip.injectMetadata("page.question.2", "qqq 2");
+        pdfManip.injectMetadata("page.question.3", "EEEE");
+        pdfManip.injectMetadata("page.question.4", "qqq 4");
+        pdfManip.injectMetadata("page.question.5", "qqq 4");
 
         FilesManip.distributeSubmission(unmarkedSubmission);
 

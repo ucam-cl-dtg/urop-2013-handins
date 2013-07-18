@@ -4,13 +4,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
-import uk.ac.cam.sup.models.MarkedSubmission;
-import uk.ac.cam.sup.models.UnmarkedSubmission;
-import uk.ac.cam.sup.structures.Distribution;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,87 +30,27 @@ public class PDFManip {
     }
 
     public void setFilePath(String filePath) {
+        File file = new File(filePath);
+
+        if (!file.exists()) {
+            try {
+                Document document = new Document();
+
+                PdfWriter.getInstance(document, new FileOutputStream(filePath));
+
+                document.open();
+                document.add(P)
+                document.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
         this.filePath = filePath;
     }
 
     // Actual useful functions
-
-    /*
-
-     */
-    public static List<Distribution> getSubmissionDistribution(UnmarkedSubmission unmarkedSubmission) throws MetadataNotFoundException {
-
-        List<Distribution> distributionList = new LinkedList<Distribution>();
-
-        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
-
-        String student = unmarkedSubmission.getOwner();
-
-        int pages = pdfManip.getPageCount();
-
-        String question = "";
-        Distribution distribution = null;
-        for (int i = 1; i <= pages; i++) {
-            if (pdfManip.queryMetadata("page." + i).equals(question))
-                distribution.setEndPage(i);
-            else
-            {
-                if (distribution != null)
-                    distributionList.add(distribution);
-
-                question = pdfManip.queryMetadata("page." + i);
-
-                distribution = new Distribution();
-
-                distribution.setSubmissionId(unmarkedSubmission.getId());
-                distribution.setStartPage(i);
-                distribution.setEndPage(i);
-                distribution.setQuestion(question);
-                distribution.setStudent(student);
-            }
-        }
-
-        distributionList.add(distribution);
-
-        return distributionList;
-    }
-
-    /*
-
-     */
-    public static List<Distribution> getMarkedSubmissionDistribution(MarkedSubmission markedSubmission) throws MetadataNotFoundException {
-
-        List<Distribution> distributionList = new LinkedList<Distribution>();
-
-        PDFManip pdfManip = new PDFManip(markedSubmission.getFilePath());
-
-        int pages = pdfManip.getPageCount();
-
-        String question = "";
-        Distribution distribution = new Distribution();
-        for (int i = 1; i <= pages; i++) {
-            if (pdfManip.queryMetadata("page.question." + i).equals(question))
-                distribution.setEndPage(i);
-            else
-            {
-                distributionList.add(distribution);
-
-                question = pdfManip.queryMetadata("page.question." + i);
-
-                distribution = new Distribution();
-
-                distribution.setSubmissionId(markedSubmission.getId());
-                distribution.setStartPage(i);
-                distribution.setEndPage(i);
-                distribution.setQuestion(question);
-                distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
-            }
-        }
-
-        distributionList.add(distribution);
-
-        return distributionList;
-    }
 
     /*
     FixMe: This function should be rewritten because it behaves badly in general
@@ -121,7 +58,7 @@ public class PDFManip {
     public boolean addHeader(String content) {
 
         try {
-            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
+            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
             FilesManip.fileMove(filePath, randomTemp);
 
@@ -159,12 +96,11 @@ public class PDFManip {
     }
     /*
     Metadata table:
-        UnmarkedSubmission:
-            "page.X" - question solved on page X
-
-        MarkedSubmission:
-            "page.owner.X" - crsId of the solver from page X
+        Submission:
+            "type" - "marked" / "unmarked"
+            "page.owner.X" - crsId of the solver of page X
             "page.question.X" - question solved on page X
+
      */
 
     /*
@@ -198,7 +134,7 @@ public class PDFManip {
      */
     public boolean injectMetadata(String key, String value) {
         try {
-            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
+            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
             FilesManip.fileMove(filePath, randomTemp);
 
@@ -253,7 +189,7 @@ public class PDFManip {
     public boolean add(String sourcePath) {
 
         try {
-            String randomTemp = "temp" + RandomStringUtils.random(1000) + ".pdf";
+            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
             Document document = new Document();
 

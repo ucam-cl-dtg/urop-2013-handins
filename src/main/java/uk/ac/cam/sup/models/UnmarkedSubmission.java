@@ -30,6 +30,12 @@ public class UnmarkedSubmission extends Submission<Answer> {
         this.answers = answers;
     }
 
+    // Actual useful functions
+
+    public String getFolder() {
+        return "annotated";
+    }
+
     // TODO make this work when the site is mounted at a random point
     @Transient
     public String getLink() {
