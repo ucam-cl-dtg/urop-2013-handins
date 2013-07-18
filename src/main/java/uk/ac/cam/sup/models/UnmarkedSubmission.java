@@ -33,7 +33,7 @@ public class UnmarkedSubmission extends Submission<Answer> {
     // Actual useful functions
 
     public String getFolder() {
-        return "annotated";
+        return "answer";
     }
 
     // TODO make this work when the site is mounted at a random point

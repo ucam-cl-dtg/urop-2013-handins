@@ -106,7 +106,7 @@ public abstract class Submission<T> {
                 distribution.setStartPage(i);
                 distribution.setEndPage(i);
                 distribution.setQuestion(question);
-                distribution.setStudent("page.owner." + i);
+                distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
             }
         }
 

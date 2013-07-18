@@ -35,11 +35,10 @@ public class PDFManip {
         if (!file.exists()) {
             try {
                 Document document = new Document();
-
                 PdfWriter.getInstance(document, new FileOutputStream(filePath));
 
                 document.open();
-                document.add(P)
+                document.add(new Paragraph(""));
                 document.close();
             } catch (Exception e) {
                 e.printStackTrace();

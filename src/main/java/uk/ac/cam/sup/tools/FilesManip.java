@@ -29,7 +29,7 @@ public class FilesManip {
 
             for (Distribution distribution : distributions)
             {
-                String location = "temp/" + distribution.getStudent() + submission.getFolder();
+                String location = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
 
                 // New Answer and get id
                 Answer answer = new Answer();
