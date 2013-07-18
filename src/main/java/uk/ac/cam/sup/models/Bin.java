@@ -29,7 +29,7 @@ public class Bin {
     private Set<BinPermission> permissions;
 
     @OneToMany(mappedBy="bin")
-    private Set<Submission> submissions;
+    private Set<UnmarkedSubmission> unmarkedSubmissions;
 
     @OneToMany(mappedBy = "bin")
     private Set<Answer> answers;
@@ -67,12 +67,12 @@ public class Bin {
     }
 
     // Submissions
-    public Set<Submission> getSubmissions(){
-        return submissions;
+    public Set<UnmarkedSubmission> getUnmarkedSubmissions(){
+        return unmarkedSubmissions;
     }
 
-    public void setSubmissions(Set submissions) {
-        this.submissions = submissions;
+    public void setUnmarkedSubmissions(Set unmarkedSubmissions) {
+        this.unmarkedSubmissions = unmarkedSubmissions;
     }
 
     // QuestionSetName
@@ -180,31 +180,31 @@ public class Bin {
     }
 
     /*
-    The Owner should be able to see any submissions
-    The Dos should be able to see any submissions
-    The Admin should be able to see any submissions
-    The User who uploaded the submission should be able to see it
+    The Owner should be able to see any unmarkedSubmissions
+    The Dos should be able to see any unmarkedSubmissions
+    The Admin should be able to see any unmarkedSubmissions
+    The User who uploaded the unmarkedSubmission should be able to see it
      */
-    public boolean canSeeSubmission(String user, Submission submission) {
+    public boolean canSeeSubmission(String user, UnmarkedSubmission unmarkedSubmission) {
         if (isOwner(user) || UserHelper.isAdmin(user) || UserHelper.isDos(user)) {
             return true;
         }
 
-        return submission.getOwner().equals(user);
+        return unmarkedSubmission.getOwner().equals(user);
     }
 
     /*
-    The Owner SHOULDN'T be able to delete the submission
-    The Dos SHOULDN'T be able to see delete the submission
-    The Admin should be able to delete the submission
-    The User who uploaded the submission should be able to delete it
+    The Owner SHOULDN'T be able to delete the unmarkedSubmission
+    The Dos SHOULDN'T be able to see delete the unmarkedSubmission
+    The Admin should be able to delete the unmarkedSubmission
+    The User who uploaded the unmarkedSubmission should be able to delete it
      */
-    public boolean canDeleteSubmission(String user, Submission submission) {
+    public boolean canDeleteSubmission(String user, UnmarkedSubmission unmarkedSubmission) {
         if (UserHelper.isAdmin(user)) {
             return true;
         }
 
-        return submission.getOwner().equals(user);
+        return unmarkedSubmission.getOwner().equals(user);
     }
 
     /*

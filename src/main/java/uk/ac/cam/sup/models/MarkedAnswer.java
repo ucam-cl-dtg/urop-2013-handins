@@ -60,7 +60,7 @@ public class MarkedAnswer {
         this.filePath = filePath;
     }
 
-    // Submission
+    // UnmarkedSubmission
     public MarkedSubmission getMarkedSubmission() {
         return markedSubmission;
     }
@@ -69,7 +69,7 @@ public class MarkedAnswer {
         this.markedSubmission = markedSubmission;
     }
 
-    // Submission
+    // UnmarkedSubmission
     public Answer getAnswer() {
         return answer;
     }

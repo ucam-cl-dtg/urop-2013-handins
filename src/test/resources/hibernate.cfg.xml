@@ -56,7 +56,7 @@
         <mapping class="uk.ac.cam.sup.models.MarkedAnswer" />
         <mapping class="uk.ac.cam.sup.models.Bin" />
         <mapping class="uk.ac.cam.sup.models.BinPermission" />
-        <mapping class="uk.ac.cam.sup.models.Submission" />
+        <mapping class="uk.ac.cam.sup.models.UnmarkedSubmission" />
         <mapping class="uk.ac.cam.sup.models.MarkedSubmission" />
 
     </session-factory>

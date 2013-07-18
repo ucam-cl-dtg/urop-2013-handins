@@ -5,23 +5,19 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Set;
 
-@Entity
-@Table(name = "Submission")
-public class Submission {
+@MappedSuperclass
+public abstract class Submission<T> {
     // Fields
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
-    private String filePath;
     private String owner;
+    private String filePath;
 
     @ManyToOne
     private Bin bin;
-
-    @OneToMany(mappedBy="submission")
-    private Set<Answer> answers;
 
     // Constructors
     public Submission() {
@@ -38,13 +34,8 @@ public class Submission {
     }
 
     // Answers
-    public Set<Answer> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(Set answers) {
-        this.answers = answers;
-    }
+    public abstract Set<T> getAllAnswers();
+    public abstract void setAllAnswers(Set<T> answers);
 
     // Bin
     public Bin getBin() {
@@ -71,11 +62,5 @@ public class Submission {
 
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    // TODO make this work when the site is mounted at a random point
-    @Transient
-    public String getLink() {
-        return "/submission/" + getBin().getId() + "/" + getId();
     }
 }

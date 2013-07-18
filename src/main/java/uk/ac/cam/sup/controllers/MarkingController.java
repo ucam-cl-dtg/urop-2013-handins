@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.*;
 
 @Path("/marking/{binId}")
-@Produces("application/json")
 public class MarkingController {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
     public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
 
         // Set Hibernate and get user
@@ -73,6 +73,7 @@ public class MarkingController {
     }
 
     @GET
+    @Produces("application/json")
     public Object viewAllSubmissions(@PathParam("binId") long binId) {
 
         // Get user
@@ -124,6 +125,7 @@ public class MarkingController {
 
     @GET
     @Path("/getStudent/{studentCrsId}")
+    @Produces("application/pdf")
     public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) {
 
         // Set Hibernate and get user
@@ -143,24 +145,27 @@ public class MarkingController {
             if (answer.getFilePath() != null && answer.getOwner().equals(studentCrsId))
                 questionPathList.add(answer.getFilePath());
 
-        PDFManip.PdfMerge(questionPathList, "tempo.pdf");
+        PDFManip pdfManip = new PDFManip("tempo.pdf");
 
-        PDFManip.PdfMetadataInject("page.user.1", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.user.2", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.user.3", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.user.4", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.user.5", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.question.1", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.question.2", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.question.3", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.question.4", "ap760", "tempo.pdf");
-        PDFManip.PdfMetadataInject("page.question.5", "ap760", "tempo.pdf");
+        FilesManip.mergePdf(pdfManip, questionPathList);
+
+        pdfManip.injectMetadata("page.owner.1", "ap760");
+        pdfManip.injectMetadata("page.owner.2", "ap760");
+        pdfManip.injectMetadata("page.owner.3", "ap760");
+        pdfManip.injectMetadata("page.owner.4", "ap760");
+        pdfManip.injectMetadata("page.owner.5", "ap760");
+        pdfManip.injectMetadata("page.question.1", "ap760");
+        pdfManip.injectMetadata("page.question.2", "ap760");
+        pdfManip.injectMetadata("page.question.3", "ap760");
+        pdfManip.injectMetadata("page.question.4", "ap760");
+        pdfManip.injectMetadata("page.question.5", "ap760");
 
         return Response.ok(new File("tempo.pdf")).build();
     }  /*
 
     @GET
     @Path("/question/{questionDetail}")
+    @Produces("application/json")
     public Object viewQuestion(@PathParam("binId") long binId, @PathParam("questionDetail") String questionDetail) {
 
         // Set Hibernate and get user
@@ -214,6 +219,7 @@ public class MarkingController {
 
     @GET
     @Path("/all")
+    @Produces("application/json")
     public Object viewAll(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user
