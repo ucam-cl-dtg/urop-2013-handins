@@ -151,8 +151,6 @@ public class MarkingController {
 
         PDFManip pdfManip = new PDFManip("tempo.pdf");
 
-        pdfManip.injectMetadata("PuLa", "true");
-
         try {
             FilesManip.mergePdf(pdfManip, questionPathList);
         } catch (IOException e) {
