@@ -29,7 +29,10 @@ public class FilesManip {
 
             for (Distribution distribution : distributions)
             {
-                String location = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
+                // Create directory
+                String directory = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
+                File fileDirectory = new File(directory);
+                fileDirectory.mkdirs();
 
                 // New Answer and get id
                 Answer answer = new Answer();
@@ -43,7 +46,7 @@ public class FilesManip {
                 session.beginTransaction();
 
                 // Save Answer
-                String filePath = location + answer.getId() + ".pdf";
+                String filePath = directory + answer.getId() + ".pdf";
                 PDFManip pdfManip = new PDFManip(filePath);
                 new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
                 pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
@@ -65,7 +68,10 @@ public class FilesManip {
     /*
 
      */
-    public static void mergePdf(PDFManip pdfManip, List<String> filePaths) {
+    public static void mergePdf(PDFManip pdfManip, List<String> filePaths) throws IOException {
+        fileMove(filePaths.get(0), pdfManip.getFilePath());
+        filePaths.remove(0);
+
         for (String filePath : filePaths)
             pdfManip.add(filePath);
     }

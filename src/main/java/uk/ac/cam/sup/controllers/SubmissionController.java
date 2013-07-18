@@ -49,7 +49,11 @@ public class SubmissionController {
         session = HibernateUtil.getSession();
         session.beginTransaction();
 
+        // Create dir
         String directory = "temp/" + user + "/submissions/answers/";
+        File fileDirectory = new File(directory);
+        fileDirectory.mkdirs();
+
         String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
 
         try {
