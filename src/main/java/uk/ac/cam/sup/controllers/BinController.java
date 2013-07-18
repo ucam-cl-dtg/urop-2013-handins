@@ -29,6 +29,7 @@ public class BinController {
         return bin;
     }
 
+
     @GET
     public Object listBins() {
         // Set Hibernate and get user
@@ -37,13 +38,17 @@ public class BinController {
         String user = UserHelper.getCurrentUser();
 
         List<Bin> binList = session.createCriteria(Bin.class).list();
-        List<Bin> finalBinList = new LinkedList<Bin>();
+        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
 
         for (Bin bin : binList)
             if (bin.canAddSubmission(user))
-                finalBinList.add(bin);
+                finalBinList.add(ImmutableMap.of(
+                        "id", bin.getId(),
+                        "name", bin.getName()
+                    )
+                );
 
-        return ImmutableMap.of("binList", finalBinList);
+        return ImmutableMap.of("bins", finalBinList);
     }
 
     @POST
@@ -79,13 +84,16 @@ public class BinController {
 
     @GET
     @Path("/{id}")
-    public Object getOwner(@PathParam("id") long id) {
+    public Object showBin(@PathParam("id") long id) {
         Bin bin = getBin(id);
 
         if (bin == null)
             throw new NotFoundException();
 
-        return bin.getOwner();
+        return ImmutableMap.of("bin", ImmutableMap.of(
+             "id", bin.getId(),
+             "name", bin.getName()
+        ));
     }
 
     @GET

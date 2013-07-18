@@ -114,6 +114,11 @@ public class Bin {
         this.answers = answers;
     }
 
+    @Transient
+    public String getName() {
+        return "Bin " + getId();
+    }
+
     // MarkedSubmissions
     public Set<MarkedSubmission> getMarkedSubmissions() {
         return markedSubmissions;
