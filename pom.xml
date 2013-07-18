@@ -20,6 +20,7 @@
             <![CDATA[
             <script src="/soy/js/1/handins.submission.js"></script>
             <script src="/soy/js/1/handins.bin.js"></script>
+            <script src="/soy/js/1/shared.handins.js"></script>
 
 
 			]]>

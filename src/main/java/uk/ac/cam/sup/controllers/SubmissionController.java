@@ -18,12 +18,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@Path ("/submission/{binId}")
+@Path ("/submission")
 public class SubmissionController {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
+    @Path("/bin/{binId}")
     public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
 
         // Set Hibernate and get user
@@ -72,7 +73,7 @@ public class SubmissionController {
         pdfManip.injectMetadata("uploader", user);
 
         // ToDo: Redirect to splitting screen
-
+        /*
         pdfManip.injectMetadata("page.owner.1", "ap760");
         pdfManip.injectMetadata("page.owner.2", "ap760");
         pdfManip.injectMetadata("page.owner.3", "ap760");
@@ -85,13 +86,14 @@ public class SubmissionController {
         pdfManip.injectMetadata("page.question.5", "qqq 4");
 
         FilesManip.distributeSubmission(unmarkedSubmission);
-
+        */
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
                                                              "link", unmarkedSubmission.getLink(),
                                                              "filePath", unmarkedSubmission.getFilePath()));
     }
 
     @GET
+    @Path("/bin/{binId}")
     @Produces("application/json")
     public Object listSubmissions(@PathParam("binId") long binId) {
 
@@ -131,20 +133,20 @@ public class SubmissionController {
     @GET
     @Path("/{submissionId}")
     @Produces("application/pdf")
-    public Object seeSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
+    public Object seeSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
-
         String user = UserHelper.getCurrentUser();
 
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
-        if (bin == null)
+        if (unmarkedSubmission == null)
             return Response.status(404).build();
 
-        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+
+        // Get Bin and check
+        Bin bin = unmarkedSubmission.getBin();
 
         if (!bin.canSeeSubmission(user, unmarkedSubmission))
             return Response.status(401).build();
@@ -155,28 +157,24 @@ public class SubmissionController {
     @DELETE
     @Path("/{submissionId}")
     @Produces("application/json")
-    public Object deleteSubmission(@PathParam("binId") long binId, @PathParam("submissionId") long submissionId) {
+    public Object deleteSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
-
         String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(404).build();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
-        if (session != null)
-        {
-            if (!bin.canDeleteSubmission(user, unmarkedSubmission))
-                return Response.status(401).build();
+        if (unmarkedSubmission == null)
+            return Response.status(404).build();
 
-            session.delete(unmarkedSubmission);
-        }
+        // Get Bin and check
+        Bin bin = unmarkedSubmission.getBin();
+
+        if (!bin.canDeleteSubmission(user, unmarkedSubmission))
+            return Response.status(401).build();
+
+        session.delete(unmarkedSubmission);
 
         return Response.status(200).build();
     }

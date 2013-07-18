@@ -173,6 +173,7 @@ public class Bin {
         Session session = HibernateUtil.getSession();
         Long permission = (Long) session.createCriteria(BinPermission.class)
                .add(Restrictions.eq("user", user))
+               .add(Restrictions.eq("bin", this))
                .setProjection(Projections.rowCount())
                .list().get(0);
 

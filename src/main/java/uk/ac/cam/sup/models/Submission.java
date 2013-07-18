@@ -6,6 +6,7 @@ import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -18,9 +19,12 @@ public abstract class Submission<T> {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    @NotNull
     private String owner;
+    @NotNull
     private String filePath;
 
+    @NotNull
     @ManyToOne
     private Bin bin;
 

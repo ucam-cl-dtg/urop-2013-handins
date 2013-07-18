@@ -1,22 +1,5 @@
 {namespace handins.bin}
 
-/**
-* This is a soy doc
-* @param bin
-*/
-{template .uploadForm}
-    <h3>Upload answers to {$bin.name}</h3>
-    <div class="row upload-marked-work-form3">
-        <div class="columns large-12">
-            <form method="post" action="/submission/{$bin.id}" enctype="multipart/form-data">
-                <fieldset>
-                    <legend>Upload marked work</legend>
-                    <input type="file" name="file"><input type="submit" name="submit" value="Upload">
-                </fieldset>
-            </form>
-        </div>
-    </div>
-{/template}
 
 /**
 * This is a soy doc
@@ -42,7 +25,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="async-loader" data-path="submission/{$bin.id}" template-name="handins.submission.submissionsIncluded">
+                <div class="async-loader" data-path="submission/bin/{$bin.id}" template-name="handins.submission.submissionsIncluded">
                     Loading...
                 </div>
                 <ul class="sub-panel" style="display: none;">

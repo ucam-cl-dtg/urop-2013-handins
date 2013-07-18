@@ -6,6 +6,7 @@
 * @param binId The id of the current bin
 */
 {template .index}
+<!--
 <div class="row">
 	<div class="columns large-12 small-12">
 		<div class="button-bar">
@@ -22,6 +23,9 @@
 			</fieldset>
 		</form>
 	</div>
+</div> -->
+<div class="async-loader" data-path="bin/{$binId}" template-name="shared.handins.uploadForm">
+    Loading...
 </div>
 
 <h3> Already uploaded submissions: </h3>
@@ -31,6 +35,7 @@
 <script type="text/javascript">
     {literal}
         $(".upload-marked-work-form form").ajaxForm(uploadedSubmission);
+        $(".upload-work-form form").ajaxForm(uploadedSubmission);
     {/literal}
 </script>
 {/template}
