@@ -32,19 +32,11 @@ public class PDFManip {
     public void setFilePath(String filePath) {
         File file = new File(filePath);
 
-        if (!file.exists()) {
+        if (!file.exists())
             try {
-                Document document = new Document();
-                PdfWriter.getInstance(document, new FileOutputStream(filePath));
-
-                document.open();
-                document.add(new Paragraph(""));
-                document.close();
+                file.createNewFile();
             } catch (Exception e) {
-                e.printStackTrace();
             }
-
-        }
 
         this.filePath = filePath;
     }

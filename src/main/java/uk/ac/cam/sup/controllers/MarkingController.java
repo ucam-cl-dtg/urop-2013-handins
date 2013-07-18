@@ -51,7 +51,11 @@ public class MarkingController {
         session = HibernateUtil.getSession();
         session.beginTransaction();
 
+        // Create directory
         String directory = "temp/" + user + "/submissions/annotated/";
+        File fileDirectory = new File(directory);
+        fileDirectory.mkdirs();
+
         String fileName = "submission_" + markedSubmission.getId() + ".pdf";
 
         try {
@@ -149,7 +153,10 @@ public class MarkingController {
 
         pdfManip.injectMetadata("PuLa", "true");
 
-        FilesManip.mergePdf(pdfManip, questionPathList);
+        try {
+            FilesManip.mergePdf(pdfManip, questionPathList);
+        } catch (IOException e) {
+        }
 
         pdfManip.injectMetadata("page.owner.1", "ap760");
         pdfManip.injectMetadata("page.owner.2", "ap760");
