@@ -77,7 +77,7 @@ public class SubmissionController {
         pdfManip.injectMetadata("uploader", user);
 
         // ToDo: Redirect to splitting screen
-        /*
+
         pdfManip.injectMetadata("page.owner.1", "ap760");
         pdfManip.injectMetadata("page.owner.2", "ap760");
         pdfManip.injectMetadata("page.owner.3", "ap760");
@@ -90,7 +90,7 @@ public class SubmissionController {
         pdfManip.injectMetadata("page.question.5", "qqq 4");
 
         FilesManip.distributeSubmission(unmarkedSubmission);
-        */
+
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
                                                              "link", unmarkedSubmission.getLink(),
                                                              "filePath", unmarkedSubmission.getFilePath()));
