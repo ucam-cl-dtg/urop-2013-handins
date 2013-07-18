@@ -3,20 +3,21 @@
 /**
 * This is a soy doc
 * @param submissions A list of submissions to be displayed
+* @param binId The id of the current bin
 */
 {template .index}
-
+<div class="test">
 <h3>Upload answers</h3>
 <div class="row">
 	<div class="columns large-12 small-12">
 		<div class="button-bar">
-			<a href="#" class="medium secondary button upload-marked-work">Upload</a>
+			<a class="medium secondary button upload-marked-work">Upload</a>
 		</div>
 	</div>
 </div>
 <div class="row upload-marked-work-form">
 	<div class="columns large-12">
-		<form method="post" action="/submission/$" enctype="multipart/form-data">
+		<form method="post" action="/submission/{$binId}" enctype="multipart/form-data">
 			<fieldset>
 				<legend>Upload marked work</legend>
 				<input type="file" name="file"><input type="submit" name="submit" value="Upload">
@@ -86,4 +87,10 @@
 		<input type="file" name="file"><input type="submit" class="btn btn-primary" name="submit" value="Upload">
 	</fieldset>
 </form>
+</div>
+<script type="text/javascript">
+    {literal}
+        $(".upload-marked-work-form form").ajaxForm(uploadedSubmission);
+    {/literal}
+</script>
 {/template}

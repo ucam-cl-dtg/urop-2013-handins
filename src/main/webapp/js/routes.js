@@ -9,7 +9,10 @@ $(document).ready(function() {
     router = Router({
         //"tester": function(json) { return json['isSupervisor'] ? "a" : "b";}
         // Use the last line to redirect unmatched routes to an error page
-        "submission/:id": "handins.submission.index"
+        "submission/:id": function(json) {
+            json.binId = getRouteParams()[0];
+            return "handins.submission.index";
+        }
         //"*undefined": "main.test"
     })
 })
