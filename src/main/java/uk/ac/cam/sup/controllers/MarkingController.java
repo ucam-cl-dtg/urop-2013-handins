@@ -154,9 +154,6 @@ public class MarkingController {
     @Produces("application/pdf")
     public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) {
 
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
 
@@ -192,9 +189,6 @@ public class MarkingController {
     @Produces("application/json")
     public Object viewAllQuestionSubmissions(@PathParam("binId") long binId) {
 
-        // Get user
-        String user = UserHelper.getCurrentUser();
-
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
 
@@ -208,11 +202,6 @@ public class MarkingController {
     @Path("/bin/{binId}/question/{questionId}")
     @Produces("application/pdf")
     public Object viewQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -229,11 +218,6 @@ public class MarkingController {
     public Object viewStudentQuestion(@PathParam("binId") long binId,
                                       @PathParam("studentCrsId") long studentCrsId,
                                       @PathParam("questionId}") long questionId) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -257,11 +241,6 @@ public class MarkingController {
     @Path("/bin/{binId}/all")
     @Produces("application/pdf")
     public Object viewAll(@PathParam("binId") long binId) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
