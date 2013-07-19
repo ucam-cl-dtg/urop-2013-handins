@@ -13,6 +13,7 @@ public class BinPermission {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    @Column(name="`user`")
     private String user;
 
     @ManyToOne

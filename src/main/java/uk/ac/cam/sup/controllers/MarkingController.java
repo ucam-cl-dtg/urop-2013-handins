@@ -132,7 +132,7 @@ public class MarkingController {
     }
 
     @GET
-    @Path("/getStudent/{studentCrsId}")
+    @Path("/student/{studentCrsId}")
     @Produces("application/pdf")
     public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) {
 
@@ -167,7 +167,9 @@ public class MarkingController {
 
             return Response.status(401).build();
         }
-    }  /*
+    }
+
+    /*
 
     @GET
     @Path("/question/{questionDetail}")

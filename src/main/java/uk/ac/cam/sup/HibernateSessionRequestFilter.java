@@ -40,7 +40,8 @@ public class HibernateSessionRequestFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		//request.setAttribute(SESSION_FACTORY, sf);
-        sf.getCurrentSession().beginTransaction();
+        HibernateUtil.getTransaction();
+
 		chain.doFilter(request, response);
 
         Transaction transaction = sf.getCurrentSession().getTransaction();

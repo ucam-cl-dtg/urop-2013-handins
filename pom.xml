@@ -20,6 +20,7 @@
             <![CDATA[
             <script src="/soy/js/1/handins.submission.js"></script>
             <script src="/soy/js/1/handins.bin.js"></script>
+            <script src="/soy/js/1/handins.marking.js"></script>
             <script src="/soy/js/1/shared.handins.js"></script>
 
 
@@ -141,6 +142,12 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>1.1.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901.jdbc4</version>
         </dependency>
 
 	</dependencies>

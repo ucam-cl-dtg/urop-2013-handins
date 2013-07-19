@@ -6,6 +6,35 @@ a function that returns the template name. The function will receive the json re
 by the request as the first parameter.
 */
 
+function binInjector(templateName) {
+    var bin = null;
+    isCached = function() {
+        if (bin == null)
+            return false;
+        if (bin.id != getRouteParams()[0])
+            return false;
+        return true;
+    }
+
+    updateBin = function() {
+        $.ajax("/bin/" + getRouteParams()[0], {
+            async: false,
+            success: function(res) {
+               bin = res.bin;
+            }
+        });
+
+    }
+
+    return function(json) {
+        if (! isCached())
+            updateBin();
+        json.bin = bin;
+
+        return templateName;
+    }
+}
+
 $(document).ready(function() {
     router = Router({
         //"tester": function(json) { return json['isSupervisor'] ? "a" : "b";}
@@ -15,7 +44,8 @@ $(document).ready(function() {
             return "handins.submission.index";
         },
 
-        "bin": "handins.bin.index"
+        "bin": "handins.bin.index",
+        "marking/:binId/student": binInjector("handins.marking.student")
 
         //"*undefined": "main.test"
     })
