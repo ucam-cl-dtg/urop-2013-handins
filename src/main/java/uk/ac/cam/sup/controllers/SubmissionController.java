@@ -74,26 +74,15 @@ public class SubmissionController {
         // todo: convert the received file;
 
         PDFManip pdfManip = new PDFManip(directory + fileName);
-        pdfManip.injectMetadata("uploader", user);
 
         // ToDo: Redirect to splitting screen
 
-        pdfManip.injectMetadata("page.owner.1", "ap760");
-        pdfManip.injectMetadata("page.owner.2", "ap760");
-        pdfManip.injectMetadata("page.owner.3", "ap760");
-        pdfManip.injectMetadata("page.owner.4", "ap760");
-        pdfManip.injectMetadata("page.owner.5", "ap760");
-        pdfManip.injectMetadata("page.question.1", "qqq 2");
-        pdfManip.injectMetadata("page.question.2", "qqq 2");
-        pdfManip.injectMetadata("page.question.3", "EEEE");
-        pdfManip.injectMetadata("page.question.4", "qqq 4");
-        pdfManip.injectMetadata("page.question.5", "qqq 4");
+        FilesManip.markPdf(pdfManip, "ap760", "1");
 
         FilesManip.distributeSubmission(unmarkedSubmission);
 
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
-                                                             "link", unmarkedSubmission.getLink(),
-                                                             "filePath", unmarkedSubmission.getFilePath()));
+                                                                     "link", unmarkedSubmission.getLink()));
     }
 
     @GET
@@ -119,13 +108,11 @@ public class SubmissionController {
 
         List<Map<String, String> > mapList = new LinkedList<Map<String, String>>();
 
-        int p = 0;
         for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions) {
 
             Map<String, String> map = new HashMap<String, String>();
 
             map.put("id", Long.toString(unmarkedSubmission.getId()));
-            map.put("filePath", unmarkedSubmission.getFilePath());
             map.put("link", unmarkedSubmission.getLink());
 
             mapList.add(map);

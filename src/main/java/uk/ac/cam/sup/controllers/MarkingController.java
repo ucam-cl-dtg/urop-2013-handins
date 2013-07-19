@@ -1,6 +1,7 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -12,11 +13,13 @@ import uk.ac.cam.sup.structures.AnsweredQuestion;
 import uk.ac.cam.sup.structures.StudentSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
+import uk.ac.cam.sup.tools.TemporaryFileInputStream;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -149,25 +152,20 @@ public class MarkingController {
             if (answer.getFilePath() != null && answer.getOwner().equals(studentCrsId))
                 questionPathList.add(answer.getFilePath());
 
-        PDFManip pdfManip = new PDFManip("tempo.pdf");
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        PDFManip pdfManip = new PDFManip(randomTemp);
+
+        if (FilesManip.mergePdf(pdfManip, questionPathList))
+            FilesManip.markPdf(pdfManip, "ap760", Integer.toString(3));
+        else return Response.status(401).build();
 
         try {
-            FilesManip.mergePdf(pdfManip, questionPathList);
-        } catch (IOException e) {
+            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+            return Response.status(401).build();
         }
-
-        pdfManip.injectMetadata("page.owner.1", "ap760");
-        pdfManip.injectMetadata("page.owner.2", "ap760");
-        pdfManip.injectMetadata("page.owner.3", "ap760");
-        pdfManip.injectMetadata("page.owner.4", "ap760");
-        pdfManip.injectMetadata("page.owner.5", "ap760");
-        pdfManip.injectMetadata("page.question.1", "ap760");
-        pdfManip.injectMetadata("page.question.2", "ap760");
-        pdfManip.injectMetadata("page.question.3", "ap760");
-        pdfManip.injectMetadata("page.question.4", "ap760");
-        pdfManip.injectMetadata("page.question.5", "ap760");
-
-        return Response.ok(new File("tempo.pdf")).build();
     }  /*
 
     @GET
