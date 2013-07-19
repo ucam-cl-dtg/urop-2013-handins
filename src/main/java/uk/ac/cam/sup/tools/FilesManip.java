@@ -68,12 +68,31 @@ public class FilesManip {
     /*
 
      */
-    public static void mergePdf(PDFManip pdfManip, List<String> filePaths) throws IOException {
-        fileMove(filePaths.get(0), pdfManip.getFilePath());
+    public static boolean mergePdf(PDFManip pdfManip, List<String> filePaths) {
+        if (filePaths.size() == 0)
+            return false;
+
+        try {
+            fileCopy(filePaths.get(0), pdfManip.getFilePath());
+        } catch (IOException e) {
+            return false;
+        }
         filePaths.remove(0);
 
         for (String filePath : filePaths)
             pdfManip.add(filePath);
+
+        return true;
+    }
+
+    /*
+    Todo: maybe delete or change the function
+     */
+    public static void markPdf(PDFManip pdfManip, String owner, String question) {
+        for (int i = 1; i <= pdfManip.getPageCount(); i++) {
+            pdfManip.injectMetadata("page.owner." + i, owner);
+            pdfManip.injectMetadata("page.question." + i, Integer.toString((1 + i) / 2));
+        }
     }
 
     /*
@@ -95,6 +114,16 @@ public class FilesManip {
         File f = new File(filePath);
 
         f.delete();
+    }
+
+    /*
+
+     */
+    public static void fileCopy(String source, String destination) throws IOException {
+        File sourceFile = new File(source);
+        File destinationFile = new File(destination);
+
+        FileUtils.copyFile(sourceFile, destinationFile);
     }
 
     /*
