@@ -6,6 +6,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
+import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
@@ -165,6 +166,12 @@ public class SubmissionController {
         if (!bin.canDeleteSubmission(user, unmarkedSubmission))
             return Response.status(401).build();
 
+        for (Answer answer : unmarkedSubmission.getAllAnswers()) {
+            FilesManip.fileDelete(answer.getFilePath());
+            session.delete(answer);
+        }
+
+        FilesManip.fileDelete(unmarkedSubmission.getFilePath());
         session.delete(unmarkedSubmission);
 
         return Response.status(200).build();

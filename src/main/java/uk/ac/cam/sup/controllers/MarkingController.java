@@ -3,14 +3,13 @@ package uk.ac.cam.sup.controllers;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
-import uk.ac.cam.sup.structures.AnsweredQuestion;
-import uk.ac.cam.sup.structures.StudentSubmission;
+import uk.ac.cam.sup.structures.StudentSubmissions;
+import uk.ac.cam.sup.structures.StudentSubmissions.AnsweredQuestion;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 import uk.ac.cam.sup.tools.TemporaryFileInputStream;
@@ -23,10 +22,67 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-@Path("/marking/{binId}")
+@Path("/marking")
 public class MarkingController {
 
+    public Object resultingFile(List<String> questionPathList) {
+
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        PDFManip pdfManip = new PDFManip(randomTemp);
+
+        if (FilesManip.mergePdf(pdfManip, questionPathList))
+            FilesManip.markPdf(pdfManip, "ap760", Integer.toString(3));
+        else return Response.status(401).build();
+
+        try {
+            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+            return Response.status(401).build();
+        }
+    }
+
+    public Map <String, List <StudentSubmissions>> getStudentList(Bin bin) {
+
+        // Get user
+        String user = UserHelper.getCurrentUser();
+
+        List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
+
+        Set<String> studentSet = new TreeSet<String>();
+        Map<String, StudentSubmissions> studentMap = new HashMap<String, StudentSubmissions>();
+
+        for (Answer answer : allAnswers) {
+
+            if (bin.canSeeAnswer(user, answer)) {
+
+                if (!studentSet.contains(answer.getOwner())) {
+                    studentSet.add(answer.getOwner());
+                    studentMap.put(answer.getOwner(), new StudentSubmissions(answer.getOwner(), false));
+                }
+
+                studentMap.get(answer.getOwner()).addAnsweredQuestions(answer.getQuestion(), answer.getFilePath(),
+                        "/bin/" + bin.getId() + "/student/" + answer.getOwner(), true, answer.getMarkedAnswers().size() > 0);
+            }
+        }
+
+        List<StudentSubmissions> studentSubmissionsList = new LinkedList<StudentSubmissions>();
+
+        for (String student : studentSet) {
+
+            StudentSubmissions studentSubmissions = studentMap.get(student);
+
+            studentSubmissions.setMarked(studentSubmissions.getAnsweredQuestions().size() == bin.getQuestionCount());
+
+            studentSubmissionsList.add(studentSubmissions);
+        }
+
+        return ImmutableMap.of("students", studentSubmissionsList);
+    }
+
     @POST
+    @Path("/bin/{binId}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
@@ -76,16 +132,13 @@ public class MarkingController {
         List<String> listOfUploads = null;
         FilesManip.distributeSubmission(markedSubmission);
 
-        return ImmutableMap.of("id", markedSubmission.getId(), "filePath", markedSubmission.getFilePath(), "User/Question List", listOfUploads);
+        return ImmutableMap.of("id", markedSubmission.getId(), "User/Question List", listOfUploads);
     }
 
     @GET
-    @Path("/student")
+    @Path("/bin/{binId}/student")
     @Produces("application/json")
-    public Object viewAllSubmissions(@PathParam("binId") long binId) {
-
-        // Get user
-        String user = UserHelper.getCurrentUser();
+    public Object viewAllStudentSubmissions(@PathParam("binId") long binId) {
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -93,46 +146,11 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
-        List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
-
-        Map<String, List<AnsweredQuestion>> studentQuestions = new HashMap<String, List<AnsweredQuestion>>();
-        Set<String> studentSet = new TreeSet<String>();
-
-        for (Answer answer : allAnswers) {
-
-            if (bin.canSeeAnswer(user, answer))
-            {
-                if (!studentSet.contains(answer.getOwner())) {
-                    studentQuestions.put(answer.getOwner(), new LinkedList<AnsweredQuestion>());
-
-                    studentSet.add(answer.getOwner());
-                }
-
-                boolean marked = answer.getMarkedAnswers().size() > 0;
-
-                AnsweredQuestion q = new AnsweredQuestion(answer.getQuestion(), answer.getFilePath(), true, marked);
-
-                studentQuestions.get(answer.getOwner()).add(q);
-            }
-        }
-
-        List<StudentSubmission> studentSubmissionList = new LinkedList<StudentSubmission>();
-
-        for (String s : studentSet) {
-            StudentSubmission studentSubmission = new StudentSubmission();
-
-            studentSubmission.setName(s);
-            studentSubmission.setAnsweredQuestions(studentQuestions.get(s));
-            studentSubmission.setMarked(studentSubmission.getAnsweredQuestions().size() == bin.getQuestionCount());
-
-            studentSubmissionList.add(studentSubmission);
-        }
-
-        return ImmutableMap.of("students", studentSubmissionList);
+        return getStudentList(bin);
     }
 
     @GET
-    @Path("/student/{studentCrsId}")
+    @Path("/bin/{binId}/student/{studentCrsId}")
     @Produces("application/pdf")
     public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) {
 
@@ -145,13 +163,13 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
 
-        List<Answer> answerList = new LinkedList<Answer>(bin.getAnswers());
+        List <StudentSubmissions> allAnswers = getStudentList(bin).get("students");
+        List <String> questionPathList = new LinkedList<String>();
 
-        List<String> questionPathList = new LinkedList<String>();
-
-        for (Answer answer : answerList)
-            if (answer.getFilePath() != null && answer.getOwner().equals(studentCrsId))
-                questionPathList.add(answer.getFilePath());
+        for (StudentSubmissions studentSubmissions : allAnswers)
+            if (studentSubmissions.getName().equals(studentCrsId))
+                for (AnsweredQuestion answeredQuestion : studentSubmissions.getAnsweredQuestions())
+                    questionPathList.add(answeredQuestion.getFilePath());
 
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
         PDFManip pdfManip = new PDFManip(randomTemp);
@@ -169,12 +187,27 @@ public class MarkingController {
         }
     }
 
-    /*
+    @GET
+    @Path("/bin/{binId}/question")
+    @Produces("application/json")
+    public Object viewAllQuestionSubmissions(@PathParam("binId") long binId) {
+
+        // Get user
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(401).build();
+
+        return null;
+    }
 
     @GET
-    @Path("/question/{questionDetail}")
-    @Produces("application/json")
-    public Object viewQuestion(@PathParam("binId") long binId, @PathParam("questionDetail") String questionDetail) {
+    @Path("/bin/{binId}/question/{questionId}")
+    @Produces("application/pdf")
+    public Object viewQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -187,47 +220,42 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
-        List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
-
-        Map<String, List<AnsweredQuestion>> studentQuestions = new HashMap<String, List<AnsweredQuestion>>();
-        Set<String> studentSet = new TreeSet<String>();
-
-        for (Answer answer : allAnswers) {
-
-            if (bin.canSeeAnswer(user, answer))
-            {
-                if (!studentSet.contains(answer.getOwner())) {
-                    studentQuestions.put(answer.getOwner(), new LinkedList<AnsweredQuestion>());
-
-                    studentSet.add(answer.getOwner());
-                }
-
-                boolean marked = answer.getMarkedAnswers().size() > 0;
-
-                AnsweredQuestion q = new AnsweredQuestion(answer.getQuestion(), answer.getFilePath(), true, marked);
-
-                studentQuestions.get(answer.getOwner()).add(q);
-            }
-        }
-
-        List<StudentSubmission> studentSubmissionList = new LinkedList<StudentSubmission>();
-
-        for (String s : studentSet) {
-            StudentSubmission studentSubmission = new StudentSubmission();
-
-            studentSubmission.setName(s);
-            studentSubmission.setAnsweredQuestions(studentQuestions.get(s));
-            studentSubmission.setMarked(studentSubmission.getAnsweredQuestions().size() == bin.getQuestionCount());
-
-            studentSubmissionList.add(studentSubmission);
-        }
-
-        return ImmutableMap.of("studentSubmissionList", studentSubmissionList);
+        return null;
     }
 
     @GET
-    @Path("/all")
-    @Produces("application/json")
+    @Path("/bin/{binId}/student/{studentCrsId}/question/{questionId}")
+    @Produces("application/pdf")
+    public Object viewStudentQuestion(@PathParam("binId") long binId,
+                                      @PathParam("studentCrsId") long studentCrsId,
+                                      @PathParam("questionId}") long questionId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(401).build();
+
+        List <StudentSubmissions> allAnswers = getStudentList(bin).get("students");
+        List <String> questionPathList = new LinkedList<String>();
+
+        for (StudentSubmissions studentSubmissions : allAnswers)
+            if (studentSubmissions.getName().equals(studentCrsId))
+                for (StudentSubmissions.AnsweredQuestion answeredQuestion : studentSubmissions.getAnsweredQuestions())
+                    if (answeredQuestion.getQuestion().getId() == questionId)
+                        questionPathList.add(answeredQuestion.getFilePath());
+
+        return resultingFile(questionPathList);
+    }
+
+    @GET
+    @Path("/bin/{binId}/all")
+    @Produces("application/pdf")
     public Object viewAll(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user
@@ -241,41 +269,13 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
-        List<Answer> allAnswers = new LinkedList<Answer>(bin.getAnswers());
+        List <StudentSubmissions> allAnswers = getStudentList(bin).get("students");
+        List <String> questionPathList = new LinkedList<String>();
 
-        Map<String, List<AnsweredQuestion>> studentQuestions = new HashMap<String, List<AnsweredQuestion>>();
-        Set<String> studentSet = new TreeSet<String>();
+        for (StudentSubmissions studentSubmissions : allAnswers)
+            for (StudentSubmissions.AnsweredQuestion answeredQuestion : studentSubmissions.getAnsweredQuestions())
+                questionPathList.add(answeredQuestion.getFilePath());
 
-        for (Answer answer : allAnswers) {
-
-            if (bin.canSeeAnswer(user, answer))
-            {
-                if (!studentSet.contains(answer.getOwner())) {
-                    studentQuestions.put(answer.getOwner(), new LinkedList<AnsweredQuestion>());
-
-                    studentSet.add(answer.getOwner());
-                }
-
-                boolean marked = answer.getMarkedAnswers().size() > 0;
-
-                AnsweredQuestion q = new AnsweredQuestion(answer.getQuestion(), answer.getFilePath(), true, marked);
-
-                studentQuestions.get(answer.getOwner()).add(q);
-            }
-        }
-
-        List<StudentSubmission> studentSubmissionList = new LinkedList<StudentSubmission>();
-
-        for (String s : studentSet) {
-            StudentSubmission studentSubmission = new StudentSubmission();
-
-            studentSubmission.setName(s);
-            studentSubmission.setAnsweredQuestions(studentQuestions.get(s));
-            studentSubmission.setMarked(studentSubmission.getAnsweredQuestions().size() == bin.getQuestionCount());
-
-            studentSubmissionList.add(studentSubmission);
-        }
-
-        return ImmutableMap.of("studentSubmissionList", studentSubmissionList);
-    }                   */
+        return resultingFile(questionPathList);
+    }
 }

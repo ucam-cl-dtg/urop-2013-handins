@@ -15,7 +15,9 @@ public class MarkedAnswer {
 
     private String owner;
     private String filePath;
-    private String question;
+
+    @ManyToOne
+    private ProposedQuestion question;
 
     @ManyToOne
     private MarkedSubmission markedSubmission;
@@ -43,11 +45,11 @@ public class MarkedAnswer {
     }
 
     // Question
-    public String getQuestion() {
+    public ProposedQuestion getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question) {
+    public void setQuestion(ProposedQuestion question) {
         this.question = question;
     }
 
