@@ -1,11 +1,11 @@
 package uk.ac.cam.sup.models;
 
-// KILL ME!
-
+// TODO: KILL ME!
 
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "ProposedQuestion")
@@ -20,6 +20,12 @@ public class ProposedQuestion {
 
     @ManyToOne
     private Bin bin;
+
+    @OneToMany(mappedBy = "question")
+    private Set<Answer> answers;
+
+    @OneToMany(mappedBy = "question")
+    private Set<MarkedAnswer> markedAnswers;
 
     // Constructors
     public ProposedQuestion() {
@@ -47,5 +53,23 @@ public class ProposedQuestion {
 
     public void setBin(Bin bin) {
         this.bin = bin;
+    }
+
+    // Answers
+    public Set<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
+    }
+
+    // MarkedAnswers
+    public Set<MarkedAnswer> getMarkedAnswers() {
+        return markedAnswers;
+    }
+
+    public void setMarkedAnswers(Set<MarkedAnswer> markedAnswers) {
+        this.markedAnswers = markedAnswers;
     }
 }

@@ -16,9 +16,11 @@ public class Answer {
 
     private String owner;
     private String filePath;
-    private String question;
 
     private boolean finalState;
+
+    @ManyToOne
+    private ProposedQuestion question;
 
     @ManyToOne
     private UnmarkedSubmission unmarkedSubmission;
@@ -49,11 +51,11 @@ public class Answer {
     }
 
     // Question
-    public String getQuestion() {
+    public ProposedQuestion getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question) {
+    public void setQuestion(ProposedQuestion question) {
         this.question = question;
     }
 

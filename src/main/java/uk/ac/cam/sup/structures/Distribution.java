@@ -1,12 +1,18 @@
 package uk.ac.cam.sup.structures;
 
+import uk.ac.cam.sup.models.ProposedQuestion;
+import uk.ac.cam.sup.models.Submission;
+
 public class Distribution {
     // Fields
     private int startPage;
     private int endPage;
+
     private String student;
-    private String question;
-    private long submissionId;
+
+    private ProposedQuestion question;
+
+    private Submission submission;
 
     // Constructors
     public Distribution() {
@@ -41,20 +47,20 @@ public class Distribution {
     }
 
     // Question
-    public String getQuestion() {
+    public ProposedQuestion getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question) {
+    public void setQuestion(ProposedQuestion question) {
         this.question = question;
     }
 
-    // SubmissionId
-    public long getSubmissionId() {
-        return submissionId;
+    // Submission
+    public Submission getSubmission() {
+        return submission;
     }
 
-    public void setSubmissionId(long submissionId) {
-        this.submissionId = submissionId;
+    public void setSubmission(Submission submission) {
+        this.submission = submission;
     }
 }

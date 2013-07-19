@@ -1,6 +1,8 @@
 package uk.ac.cam.sup.models;
 
+import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
+import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.tools.PDFManip;
@@ -86,27 +88,30 @@ public abstract class Submission<T> {
      */
     public List<Distribution> getSubmissionDistribution() throws MetadataNotFoundException {
 
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
         List<Distribution> distributionList = new LinkedList<Distribution>();
 
         PDFManip pdfManip = new PDFManip(getFilePath());
 
         int pages = pdfManip.getPageCount();
 
-        String question = "";
+        ProposedQuestion prevQuestion = null;
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
-            if (pdfManip.queryMetadata("page.question." + i).equals(question))
+            ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("page.question." + i)));
+            if (prevQuestion != null && question.getId() == prevQuestion.getId())
                 distribution.setEndPage(i);
-            else
-            {
+            else {
                 if (distribution != null)
                     distributionList.add(distribution);
 
-                question = pdfManip.queryMetadata("page.question." + i);
+                prevQuestion = question;
 
                 distribution = new Distribution();
 
-                distribution.setSubmissionId(getId());
+                distribution.setSubmission(this);
                 distribution.setStartPage(i);
                 distribution.setEndPage(i);
                 distribution.setQuestion(question);
