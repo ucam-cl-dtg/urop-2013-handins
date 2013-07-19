@@ -77,6 +77,7 @@ public class MarkingController {
     }
 
     @GET
+    @Path("/student")
     @Produces("application/json")
     public Object viewAllSubmissions(@PathParam("binId") long binId) {
 
@@ -124,7 +125,7 @@ public class MarkingController {
             studentSubmissionList.add(studentSubmission);
         }
 
-        return ImmutableMap.of("studentSubmissionList", studentSubmissionList);
+        return ImmutableMap.of("students", studentSubmissionList);
     }
 
     @GET
