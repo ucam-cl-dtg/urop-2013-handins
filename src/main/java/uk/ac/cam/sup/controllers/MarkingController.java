@@ -1,10 +1,12 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import com.itextpdf.text.DocumentException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
@@ -25,7 +27,7 @@ import java.util.*;
 @Path("/marking")
 public class MarkingController {
 
-    public Object resultingFile(List<String> questionPathList) {
+    public Object resultingFile(List<String> questionPathList) throws IOException, DocumentException {
 
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
         PDFManip pdfManip = new PDFManip(randomTemp);
@@ -34,13 +36,7 @@ public class MarkingController {
             FilesManip.markPdf(pdfManip, "ap760", Integer.toString(3));
         else return Response.status(401).build();
 
-        try {
-            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-
-            return Response.status(401).build();
-        }
+        return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
     }
 
     public Map <String, List <StudentSubmissions>> getStudentList(Bin bin) {
@@ -85,7 +81,7 @@ public class MarkingController {
     @Path("/bin/{binId}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
+    public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) throws IOException, MetadataNotFoundException, DocumentException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -117,13 +113,7 @@ public class MarkingController {
 
         String fileName = "submission_" + markedSubmission.getId() + ".pdf";
 
-        try {
-            FilesManip.fileSave(uploadForm.file, directory + fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return Response.status(500).build();
-        }
+        FilesManip.fileSave(uploadForm.file, directory + fileName);
 
         markedSubmission.setFilePath(directory + fileName);
 
@@ -152,7 +142,7 @@ public class MarkingController {
     @GET
     @Path("/bin/{binId}/student/{studentCrsId}")
     @Produces("application/pdf")
-    public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) {
+    public Object viewStudent(@PathParam("binId") long binId, @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -175,13 +165,7 @@ public class MarkingController {
             FilesManip.markPdf(pdfManip, "ap760", Integer.toString(3));
         else return Response.status(401).build();
 
-        try {
-            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-
-            return Response.status(401).build();
-        }
+        return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
     }
 
     @GET
@@ -217,7 +201,7 @@ public class MarkingController {
     @Produces("application/pdf")
     public Object viewStudentQuestion(@PathParam("binId") long binId,
                                       @PathParam("studentCrsId") long studentCrsId,
-                                      @PathParam("questionId}") long questionId) {
+                                      @PathParam("questionId}") long questionId) throws IOException, DocumentException {
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -240,7 +224,7 @@ public class MarkingController {
     @GET
     @Path("/bin/{binId}/all")
     @Produces("application/pdf")
-    public Object viewAll(@PathParam("binId") long binId) {
+    public Object viewAll(@PathParam("binId") long binId) throws IOException, DocumentException {
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);

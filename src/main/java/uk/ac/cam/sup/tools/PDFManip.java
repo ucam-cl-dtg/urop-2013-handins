@@ -20,7 +20,7 @@ public class PDFManip {
 
     }
 
-    public PDFManip(String filePath) {
+    public PDFManip(String filePath) throws IOException {
         setFilePath(filePath);
     }
 
@@ -29,14 +29,11 @@ public class PDFManip {
         return filePath;
     }
 
-    public void setFilePath(String filePath) {
+    public void setFilePath(String filePath) throws IOException {
         File file = new File(filePath);
 
         if (!file.exists())
-            try {
-                file.createNewFile();
-            } catch (Exception e) {
-            }
+            file.createNewFile();
 
         this.filePath = filePath;
     }
@@ -46,28 +43,22 @@ public class PDFManip {
     /*
     FixMe: This function should be rewritten because it behaves badly in general
      */
-    public boolean addHeader(String content) {
+    public void addHeader(String content) throws IOException, DocumentException {
 
-        try {
-            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-            FilesManip.fileMove(filePath, randomTemp);
+        FilesManip.fileMove(filePath, randomTemp);
 
-            PdfReader reader = new PdfReader(randomTemp);
-            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
+        PdfReader reader = new PdfReader(randomTemp);
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
-            int n = reader.getNumberOfPages();
-            for (int i = 1; i <= n; i++)
-                getHeaderTable(i, n, content).writeSelectedRows(0, -1, 30, 795, stamper.getOverContent(i));
+        int n = reader.getNumberOfPages();
+        for (int i = 1; i <= n; i++)
+            getHeaderTable(i, n, content).writeSelectedRows(0, -1, 30, 795, stamper.getOverContent(i));
 
-            stamper.close();
+        stamper.close();
 
-            FilesManip.fileDelete(randomTemp);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        FilesManip.fileDelete(randomTemp);
     }
 
     /*
@@ -100,22 +91,18 @@ public class PDFManip {
     throws Exception MetadataNotFound otherwise.
     Done
      */
-    public String queryMetadata(String key) throws MetadataNotFoundException {
+    public String queryMetadata(String key) throws MetadataNotFoundException, IOException {
 
-        try {
-            List<String> pageDetails;
+        List<String> pageDetails;
 
-            PdfReader reader = new PdfReader(filePath);
+        PdfReader reader = new PdfReader(filePath);
 
-            Map <String, String> info = reader.getInfo();
+        Map <String, String> info = reader.getInfo();
 
-            if (!info.containsKey(key))
-                throw new MetadataNotFoundException();
-
-            return info.get(key);
-        } catch (IOException e) {
+        if (!info.containsKey(key))
             throw new MetadataNotFoundException();
-        }
+
+        return info.get(key);
     }
 
     /*
@@ -123,53 +110,43 @@ public class PDFManip {
     the PDF and inserts metadata according to the input pair.
     Done
      */
-    public boolean injectMetadata(String key, String value) {
-        try {
-            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+    public void injectMetadata(String key, String value) throws IOException, DocumentException {
 
-            FilesManip.fileMove(filePath, randomTemp);
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-            PdfReader reader = new PdfReader(randomTemp);
-            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
+        FilesManip.fileMove(filePath, randomTemp);
 
-            Map <String, String> info = reader.getInfo();
+        PdfReader reader = new PdfReader(randomTemp);
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
-            info.put(key, value);
+        Map <String, String> info = reader.getInfo();
 
-            stamper.setMoreInfo(info);
-            stamper.close();
+        info.put(key, value);
 
-            FilesManip.fileDelete(randomTemp);
+        stamper.setMoreInfo(info);
+        stamper.close();
 
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        FilesManip.fileDelete(randomTemp);
     }
 
     /*
     The function takes the interval of pages between start and end from the contained PDF
     and stores them in a new PDF created at the destinationPath.
      */
-    public boolean takePages(int start, int end, String destinationPath) {
-        try {
-            Document document = new Document();
+    public void takePages(int start, int end, String destinationPath) throws IOException, DocumentException {
 
-            PdfCopy copy = new PdfCopy(document, new FileOutputStream(destinationPath));
+        Document document = new Document();
 
-            document.open();
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(destinationPath));
 
-            PdfReader reader = new PdfReader(filePath);
+        document.open();
 
-            for (int pn = start; pn <= end; )
-                    copy.addPage(copy.getImportedPage(reader, pn++));
+        PdfReader reader = new PdfReader(filePath);
 
-            document.close();
+       for (int pn = start; pn <= end; )
+           copy.addPage(copy.getImportedPage(reader, pn++));
 
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        document.close();
     }
 
     /*
@@ -177,37 +154,31 @@ public class PDFManip {
     added at the end of the initial pdf
     Done
      */
-    public boolean add(String sourcePath) {
+    public void add(String sourcePath) throws IOException, DocumentException {
 
-        try {
-            String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-            Document document = new Document();
+        Document document = new Document();
 
-            PdfCopy copy = new PdfCopy(document, new FileOutputStream(randomTemp));
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(randomTemp));
 
-            document.open();
+        document.open();
 
-            PdfReader reader = new PdfReader(filePath);
-            int n = reader.getNumberOfPages();
+        PdfReader reader = new PdfReader(filePath);
+        int n = reader.getNumberOfPages();
 
-            for (int pn = 0; pn < n; )
-                copy.addPage(copy.getImportedPage(reader, ++pn));
+        for (int pn = 0; pn < n; )
+            copy.addPage(copy.getImportedPage(reader, ++pn));
 
-            reader = new PdfReader(sourcePath);
-            n = reader.getNumberOfPages();
+        reader = new PdfReader(sourcePath);
+        n = reader.getNumberOfPages();
 
-            for (int pn = 0; pn < n; )
-                copy.addPage(copy.getImportedPage(reader, ++pn));
+        for (int pn = 0; pn < n; )
+            copy.addPage(copy.getImportedPage(reader, ++pn));
 
-            document.close();
+        document.close();
 
-            FilesManip.fileMove(randomTemp, filePath);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        FilesManip.fileMove(randomTemp, filePath);
     }
 
     /*

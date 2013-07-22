@@ -9,6 +9,7 @@ import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -86,7 +87,7 @@ public abstract class Submission<T> {
     /*
 
      */
-    public List<Distribution> getSubmissionDistribution() throws MetadataNotFoundException {
+    public List<Distribution> getSubmissionDistribution() throws MetadataNotFoundException, IOException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
