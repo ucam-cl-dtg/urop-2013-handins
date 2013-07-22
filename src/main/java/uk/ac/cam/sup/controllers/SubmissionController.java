@@ -1,9 +1,11 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import com.itextpdf.text.DocumentException;
 import org.hibernate.Session;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
@@ -26,7 +28,7 @@ public class SubmissionController {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     @Path("/bin/{binId}")
-    public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) {
+    public Object createSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) throws IOException, MetadataNotFoundException, DocumentException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -58,13 +60,7 @@ public class SubmissionController {
 
         String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
 
-        try {
-            FilesManip.fileSave(uploadForm.file, directory + fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return Response.status(500).build();
-        }
+        FilesManip.fileSave(uploadForm.file, directory + fileName);
 
         unmarkedSubmission.setBin(bin);
         unmarkedSubmission.setOwner(user);
@@ -129,13 +125,13 @@ public class SubmissionController {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
+
         String user = UserHelper.getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
         if (unmarkedSubmission == null)
             return Response.status(404).build();
-
 
         // Get Bin and check
         Bin bin = unmarkedSubmission.getBin();
@@ -153,6 +149,7 @@ public class SubmissionController {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
+
         String user = UserHelper.getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);

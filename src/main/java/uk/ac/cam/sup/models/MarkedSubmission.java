@@ -1,7 +1,5 @@
 package uk.ac.cam.sup.models;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.Set;
 
