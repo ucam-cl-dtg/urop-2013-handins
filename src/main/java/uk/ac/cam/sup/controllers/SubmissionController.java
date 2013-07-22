@@ -125,13 +125,13 @@ public class SubmissionController {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
+
         String user = UserHelper.getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
         if (unmarkedSubmission == null)
             return Response.status(404).build();
-
 
         // Get Bin and check
         Bin bin = unmarkedSubmission.getBin();
@@ -149,6 +149,7 @@ public class SubmissionController {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
+
         String user = UserHelper.getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);

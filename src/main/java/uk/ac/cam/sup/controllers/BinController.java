@@ -21,14 +21,11 @@ public class BinController {
         // Set Hibernate
         Session session = HibernateUtil.getSession();
 
-        Bin bin = (Bin) session.createCriteria(Bin.class)
-                .add(Restrictions.eq("id", id))
-                .setFetchMode("permissions", FetchMode.JOIN)
-                .uniqueResult();
-
-        return bin;
+        return (Bin) session.createCriteria(Bin.class)
+                            .add(Restrictions.eq("id", id))
+                            .setFetchMode("permissions", FetchMode.JOIN)
+                            .uniqueResult();
     }
-
 
     @GET
     public Object listBins() {
@@ -42,11 +39,8 @@ public class BinController {
 
         for (Bin bin : binList)
             if (bin.canAddSubmission(user))
-                finalBinList.add(ImmutableMap.of(
-                        "id", bin.getId(),
-                        "name", bin.getName()
-                    )
-                );
+                finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                                                 "name", bin.getName()));
 
         return ImmutableMap.of("bins", finalBinList);
     }
@@ -91,20 +85,19 @@ public class BinController {
             throw new NotFoundException();
 
         return ImmutableMap.of("bin", ImmutableMap.of(
-             "id", bin.getId(),
-             "name", bin.getName()
-        ));
+                               "id", bin.getId(),
+                               "name", bin.getName()));
     }
 
     @GET
     @Path("/{id}/permission/")
-    public List listPermissions(@PathParam("id") long id) {
+    public List<String> listPermissions(@PathParam("id") long id) {
         Bin bin = getBin(id);
 
         if (bin == null)
             throw new NotFoundException();
 
-        List res = new LinkedList();
+        List<String> res = new LinkedList<String>();
 
         for (BinPermission binPermission: bin.getPermissions()) {
             res.add(binPermission.getUser());
@@ -116,8 +109,8 @@ public class BinController {
     @POST
     @Path("/{id}/permission/")
     public Response addPermissions(@PathParam("id") long id,
-                              @FormParam("users[]") String[] users,
-                              @FormParam("token") String token) {
+                                   @FormParam("users[]") String[] users,
+                                   @FormParam("token") String token) {
         Bin bin = getBin(id);
 
         if (bin == null)
