@@ -1,0 +1,115 @@
+{namespace shared.handins.generic}
+
+/**
+* @param name
+* @param download - link
+* @param delete - link
+* @param sublist - link / list
+* @param uploadTo - link
+* param id
+* @param sublistTemplateName
+* @param sublistTemplateFunction
+*/
+{template .elementContents}
+    <div class="columns large-7 small-7">{$name}</div>
+    <div class="columns large-5 small-5 text-right">
+        <div class="icon-button-wrapper">
+
+            {if $sublist }
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array expand-sub-list"
+                data-location="{$sublist}"
+                {if $sublistTemplateName}
+                    template-name="{$sublistTemplateName}"
+                {/if}
+                {if $sublistTemplateFunction}
+                    template-function = "{$sublistTemplateFunction}"
+                {/if}
+                >p</a>
+
+            {/if}
+            {if $download }
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$download}">X</a>
+            {/if}
+            {if $uploadTo}
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array upload-work-for-bin" bin="{$uploadTo}">J</a>
+            {/if}
+            {if $delete}
+                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-location="{$delete}">'</a>
+            {/if}
+        </div>
+    </div>
+
+{/template}
+/**
+  @param elem
+*/
+{template .listElement}
+<li class="panel-wrapper columns large-12 delete-me">
+    <div class="list-panel">
+        <div class="row list-inner-panel">
+            {call .elementContents data="$elem"}
+            {/call}
+        </div>
+    </div>
+
+
+    <div class="sublist-container" style="display: none;">
+        Loading...,
+    </div>
+</li>
+
+{/template}
+/**
+  @param elem
+*/
+{template .listElementSubPanel}
+<li class="list-sub-panel delete-me">
+    <div class="row list-inner-sub-panel">
+        {call .elementContents data="$elem"}
+        {/call}
+    </div>
+
+
+    <div class="sublist-container" style="display: none;">
+        Loading...,
+    </div>
+</li>
+
+{/template}
+
+/**
+* @param elems  - list of
+    ** name
+    ** download - link
+    ** delete - link
+    ** sublist - link / list
+  @param subPanel
+*/
+{template .listPanel}
+
+    {if $subPanel}
+        <ul class="sub-panel force-display">
+        {foreach $elem in $elems}
+            {call .listElementSubPanel}
+                {param elem: $elem /}
+            {/call}
+            {ifempty}
+                <li class="list-sub-panel delete-me">
+                    Nothing found.
+                </li>
+        {/foreach}
+        </ul>
+    {else}
+        <div class="row">
+            <ul class="panels">
+                {foreach $elem in $elems}
+                    {call .listElement data="$elem"}
+                        {param elem: $elem /}
+                    {/call}
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+
+
+{/template}

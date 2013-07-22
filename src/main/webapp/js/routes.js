@@ -35,6 +35,32 @@ function binInjector(templateName) {
     }
 }
 
+function binList (json) {
+    json.elems = json.bins;
+    _.map(json.elems, function(elem) {
+        elem.sublist = "submission/bin/" + elem.id;
+        elem.sublistTemplateFunction = "submissionList";
+
+        return elem;
+    });
+    return "shared.handins.generic.listPanel";
+}
+
+function submissionList(json) {
+    json.elems = json.submissions;
+    json.subPanel = true;
+
+    _.map(json.elems, function(elem) {
+        elem.uploadTo = elem.bin;
+        elem.name = "Submission " + elem.id;
+        elem.delete = "/submission/" + elem.id;
+        elem.download = "/submission/" + elem.id;
+
+    })
+
+    return "shared.handins.generic.listPanel";
+}
+
 $(document).ready(function() {
     router = Router({
         //"tester": function(json) { return json['isSupervisor'] ? "a" : "b";}
@@ -44,8 +70,10 @@ $(document).ready(function() {
             return "handins.submission.index";
         },
 
-        "bin": "handins.bin.index",
-        "marking/:binId/student": binInjector("handins.marking.student")
+        //"bin": "handins.bin.index",
+        "bin": binList,
+        "marking/:binId/student": binInjector("handins.marking.student"),
+
 
         //"*undefined": "main.test"
     })

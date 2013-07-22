@@ -22,6 +22,8 @@
             <script src="/soy/js/1/handins.bin.js"></script>
             <script src="/soy/js/1/handins.marking.js"></script>
             <script src="/soy/js/1/shared.handins.js"></script>
+            <script src="/soy/js/1/shared.handins.generic.js"></script>
+            <script src="/soy/js/1/main.js"></script>
 
 
 			]]>

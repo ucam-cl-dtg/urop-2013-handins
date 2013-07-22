@@ -1,8 +1,6 @@
 $(document).on("click", ".delete-submission", function() {
     var elem = $(this),
-        deleteId = elem.attr("delete-id"),
-        binId = getRouteParams()[0],
-        deleteLink = "/submission/" + deleteId;
+        deleteLink = elem.attr("delete-link");
 
     if (confirm("Are you sure you want to delete the submission?")) {
         $.ajax({
@@ -22,7 +20,9 @@ $(document).on("click", ".upload-work-for-bin", function() {
     var elem = $(this),
         bin = elem.attr("bin");
 
-    loadModule($('.upload-work'), "bin/" + bin, "shared.handins.uploadForm");
+    loadModule($('.upload-work'), "bin/" + bin, "shared.handins.uploadForm", function() {
+        this.slideToggle();
+    });
 })
 
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
@@ -32,3 +32,24 @@ function uploadedSubmission(data) {
 }
 
 
+
+$(document).on("click", ".expand-sub-list", function() {
+
+  var elem = $(this).closest(".list-panel").siblings(".sublist-container");
+  if (elem.attr("loaded") == "true") {
+    elem.slideToggle();
+    return;
+  }
+
+  var template;
+  if ($(this).attr("template-name"))
+    template = $(this).attr("template-name");
+  else if ($(this).attr("template-function")) {
+    template = getTemplate($(this).attr("template-function"));
+  }
+
+  loadModule(elem, $(this).attr("data-location"), template, function() {
+    elem.slideToggle();
+  });
+  elem.attr("loaded", "true");
+})
