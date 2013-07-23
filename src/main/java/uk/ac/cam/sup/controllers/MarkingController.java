@@ -320,7 +320,7 @@ public class MarkingController {
     @GET
     @Path("/bin/{binId}/question/{questionId}/download")
     @Produces("application/pdf")
-    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) throws IOException, DocumentException {
+    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") long questionId) throws IOException, DocumentException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
