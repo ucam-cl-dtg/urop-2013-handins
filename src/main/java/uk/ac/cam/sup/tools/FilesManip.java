@@ -34,17 +34,11 @@ public class FilesManip {
             File fileDirectory = new File(directory);
             fileDirectory.mkdirs();
 
-            // New Answer and get id
+            // New Answer to get id
             Answer answer = new Answer();
-
             session.save(answer);
-            session.getTransaction().commit();
 
-            // Restart session
-            session = HibernateUtil.getSession();
-            session.beginTransaction();
-
-            // Save Answer
+            // Update Answer
             String filePath = directory + answer.getId() + ".pdf";
             PDFManip pdfManip = new PDFManip(filePath);
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);

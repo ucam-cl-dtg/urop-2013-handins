@@ -135,7 +135,11 @@ public class Bin {
         return questionSet;
     }
 
-    public void setQuestionSet(Set questionSet) {
+    public void addQuestion(ProposedQuestion question) {
+        questionSet.add(question);
+    }
+
+    public void setQuestionSet(Set<ProposedQuestion> questionSet) {
         this.questionSet = questionSet;
     }
 
@@ -157,12 +161,16 @@ public class Bin {
         return user.equals(owner);
     }
 
-    public boolean canDelete(String token) {
+    public boolean canDelete(String user, String token) {
 
         // return token.equals(this.token);
         // FIXME Is there any reason to allow deletion of bins?
         // Andi: Yes, for example if it is created by mistake,
-        //       or just to check how interface works.
+        //       or just to check how the app works.
+        // Done?
+
+        if (UserHelper.isAdmin(user) || UserHelper.isDos(user) || isOwner(user))
+            return true;
 
         return false;
     }

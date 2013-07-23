@@ -52,12 +52,6 @@ public class MarkingController {
         MarkedSubmission markedSubmission = new MarkedSubmission();
         session.save(markedSubmission);
 
-        session.getTransaction().commit();
-
-        // Restart session
-        session = HibernateUtil.getSession();
-        session.beginTransaction();
-
         // Create directory
         String directory = "temp/" + user + "/submissions/annotated/";
         File fileDirectory = new File(directory);

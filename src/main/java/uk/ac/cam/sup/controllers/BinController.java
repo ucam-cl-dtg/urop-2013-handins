@@ -8,6 +8,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinPermission;
+import uk.ac.cam.sup.models.ProposedQuestion;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -42,7 +43,8 @@ public class BinController {
             if (bin.canAddSubmission(user))
                 finalBinList.add(ImmutableMap.of("id", bin.getId(),
                                                  "name", bin.getName(),
-                                                 "isArchived", bin.isArchived()));
+                                                 "isArchived", bin.isArchived(),
+                                                 "questions", bin.getQuestionCount()));
 
         return ImmutableMap.of("bins", finalBinList);
     }
@@ -55,6 +57,7 @@ public class BinController {
         Session session = HibernateUtil.getSession();
 
         Bin bin = new Bin(owner, questionSet);
+
         session.save(bin);
 
         return ImmutableMap.of("id", bin.getId(),
@@ -62,8 +65,8 @@ public class BinController {
     }
 
     @POST
-    @Path("/{binId}")
-    public Object changeArchiveBin(@FormParam("owner") long binId) {
+    @Path("/{binId}/change")
+    public Object changeArchiveBin(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -72,27 +75,63 @@ public class BinController {
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
-        if (bin.isOwner(user))
-            bin.setArchived(!bin.isArchived());
+        if (!bin.isOwner(user))
+            return Response.status(401).build();
+
+        bin.setArchived(!bin.isArchived());
+
+        session.update(bin);
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/{binId}/add")
+    public Object addBinQuestion(@PathParam("binId") long binId,
+                                 @FormParam("questionName") String questionName) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        if (!bin.isOwner(user))
+            return Response.status(401).build();
+
+        ProposedQuestion question = new ProposedQuestion();
+        session.save(question);
+
+        question.setName(questionName);
+        question.setBin(bin);
+
+        session.update(question);
 
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("/{id}/")
-    public Response deleteBin(@PathParam("id") long id,
+    @Path("/{binId}/")
+    public Response deleteBin(@PathParam("binId") long binId,
                               @QueryParam("token") String token) {
 
-        Bin bin = getBin(id);
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
 
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDelete(token)) {
+        if (!bin.canDelete(user, token)) {
             return Response.status(401).build();
         }
 
-        Session session = HibernateUtil.getSession();
         session.delete(bin);
+
         return Response.ok().build();
     }
 

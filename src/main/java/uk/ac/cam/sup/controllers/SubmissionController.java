@@ -47,12 +47,6 @@ public class SubmissionController {
         UnmarkedSubmission unmarkedSubmission = new UnmarkedSubmission();
         session.save(unmarkedSubmission);
 
-        session.getTransaction().commit();
-
-        // Restart session
-        session = HibernateUtil.getSession();
-        session.beginTransaction();
-
         // Create dir
         String directory = "temp/" + user + "/submissions/answers/";
         File fileDirectory = new File(directory);

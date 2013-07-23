@@ -59,8 +59,8 @@ public class BinTest {
 
     @Test
     public void testCanDelete() throws Exception {
-        Assert.assertFalse(testBin.canDelete(testBin.getToken()));
-        Assert.assertFalse(testBin.canDelete("fake token"));
+        Assert.assertFalse(testBin.canDelete("ap760", testBin.getToken()));
+        Assert.assertFalse(testBin.canDelete("ap760", "fake token"));
     }
 
     @Test
