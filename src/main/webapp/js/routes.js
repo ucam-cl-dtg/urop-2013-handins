@@ -23,13 +23,18 @@ function binInjector(templateName) {
                bin = res.bin;
             }
         });
+        console.log(bin);
 
+    }
+
+    getBin = function() {
+        return bin;
     }
 
     return function(json) {
         if (! isCached())
             updateBin();
-        json.bin = bin;
+        json.bin = getBin();
 
         return templateName;
     }
@@ -38,20 +43,20 @@ function binInjector(templateName) {
 function binList (json) {
     json.elems = json.bins;
     _.map(json.elems, function(elem) {
+        elem.uploadTo = elem.id;
         elem.sublist = "submission/bin/" + elem.id;
-        elem.sublistTemplateFunction = "submissionList";
+        elem.sublistTemplateFunction = "submissionSubList";
 
         return elem;
     });
     return "shared.handins.generic.listPanel";
 }
 
-function submissionList(json) {
+function submissionSubList(json) {
     json.elems = json.submissions;
     json.subPanel = true;
 
     _.map(json.elems, function(elem) {
-        elem.uploadTo = elem.bin;
         elem.name = "Submission " + elem.id;
         elem.delete = "/submission/" + elem.id;
         elem.download = "/submission/" + elem.id;
@@ -61,14 +66,28 @@ function submissionList(json) {
     return "shared.handins.generic.listPanel";
 }
 
+function submissionList(json) {
+    json.elems = json.submissions;
+
+    _.map(json.elems, function(elem) {
+        elem.name = "Submission " + elem.id;
+        elem.delete = "/submission/" + elem.id;
+        elem.download = "/submission/" + elem.id;
+    })
+}
+
+function combine(f1 , f2) {
+    return function(json) {
+        f1(json);
+        return f2(json);
+    }
+}
+
 $(document).ready(function() {
     router = Router({
         //"tester": function(json) { return json['isSupervisor'] ? "a" : "b";}
         // Use the last line to redirect unmatched routes to an error page
-        "submission/bin/:id": function(json) {
-            json.binId = getRouteParams()[0];
-            return "handins.submission.index";
-        },
+        "submission/bin/:id": combine(submissionList, binInjector("handins.submission.index")),
 
         //"bin": "handins.bin.index",
         "bin": binList,

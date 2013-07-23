@@ -20,7 +20,7 @@ $(document).on("click", ".upload-work-for-bin", function() {
     var elem = $(this),
         bin = elem.attr("bin");
 
-    loadModule($('.upload-work'), "bin/" + bin, "shared.handins.uploadForm", function() {
+    loadModule($('.upload-work').first(), "bin/" + bin, "shared.handins.uploadForm", function() {
         this.slideToggle();
     });
 })
@@ -29,6 +29,8 @@ $(".upload-work-form form").ajaxForm(uploadedSubmission);
 
 function uploadedSubmission(data) {
     console.log(data);
+    Backbone.history.fragment = null;
+    router.navigate(window.location.hash, {trigger: true});
 }
 
 

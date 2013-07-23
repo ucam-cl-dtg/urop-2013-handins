@@ -111,6 +111,7 @@ public class SubmissionController {
 
             map.put("id", Long.toString(unmarkedSubmission.getId()));
             map.put("link", unmarkedSubmission.getLink());
+            map.put("bin", "" + unmarkedSubmission.getBin().getId());
 
             mapList.add(map);
         }
