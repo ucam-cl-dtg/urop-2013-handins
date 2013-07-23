@@ -93,8 +93,6 @@ public class PDFManip {
      */
     public String queryMetadata(String key) throws MetadataNotFoundException, IOException {
 
-        List<String> pageDetails;
-
         PdfReader reader = new PdfReader(filePath);
 
         Map <String, String> info = reader.getInfo();

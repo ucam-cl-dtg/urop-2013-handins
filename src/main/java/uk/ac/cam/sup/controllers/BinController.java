@@ -29,6 +29,7 @@ public class BinController {
 
     @GET
     public Object listBins() {
+
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
@@ -40,7 +41,8 @@ public class BinController {
         for (Bin bin : binList)
             if (bin.canAddSubmission(user))
                 finalBinList.add(ImmutableMap.of("id", bin.getId(),
-                                                 "name", bin.getName()));
+                                                 "name", bin.getName(),
+                                                 "isArchived", bin.isArchived()));
 
         return ImmutableMap.of("bins", finalBinList);
     }
@@ -48,6 +50,7 @@ public class BinController {
     @POST
     public Map<String, ?> createBin(@FormParam("owner") String owner,
                                     @FormParam("questionSet") String questionSet ) {
+
         // Set Hibernate
         Session session = HibernateUtil.getSession();
 
@@ -56,6 +59,23 @@ public class BinController {
 
         return ImmutableMap.of("id", bin.getId(),
                                "token", bin.getToken());
+    }
+
+    @POST
+    @Path("/{binId}")
+    public Object changeArchiveBin(@FormParam("owner") long binId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        if (bin.isOwner(user))
+            bin.setArchived(!bin.isArchived());
+
+        return Response.ok().build();
     }
 
     @DELETE

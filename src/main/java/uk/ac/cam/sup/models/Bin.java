@@ -25,6 +25,8 @@ public class Bin {
     private String token;
     private String questionSetName;
 
+    private boolean isArchived;
+
     @OneToMany(mappedBy="bin")
     private Set<BinPermission> permissions;
 
@@ -137,6 +139,15 @@ public class Bin {
         this.questionSet = questionSet;
     }
 
+    // Archived
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
     // Actual useful functions
     public static String generateToken() {
         return RandomStringUtils.randomAlphabetic(35);
@@ -200,12 +211,12 @@ public class Bin {
     The Admin should be able to delete the unmarkedSubmission
     The User who uploaded the unmarkedSubmission should be able to delete it
      */
-    public boolean canDeleteSubmission(String user, UnmarkedSubmission unmarkedSubmission) {
+    public boolean canDeleteSubmission(String user, Submission submission) {
         if (UserHelper.isAdmin(user)) {
             return true;
         }
 
-        return unmarkedSubmission.getOwner().equals(user);
+        return submission.getOwner().equals(user);
     }
 
     /*

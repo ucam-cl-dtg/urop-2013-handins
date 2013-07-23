@@ -77,10 +77,49 @@ public class MarkingController {
         return ImmutableMap.of("id", markedSubmission.getId(), "List of Student/Question", listOfUploads);
     }
 
+    @DELETE
+    @Path("bin/{binId}/{submissionId}")
+    @Produces("application/json")
+    public Object deleteSubmission(@PathParam("binId") long binId,
+                                   @PathParam("submissionId") long submissionId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        MarkedSubmission markedSubmission = (MarkedSubmission) session.get(MarkedSubmission.class, submissionId);
+
+        if (markedSubmission == null)
+            return Response.status(404).build();
+
+        // Get Bin and check
+        Bin bin = markedSubmission.getBin();
+
+        if (!bin.canDeleteSubmission(user, markedSubmission))
+            return Response.status(401).build();
+
+        for (MarkedAnswer markedAnswer : markedSubmission.getAllAnswers()) {
+            FilesManip.fileDelete(markedAnswer.getFilePath());
+
+            session.delete(markedAnswer);
+        }
+
+        FilesManip.fileDelete(markedSubmission.getFilePath());
+        session.delete(markedSubmission);
+
+        return Response.status(200).build();
+    }
+
     /*
     Done
      */
     public Object resultingFile(List<String> questionPathList) throws IOException, DocumentException {
+
+        // Create directory
+        String directory = "temp/";
+        File fileDirectory = new File(directory);
+        fileDirectory.mkdirs();
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
         PDFManip pdfManip = new PDFManip(randomTemp);
@@ -119,8 +158,8 @@ public class MarkingController {
             boolean isMarked = true;
 
             List<Answer> answers = session.createCriteria(Answer.class)
-                                          .add(Restrictions.eq("owner", student))
                                           .add(Restrictions.eq("bin", bin))
+                                          .add(Restrictions.eq("owner", student))
                                           .list();
 
             for (Answer answer : answers)
@@ -164,8 +203,8 @@ public class MarkingController {
 
         for (ProposedQuestion question : questions) {
             List<Answer> answers = session.createCriteria(Answer.class)
-                                          .add(Restrictions.eq("owner", studentCrsId))
                                           .add(Restrictions.eq("bin", bin))
+                                          .add(Restrictions.eq("owner", studentCrsId))
                                           .add(Restrictions.eq("question", question)).list();
 
             boolean exists = answers.size() > 0;
