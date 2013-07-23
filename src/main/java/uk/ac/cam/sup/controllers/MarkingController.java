@@ -116,20 +116,16 @@ public class MarkingController {
 
         for (BinPermission permission : allAccess) {
             String student = permission.getUser();
-            boolean isMarked = false;
-
-            int markedAnswers = session.createCriteria(MarkedAnswer.class)
-                                       .add(Restrictions.eq("owner", student))
-                                       .add(Restrictions.eq("bin", bin))
-                                       .list().size();
-
-            if (markedAnswers == bin.getQuestionCount())
-                isMarked = true;
+            boolean isMarked = true;
 
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("owner", student))
                                           .add(Restrictions.eq("bin", bin))
                                           .list();
+
+            for (Answer answer : answers)
+                if (answer.getMarkedAnswers().size() == 0)
+                    isMarked = false;
 
             boolean available = false;
             for (Answer answer : answers)
