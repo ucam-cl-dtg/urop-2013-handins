@@ -33,10 +33,4 @@ public class UnmarkedSubmission extends Submission<Answer> {
     public String getFolder() {
         return "answer";
     }
-
-    // TODO make this work when the site is mounted at a random point
-    @Transient
-    public String getLink() {
-        return "/submission/" + getId();
-    }
 }

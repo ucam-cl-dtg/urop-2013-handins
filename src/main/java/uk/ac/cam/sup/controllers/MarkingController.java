@@ -11,9 +11,6 @@ import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
-import uk.ac.cam.sup.structures.Pair;
-import uk.ac.cam.sup.structures.Quad;
-import uk.ac.cam.sup.structures.Triple;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 import uk.ac.cam.sup.tools.TemporaryFileInputStream;
@@ -115,11 +112,11 @@ public class MarkingController {
             return Response.status(401).build();
 
         List<BinPermission> allAccess = new LinkedList<BinPermission>(bin.getPermissions());
-        List<Pair<String, Boolean>> students = new LinkedList<Pair<String, Boolean>>();
+        List<ImmutableMap<String, ?>> students = new LinkedList<ImmutableMap<String, ?>>();
 
         for (BinPermission permission : allAccess) {
             String student = permission.getUser();
-            boolean marked = false;
+            boolean isMarked = false;
 
             int markedAnswers = session.createCriteria(MarkedAnswer.class)
                                        .add(Restrictions.eq("owner", student))
@@ -127,7 +124,7 @@ public class MarkingController {
                                        .list().size();
 
             if (markedAnswers == bin.getQuestionCount())
-                marked = true;
+                isMarked = true;
 
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("owner", student))
@@ -140,10 +137,10 @@ public class MarkingController {
                     available = true;
 
             if (available)
-                students.add(new Pair<String, Boolean>(student, marked));
+                students.add(ImmutableMap.of("student", student, "isMarked", isMarked));
         }
 
-        return ImmutableMap.of("List of Student Pairs: <crsId/link, isMarked>", students);
+        return ImmutableMap.of("students", students);
     }
 
     /*
@@ -167,7 +164,7 @@ public class MarkingController {
             return Response.status(401).build();
 
         List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
-        List<Quad<String, Long, Boolean, Boolean>> studentQuestions = new LinkedList<Quad<String, Long, Boolean, Boolean>>();
+        List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<ImmutableMap<String, ?>>();
 
         for (ProposedQuestion question : questions) {
             List<Answer> answers = session.createCriteria(Answer.class)
@@ -181,11 +178,14 @@ public class MarkingController {
                 if (bin.canSeeAnswer(user, answers.get(0))) {
                     boolean isMarked = answers.get(0).getMarkedAnswers().size() > 0;
 
-                    studentQuestions.add(new Quad<String, Long, Boolean, Boolean>(question.getName(), question.getId(), exists, isMarked));
+                    studentQuestions.add(ImmutableMap.of("questionName", question.getName(),
+                                                         "questionId", question.getId(),
+                                                         "exists", exists,
+                                                         "isMarked", isMarked));
                 }
         }
 
-        return ImmutableMap.of("List of Question Quads: <name, id/link, isSubmitted, isMarked>", studentQuestions);
+        return ImmutableMap.of("studentQuestions", studentQuestions);
     }
 
     /*
@@ -234,7 +234,7 @@ public class MarkingController {
             return Response.status(401).build();
 
         List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
-        List<Triple<String, Long, Boolean>> questionList = new LinkedList<Triple<String, Long, Boolean>>();
+        List<ImmutableMap<String, ?>> questionList = new LinkedList<ImmutableMap<String, ?>>();
 
         for (ProposedQuestion question : questions) {
             List <Answer> answers = new LinkedList<Answer>(question.getAnswers());
@@ -250,10 +250,10 @@ public class MarkingController {
             }
 
             if (available)
-                questionList.add(new Triple<String, Long, Boolean>(question.getName(), question.getId(), isMarked));
+                questionList.add(ImmutableMap.of("questionName", question.getName(), "questionId", question.getId(), "isMarked", isMarked));
         }
 
-        return ImmutableMap.of("List of Question Triple: <name, id/link, isMarked>", questionList);
+        return ImmutableMap.of("questionList", questionList);
     }
 
     /*
@@ -279,19 +279,24 @@ public class MarkingController {
         ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
 
         List<Answer> answers = new LinkedList<Answer>(question.getAnswers());
-        List<Pair<String, Boolean>> studentList = new LinkedList<Pair<String, Boolean>>();
+        List<ImmutableMap<String, ?>> studentList = new LinkedList<ImmutableMap<String, ?>>();
 
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer))
-                studentList.add(new Pair<String, Boolean>(answer.getOwner(), answer.getMarkedAnswers().size() > 0));
+                studentList.add(ImmutableMap.of("owner", answer.getOwner(), "isMarked", answer.getMarkedAnswers().size() > 0));
 
-        return ImmutableMap.of("List of Student of Pair: <crsId/link, isMarked>", studentList);
+        return ImmutableMap.of("studentList", studentList);
     }
-     /*
+
     @GET
     @Path("/bin/{binId}/question/{questionId}/download")
     @Produces("application/pdf")
-    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) {
+    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) throws IOException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -299,15 +304,30 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
-        return null;
+        List<Answer> answerList = session.createCriteria(Answer.class)
+                                           .add(Restrictions.eq("bin", bin))
+                                           .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
+                                           .list();
+        List<String> pathList = new LinkedList<String>();
+
+        for (Answer answer : answerList)
+            if (bin.canSeeAnswer(user, answer))
+                pathList.add(answer.getFilePath());
+
+        return resultingFile(pathList);
     }
 
     @GET
     @Path("/bin/{binId}/student/{studentCrsId}/question/{questionId}")
     @Produces("application/pdf")
-    public Object viewStudentQuestion(@PathParam("binId") long binId,
+    public Object getStudentQuestion(@PathParam("binId") long binId,
                                       @PathParam("studentCrsId") String studentCrsId,
                                       @PathParam("questionId}") long questionId) throws IOException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
 
         // Get Bin and check
         Bin bin = BinController.getBin(binId);
@@ -315,23 +335,39 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
+        if (session.createCriteria(Answer.class)
+                   .add(Restrictions.eq("bin", bin))
+                   .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
+                   .add(Restrictions.eq("owner", studentCrsId))
+                   .list().size() > 0) {
+            Answer answer = (Answer) session.createCriteria(Answer.class)
+                                        .add(Restrictions.eq("bin", bin))
+                                        .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
+                                        .add(Restrictions.eq("owner", studentCrsId))
+                                        .list().get(0);
+            List<String> pathList = new LinkedList<String>();
+            pathList.add(answer.getFilePath());
 
+            if (bin.canSeeAnswer(user, answer))
+                return resultingFile(pathList);
+        }
 
-        return resultingFile(questionPathList);
+        return Response.status(401).build();
     }
+
     /*
     Done
-     */  /*
+     */
     @GET
     @Path("/bin/{binId}/question/{questionId}/student/{studentCrsId}")
     @Produces("application/pdf")
-    public Object viewQuestionStudent(@PathParam("binId") long binId,
+    public Object getQuestionStudent(@PathParam("binId") long binId,
                                       @PathParam("questionId") long questionId,
                                       @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
 
-        return viewStudentQuestion(binId, studentCrsId, questionId);
+        return getStudentQuestion(binId, studentCrsId, questionId);
     }
-    */
+
 
     /*
     Done

@@ -79,7 +79,7 @@ public class SubmissionController {
         FilesManip.distributeSubmission(unmarkedSubmission);
 
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
-                                                                     "link", unmarkedSubmission.getLink()));
+                                                                     "link", unmarkedSubmission.getId()));
     }
 
     @GET
@@ -103,25 +103,71 @@ public class SubmissionController {
             if (bin.canSeeSubmission(user, unmarkedSubmission))
                 accessibleUnmarkedSubmissions.add(unmarkedSubmission);
 
-        List<Map<String, String> > mapList = new LinkedList<Map<String, String>>();
+        List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();
 
-        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions) {
-
-            Map<String, String> map = new HashMap<String, String>();
-
-            map.put("id", Long.toString(unmarkedSubmission.getId()));
-            map.put("link", unmarkedSubmission.getLink());
-
-            mapList.add(map);
-        }
+        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions)
+            mapList.add(ImmutableMap.of("link", unmarkedSubmission.getId(),
+                                        "id", Long.toString(unmarkedSubmission.getId())));
 
         return ImmutableMap.of("submissions", mapList);
     }
 
     @GET
     @Path("/{submissionId}")
-    @Produces("application/pdf")
+    @Produces("application/json")
     public Object seeSubmission(@PathParam("submissionId") long submissionId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+
+        if (unmarkedSubmission == null)
+            return Response.status(404).build();
+
+        // Get Bin and check
+        Bin bin = unmarkedSubmission.getBin();
+
+        if (!bin.canSeeSubmission(user, unmarkedSubmission))
+            return Response.status(401).build();
+
+        List<ImmutableMap<String, String>> answerList = new LinkedList<ImmutableMap<String, String>>();
+        for (Answer answer : unmarkedSubmission.getAllAnswers())
+            answerList.add(ImmutableMap.of("question", answer.getQuestion().getName(), "link", Long.toString(answer.getId())));
+
+        return ImmutableMap.of("answers", answerList);
+    }
+
+    @GET
+    @Path("/{submissionId}/{answerId}")
+    @Produces("application/pdf")
+    public Object getAnswer(@PathParam("submissionId") long submissionId, @PathParam("answerId") long answerId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Answer answer = (Answer) session.get(Answer.class, answerId);
+
+        if (answer == null)
+            return Response.status(404).build();
+
+        // Get Bin and check
+        Bin bin = answer.getBin();
+
+        if (!bin.canSeeAnswer(user, answer))
+            return Response.status(401).build();
+
+        return Response.ok(new File(answer.getFilePath())).build();
+    }
+
+    @GET
+    @Path("/{submissionId}/download")
+    @Produces("application/pdf")
+    public Object getSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
