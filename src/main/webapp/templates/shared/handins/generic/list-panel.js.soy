@@ -34,7 +34,7 @@
                 <a class="icon-button panel-icon-button websymbols-icon icon-button-array upload-work-for-bin" bin="{$uploadTo}">J</a>
             {/if}
             {if $delete}
-                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-location="{$delete}">'</a>
+                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-link="{$delete}">'</a>
             {/if}
         </div>
     </div>
@@ -86,7 +86,8 @@
   @param subPanel
 */
 {template .listPanel}
-
+    <div class="upload-work" style="display: none">
+    </div>
     {if $subPanel}
         <ul class="sub-panel force-display">
         {foreach $elem in $elems}
