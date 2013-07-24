@@ -214,7 +214,7 @@ public class MarkingController {
                 }
         }
 
-        return ImmutableMap.of("studentQuestions", studentQuestions);
+        return ImmutableMap.of("studentQuestions", studentQuestions, "student", studentCrsId);
     }
 
     /*
@@ -314,7 +314,7 @@ public class MarkingController {
             if (bin.canSeeAnswer(user, answer))
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(), "isMarked", answer.getMarkedAnswers().size() > 0));
 
-        return ImmutableMap.of("studentList", studentList);
+        return ImmutableMap.of("studentList", studentList, "question", questionId);
     }
 
     @GET
