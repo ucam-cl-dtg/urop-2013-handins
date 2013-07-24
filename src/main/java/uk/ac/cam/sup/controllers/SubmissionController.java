@@ -10,7 +10,9 @@ import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
+import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
+import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
@@ -67,6 +69,9 @@ public class SubmissionController {
         PDFManip pdfManip = new PDFManip(directory + fileName);
 
         // ToDo: Redirect to splitting screen
+
+        for (int i = 1; i <= pdfManip.getPageCount(); i++)
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, (long) i), i, i);
 
         FilesManip.distributeSubmission(unmarkedSubmission);
 

@@ -230,6 +230,8 @@ public class MarkingController {
                 marking.setLast(actualPage - 1);
                 marking.setOwner(studentCrsId);
                 marking.setQuestion(answer.getQuestion());
+
+                markingList.add(marking);
             }
 
         return FilesManip.resultingFile(markingList);
@@ -342,6 +344,8 @@ public class MarkingController {
                 marking.setLast(actualPage - 1);
                 marking.setOwner(answer.getOwner());
                 marking.setQuestion(answer.getQuestion());
+
+                markingList.add(marking);
             }
 
         return FilesManip.resultingFile(markingList);
@@ -388,6 +392,8 @@ public class MarkingController {
             marking.setLast(new PDFManip(answer.getFilePath()).getPageCount());
             marking.setOwner(answer.getOwner());
             marking.setQuestion(answer.getQuestion());
+
+            markingList.add(marking);
 
             return FilesManip.resultingFile(markingList);
         }
@@ -445,6 +451,8 @@ public class MarkingController {
                 marking.setLast(actualPage - 1);
                 marking.setOwner(answer.getOwner());
                 marking.setQuestion(answer.getQuestion());
+
+                markingList.add(marking);
             }
 
         return FilesManip.resultingFile(markingList);
