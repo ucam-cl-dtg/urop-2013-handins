@@ -62,13 +62,11 @@ public class SubmissionController {
 
         session.update(unmarkedSubmission);
 
-        // todo: convert the received file;
+        // todo: convert the received files
 
         PDFManip pdfManip = new PDFManip(directory + fileName);
 
         // ToDo: Redirect to splitting screen
-
-        FilesManip.markPdf(pdfManip, "ap760", "1");
 
         FilesManip.distributeSubmission(unmarkedSubmission);
 

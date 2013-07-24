@@ -1,13 +1,22 @@
 package uk.ac.cam.sup.tools;
 
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfCopy;
+import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.controllers.BinController;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
+import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Distribution;
+import uk.ac.cam.sup.structures.Marking;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,12 +27,87 @@ import java.util.List;
 public class FilesManip {
 
     /*
+    Done
+     */
+    public static Object resultingFile(List<Marking> questionList) throws IOException, DocumentException {
+
+        // Create directory
+        String directory = "temp/";
+        File fileDirectory = new File(directory);
+        fileDirectory.mkdirs();
+
+        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+
+        List<String> questionPathList = new LinkedList<String>();
+        for (Marking marking : questionList)
+            questionPathList.add(marking.getFilePath());
+
+        FilesManip.mergePdf(questionPathList, randomTemp);
+        PDFManip pdfManip = new PDFManip(randomTemp);
+
+        for (Marking marking : questionList)
+            FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
+
+        return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+    }
+
+    private static void rememberAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
+
+        // Set Hibernate
+        Session session = HibernateUtil.getSession();
+
+        // New Answer to get id
+        Answer answer = new Answer();
+        session.save(answer);
+
+        // Update Answer
+        String filePath = directory + answer.getId() + ".pdf";
+        PDFManip pdfManip = new PDFManip(filePath);
+        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+        pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
+
+        answer.setBin(submission.getBin());
+        answer.setFilePath(filePath);
+        answer.setQuestion(distribution.getQuestion());
+        answer.setFinalState(false);
+        answer.setOwner(distribution.getStudent());
+        answer.setUnmarkedSubmission((UnmarkedSubmission) submission);
+
+        session.update(answer);
+    }
+
+    private static void rememberMarkedAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
+
+        // Set Hibernate
+        Session session = HibernateUtil.getSession();
+
+        // New markedAnswer to get id
+        MarkedAnswer markedAnswer = new MarkedAnswer();
+        session.save(markedAnswer);
+
+        // Update Answer
+        String filePath = directory + markedAnswer.getId() + ".pdf";
+        PDFManip pdfManip = new PDFManip(filePath);
+        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+
+        markedAnswer.setFilePath(filePath);
+        markedAnswer.setOwner(distribution.getStudent());
+        markedAnswer.setAnnotator(UserHelper.getCurrentUser());
+        markedAnswer.setMarkedSubmission((MarkedSubmission) submission);
+        markedAnswer.setAnswer((Answer) session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("owner", distribution.getStudent()))
+                                      .add(Restrictions.eq("question", distribution.getQuestion()))
+                                      .list().get(0));
+
+        session.update(markedAnswer);
+    }
+
+    /*
 
      */
     public static void distributeSubmission(Submission submission) throws MetadataNotFoundException, IOException, DocumentException {
 
-        // Set Hibernate and get file to be split
-        Session session = HibernateUtil.getSession();
+        // Split the file
 
         List <Distribution> distributions = submission.getSubmissionDistribution();
 
@@ -34,50 +118,43 @@ public class FilesManip {
             File fileDirectory = new File(directory);
             fileDirectory.mkdirs();
 
-            // New Answer to get id
-            Answer answer = new Answer();
-            session.save(answer);
-
-            // Update Answer
-            String filePath = directory + answer.getId() + ".pdf";
-            PDFManip pdfManip = new PDFManip(filePath);
-            new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
-            pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
-
-            answer.setBin(submission.getBin());
-            answer.setFilePath(filePath);
-            answer.setQuestion(distribution.getQuestion());
-            answer.setFinalState(false);
-            answer.setOwner(distribution.getStudent());
-            answer.setUnmarkedSubmission((UnmarkedSubmission) submission);
-
-            session.update(answer);
+            if (submission instanceof UnmarkedSubmission)
+                rememberAnswer(distribution, directory, submission);
+            if (submission instanceof MarkedSubmission)
+                rememberMarkedAnswer(distribution, directory, submission);
         }
     }
 
     /*
 
      */
-    public static boolean mergePdf(PDFManip pdfManip, List<String> filePaths) throws IOException, DocumentException {
-        if (filePaths.size() == 0)
-            return false;
+    public static void mergePdf(List<String> filePaths, String destination) throws IOException, DocumentException {
 
-        fileCopy(filePaths.get(0), pdfManip.getFilePath());
-        filePaths.remove(0);
+        Document document = new Document();
 
-        for (String filePath : filePaths)
-            pdfManip.add(filePath);
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(destination));
 
-        return true;
+        document.open();
+
+        for (String filePath : filePaths) {
+
+            PdfReader reader = new PdfReader(filePath);
+            int n = reader.getNumberOfPages();
+
+            for (int pn = 0; pn < n; )
+                copy.addPage(copy.getImportedPage(reader, ++pn));
+        }
+
+        document.close();
     }
 
     /*
     Todo: maybe delete or change the function
      */
-    public static void markPdf(PDFManip pdfManip, String owner, String question) throws IOException, DocumentException {
-        for (int i = 1; i <= pdfManip.getPageCount(); i++) {
+    public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) throws IOException, DocumentException {
+        for (int i = firstPage; i <= lastPage; i++) {
             pdfManip.injectMetadata("page.owner." + i, owner);
-            pdfManip.injectMetadata("page.question." + i, Integer.toString((1 + i) / 2));
+            pdfManip.injectMetadata("page.question." + i, Long.toString(question.getId()));
         }
     }
 

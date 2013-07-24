@@ -14,10 +14,8 @@ public class MarkedAnswer {
     private long id;
 
     private String owner;
+    private String annotator;
     private String filePath;
-
-    @ManyToOne
-    private ProposedQuestion question;
 
     @ManyToOne
     private MarkedSubmission markedSubmission;
@@ -42,15 +40,6 @@ public class MarkedAnswer {
 
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    // Question
-    public ProposedQuestion getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(ProposedQuestion question) {
-        this.question = question;
     }
 
     // FilePath
@@ -78,5 +67,14 @@ public class MarkedAnswer {
 
     public void setAnswer(Answer answer) {
         this.answer = answer;
+    }
+
+    // Annotator
+    public String getAnnotator() {
+        return annotator;
+    }
+
+    public void setAnnotator(String annotator) {
+        this.annotator = annotator;
     }
 }

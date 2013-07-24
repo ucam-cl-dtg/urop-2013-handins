@@ -1,6 +1,7 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import com.itextpdf.text.DocumentException;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -8,15 +9,46 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinPermission;
+import uk.ac.cam.sup.models.MarkedAnswer;
 import uk.ac.cam.sup.models.ProposedQuestion;
+import uk.ac.cam.sup.tools.FilesManip;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.*;
 
 @Path("/bin")
 @Produces("application/json")
 public class BinController {
+
+    /*
+    ToDo: COMPLETE AND MOVE THE NEXT 2 FUNCTIONS
+     */
+
+    @GET
+    @Produces("application/pdf")
+    public Object getMarkedAnswer(@PathParam("binId") long binId, @PathParam("markedAnswerId") long markedAnswerId) throws IOException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
+
+        if (bin.canSeeAnnotated(user, markedAnswer)) {
+            List<String> pathList = new LinkedList<String>();
+
+            pathList.add(markedAnswer.getFilePath());
+
+            //return FilesManip.resultingFile(pathList);
+        }
+
+        return Response.status(401).build();
+    }
 
     public static Bin getBin(long id) {
         // Set Hibernate
