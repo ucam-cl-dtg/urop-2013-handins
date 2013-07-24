@@ -130,6 +130,9 @@ public class FilesManip {
      */
     public static void mergePdf(List<String> filePaths, String destination) throws IOException, DocumentException {
 
+        if (filePaths.size() == 0)
+            return;
+
         Document document = new Document();
 
         PdfCopy copy = new PdfCopy(document, new FileOutputStream(destination));
