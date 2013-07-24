@@ -7,11 +7,21 @@ public class Marking {
 
     private String filePath;
 
-    private int first;
-    private int last;
+    private int first = 0;
+    private int last = 0;
 
     private String owner;
     private ProposedQuestion question;
+
+    // Constructors
+
+    public Marking() {
+
+    }
+
+    public Marking(String filePath) {
+        setFilePath(filePath);
+    }
 
     // FilePath
     public String getFilePath() {

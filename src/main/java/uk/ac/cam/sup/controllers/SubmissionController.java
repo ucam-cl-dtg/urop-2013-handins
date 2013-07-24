@@ -12,7 +12,6 @@ import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
-import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
@@ -204,6 +203,15 @@ public class SubmissionController {
         Bin bin = unmarkedSubmission.getBin();
 
         if (!bin.canDeleteSubmission(user, unmarkedSubmission))
+            return Response.status(401).build();
+
+        boolean canDelete = true;
+
+        for (Answer answer : unmarkedSubmission.getAllAnswers())
+            if (answer.isAnnotated())
+                canDelete = false;
+
+        if (!canDelete)
             return Response.status(401).build();
 
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {

@@ -11,6 +11,7 @@ import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinPermission;
 import uk.ac.cam.sup.models.MarkedAnswer;
 import uk.ac.cam.sup.models.ProposedQuestion;
+import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 
 import javax.ws.rs.*;
@@ -27,6 +28,7 @@ public class BinController {
      */
 
     @GET
+    @Path("/{binId}/marked/{markedAnswerId}/download")
     @Produces("application/pdf")
     public Object getMarkedAnswer(@PathParam("binId") long binId, @PathParam("markedAnswerId") long markedAnswerId) throws IOException, DocumentException {
 
@@ -40,12 +42,43 @@ public class BinController {
         MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
 
         if (bin.canSeeAnnotated(user, markedAnswer)) {
-            List<String> pathList = new LinkedList<String>();
+            List<Marking> markedList = new LinkedList<Marking>();
 
-            pathList.add(markedAnswer.getFilePath());
+            markedList.add(new Marking(markedAnswer.getFilePath()));
 
-            //return FilesManip.resultingFile(pathList);
+            return FilesManip.resultingFile(markedList);
         }
+
+        return Response.status(401).build();
+    }
+
+    @GET
+    @Path("/{binId}/marked/download")
+    @Produces("application/pdf")
+    public Object getMarkedAnswers(@PathParam("binId") long binId) throws IOException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        List<MarkedAnswer> markedAnswers = session.createCriteria(MarkedAnswer.class)
+                                                     .add(Restrictions.eq("bin", bin))
+                                                     .add(Restrictions.eq("owner", user))
+                                                     .list();
+
+        List<Marking> markedList = new LinkedList<Marking>();
+
+
+        for (MarkedAnswer markedAnswer : markedAnswers)
+            if (bin.canSeeAnnotated(user, markedAnswer)) {
+
+                markedList.add(new Marking(markedAnswer.getFilePath()));
+
+                return FilesManip.resultingFile(markedList);
+            }
 
         return Response.status(401).build();
     }
