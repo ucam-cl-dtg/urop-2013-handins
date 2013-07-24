@@ -25,6 +25,9 @@ import java.util.*;
 @Produces("application/json")
 public class BinController {
 
+    /*
+    Done
+     */
     public static Bin getBin(long id) {
         // Set Hibernate
         Session session = HibernateUtil.getSession();
@@ -36,9 +39,8 @@ public class BinController {
     }
 
     /*
-    ToDo: COMPLETE AND MOVE THE NEXT 2 FUNCTIONS
+    Done
      */
-
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
@@ -93,6 +95,9 @@ public class BinController {
                 "link", unmarkedSubmission.getId()));
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{binId}")
     @Produces("application/json")
@@ -123,6 +128,9 @@ public class BinController {
         return ImmutableMap.of("submissions", mapList);
     }
 
+    /*
+    Done
+     */
     @GET
     public Object listBins() {
 
@@ -145,6 +153,9 @@ public class BinController {
         return ImmutableMap.of("bins", finalBinList);
     }
 
+    /*
+    Done
+     */
     @POST
     public Map<String, ?> createBin(@FormParam("owner") String owner,
                                     @FormParam("questionSet") String questionSet ) {
@@ -160,6 +171,9 @@ public class BinController {
                                "token", bin.getToken());
     }
 
+    /*
+    Done
+     */
     @POST
     @Path("/{binId}/change")
     public Object changeArchiveBin(@PathParam("binId") long binId) {
@@ -181,6 +195,9 @@ public class BinController {
         return Response.ok().build();
     }
 
+    /*
+    Done
+     */
     @POST
     @Path("/{binId}/add")
     public Object addBinQuestion(@PathParam("binId") long binId,
@@ -207,6 +224,9 @@ public class BinController {
         return Response.ok().build();
     }
 
+    /*
+    Done
+     */
     @DELETE
     @Path("/{binId}")
     public Response deleteBin(@PathParam("binId") long binId,
@@ -231,6 +251,9 @@ public class BinController {
         return Response.ok().build();
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{id}")
     public Object viewBin(@PathParam("id") long id) {
@@ -244,6 +267,9 @@ public class BinController {
                                "name", bin.getName()));
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{id}/permission/")
     public List<String> viewBinPermissionsList(@PathParam("id") long id) {
@@ -261,6 +287,9 @@ public class BinController {
         return res;
     }
 
+    /*
+    Done
+     */
     @POST
     @Path("/{id}/permission/")
     public Response addPermissions(@PathParam("id") long id,
@@ -289,6 +318,9 @@ public class BinController {
         return Response.ok().build();
     }
 
+    /*
+    Done
+     */
     @DELETE
     @Path("/{id}/permission")
     public Response deletePermissions(@PathParam("id") long id,

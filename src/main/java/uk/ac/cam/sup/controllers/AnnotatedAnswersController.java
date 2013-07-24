@@ -21,6 +21,9 @@ import java.util.List;
 
 public class AnnotatedAnswersController {
 
+    /*
+    Done
+     */
     @GET
     @Path("/{binId}/marked/{markedAnswerId}/download")
     @Produces("application/pdf")
@@ -46,6 +49,9 @@ public class AnnotatedAnswersController {
         return Response.status(401).build();
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{binId}/marked/download")
     @Produces("application/pdf")

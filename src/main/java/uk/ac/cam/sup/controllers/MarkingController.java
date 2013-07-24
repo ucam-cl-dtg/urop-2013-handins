@@ -10,9 +10,7 @@ import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
-import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
-import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -25,7 +23,7 @@ import java.util.*;
 public class MarkingController {
 
     /*
-    Done?
+    Done
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -69,6 +67,9 @@ public class MarkingController {
         return ImmutableMap.of("id", markedSubmission.getId());
     }
 
+    /*
+    Done
+     */
     @DELETE
     @Path("/{submissionId}")
     @Produces("application/json")
@@ -269,48 +270,5 @@ public class MarkingController {
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(), "isMarked", answer.getMarkedAnswers().size() > 0));
 
         return ImmutableMap.of("studentList", studentList, "question", questionId);
-    }
-
-    @GET
-    @Path("/question/{questionId}/download")
-    @Produces("application/pdf")
-    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") long questionId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(401).build();
-
-        @SuppressWarnings("unchecked")
-        List<Answer> answers = session.createCriteria(Answer.class)
-                                      .add(Restrictions.eq("bin", bin))
-                                      .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                                      .list();
-
-        List<Marking> markingList = new LinkedList<Marking>();
-        int actualPage = 1;
-        for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer))
-            {
-                Marking marking = new Marking();
-
-                marking.setFilePath(answer.getFilePath());
-                marking.setFirst(actualPage);
-
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
-                marking.setLast(actualPage - 1);
-                marking.setOwner(answer.getOwner());
-                marking.setQuestion(answer.getQuestion());
-
-                markingList.add(marking);
-            }
-
-        return FilesManip.resultingFile(markingList);
     }
 }

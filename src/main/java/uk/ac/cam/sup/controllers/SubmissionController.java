@@ -17,6 +17,9 @@ import java.util.*;
 @Path ("/submission")
 public class SubmissionController {
 
+    /*
+    Done
+     */
     @GET
     @Path("/{submissionId}")
     @Produces("application/json")
@@ -45,6 +48,9 @@ public class SubmissionController {
         return ImmutableMap.of("answers", answerList);
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{submissionId}/{answerId}/download")
     @Produces("application/pdf")
@@ -69,6 +75,9 @@ public class SubmissionController {
         return Response.ok(new File(answer.getFilePath())).build();
     }
 
+    /*
+    Done
+     */
     @GET
     @Path("/{submissionId}/download")
     @Produces("application/pdf")
@@ -93,6 +102,9 @@ public class SubmissionController {
         return Response.ok(new File(unmarkedSubmission.getFilePath())).build();
     }
 
+    /*
+    Done
+     */
     @DELETE
     @Path("/{submissionId}")
     @Produces("application/json")
