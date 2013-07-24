@@ -252,6 +252,12 @@ public class Bin {
         return true;
     }
 
+    /*
+    ToDo: complete the function and add the comments
+     */
+    public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
+        return true;
+    }
     @Transient
     public int getQuestionCount() {
         return questionSet.size();

@@ -2,7 +2,6 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import com.itextpdf.text.DocumentException;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -11,9 +10,9 @@ import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
+import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
-import uk.ac.cam.sup.tools.TemporaryFileInputStream;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -103,26 +102,6 @@ public class MarkingController {
         session.delete(markedSubmission);
 
         return Response.status(200).build();
-    }
-
-    /*
-    Done
-     */
-    public Object resultingFile(List<String> questionPathList) throws IOException, DocumentException {
-
-        // Create directory
-        String directory = "temp/";
-        File fileDirectory = new File(directory);
-        fileDirectory.mkdirs();
-
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
-        PDFManip pdfManip = new PDFManip(randomTemp);
-
-        if (FilesManip.mergePdf(pdfManip, questionPathList))
-            FilesManip.markPdf(pdfManip, "ap760", Integer.toString(3));
-        else return Response.status(401).build();
-
-        return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
     }
 
     /*
@@ -237,12 +216,23 @@ public class MarkingController {
 
         List<Answer> answers = new LinkedList<Answer>(bin.getAnswers());
 
-        List<String> pathList = new LinkedList<String>();
+        List<Marking> markingList = new LinkedList<Marking>();
+        int actualPage = 1;
         for (Answer answer : answers)
             if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answer))
-                pathList.add(answer.getFilePath());
+            {
+                Marking marking = new Marking();
 
-        return resultingFile(pathList);
+                marking.setFilePath(answer.getFilePath());
+                marking.setFirst(actualPage);
+
+                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
+                marking.setLast(actualPage - 1);
+                marking.setOwner(studentCrsId);
+                marking.setQuestion(answer.getQuestion());
+            }
+
+        return FilesManip.resultingFile(markingList);
     }
 
     /*
@@ -333,17 +323,28 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
-        List<Answer> answerList = session.createCriteria(Answer.class)
-                                           .add(Restrictions.eq("bin", bin))
-                                           .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                                           .list();
-        List<String> pathList = new LinkedList<String>();
+        List<Answer> answers = session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("bin", bin))
+                                      .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
+                                      .list();
 
-        for (Answer answer : answerList)
+        List<Marking> markingList = new LinkedList<Marking>();
+        int actualPage = 1;
+        for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer))
-                pathList.add(answer.getFilePath());
+            {
+                Marking marking = new Marking();
 
-        return resultingFile(pathList);
+                marking.setFilePath(answer.getFilePath());
+                marking.setFirst(actualPage);
+
+                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
+                marking.setLast(actualPage - 1);
+                marking.setOwner(answer.getOwner());
+                marking.setQuestion(answer.getQuestion());
+            }
+
+        return FilesManip.resultingFile(markingList);
     }
 
     @GET
@@ -374,14 +375,24 @@ public class MarkingController {
                                         .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
                                         .add(Restrictions.eq("owner", studentCrsId))
                                         .list().get(0);
-            List<String> pathList = new LinkedList<String>();
-            pathList.add(answer.getFilePath());
 
             if (bin.canSeeAnswer(user, answer))
-                return resultingFile(pathList);
+                return Response.status(401).build();
+
+            List<Marking> markingList = new LinkedList<Marking>();
+            Marking marking = new Marking();
+
+            marking.setFilePath(answer.getFilePath());
+            marking.setFirst(1);
+
+            marking.setLast(new PDFManip(answer.getFilePath()).getPageCount());
+            marking.setOwner(answer.getOwner());
+            marking.setQuestion(answer.getQuestion());
+
+            return FilesManip.resultingFile(markingList);
         }
 
-        return Response.status(401).build();
+        return Response.status(404).build();
     }
 
     /*
@@ -419,12 +430,23 @@ public class MarkingController {
 
         List<Answer> answers = session.createCriteria(Answer.class)
                                       .add(Restrictions.eq("bin", bin)).list();
-        List<String> questionPathList = new LinkedList<String>();
 
+        List<Marking> markingList = new LinkedList<Marking>();
+        int actualPage = 1;
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer))
-                questionPathList.add(answer.getFilePath());
+            {
+                Marking marking = new Marking();
 
-        return resultingFile(questionPathList);
+                marking.setFilePath(answer.getFilePath());
+                marking.setFirst(actualPage);
+
+                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
+                marking.setLast(actualPage - 1);
+                marking.setOwner(answer.getOwner());
+                marking.setQuestion(answer.getQuestion());
+            }
+
+        return FilesManip.resultingFile(markingList);
     }
 }

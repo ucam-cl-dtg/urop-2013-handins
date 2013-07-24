@@ -18,6 +18,7 @@ public class Answer {
     private String filePath;
 
     private boolean finalState;
+    private boolean annotated;
 
     @ManyToOne
     private ProposedQuestion question;
@@ -82,8 +83,11 @@ public class Answer {
         return markedAnswers;
     }
 
-    public void setMarkedAnswers(Set markedAnswers) {
+    public void setMarkedAnswers(Set<MarkedAnswer> markedAnswers) {
         this.markedAnswers = markedAnswers;
+
+        if (markedAnswers.size() > 0)
+            setAnnotated(true);
     }
 
     // Bin
@@ -102,5 +106,14 @@ public class Answer {
 
     public void setFinalState(boolean finalState) {
         this.finalState = finalState;
+    }
+
+    // Annotated
+    public boolean isAnnotated() {
+        return annotated;
+    }
+
+    public void setAnnotated(boolean annotated) {
+        this.annotated = annotated;
     }
 }
