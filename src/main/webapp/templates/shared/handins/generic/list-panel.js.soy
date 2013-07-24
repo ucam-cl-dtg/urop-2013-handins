@@ -9,6 +9,8 @@
 * param id
 * @param sublistTemplateName
 * @param sublistTemplateFunction
+* @param marking - link
+* @param isMarked - boolean
 */
 {template .elementContents}
     <div class="columns large-7 small-7">{$name}</div>
@@ -36,6 +38,15 @@
             {if $delete}
                 <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-link="{$delete}">'</a>
             {/if}
+            {if $marking}
+                <a class="icon-button panel-icon-button websymbols-icon toggle-mark" marking-link="{$marking}">
+                    {if $isMarked }
+                        '
+                    {else}
+                        .
+                    {/if}
+                </a>
+            {/if}
         </div>
     </div>
 
@@ -45,7 +56,11 @@
 */
 {template .listElement}
 <li class="panel-wrapper columns large-12 delete-me">
-    <div class="list-panel">
+    {if $elem.isMarked}
+        <div class="list-panel success">
+    {else}
+        <div class="list-panel">
+    {/if}
         <div class="row list-inner-panel">
             {call .elementContents data="$elem"}
             {/call}
@@ -111,6 +126,4 @@
             </ul>
         </div>
     {/if}
-
-
 {/template}

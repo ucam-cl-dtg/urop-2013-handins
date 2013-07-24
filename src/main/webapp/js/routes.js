@@ -83,18 +83,76 @@ function combine(f1 , f2) {
     }
 }
 
+function markingStudents (json) {
+
+    _.each(json.students,  function(elem) {
+        elem.name = elem.student;
+        elem.download = "/marking/bin/" + json.bin.id + "/student/" + elem.student + "/download";
+        elem.sublist = "marking/bin/" + json.bin.id + "/student/" + elem.student;
+        elem.sublistTemplateFunction = "markingStudentsQuestion"
+        elem.marking = "bla";
+    })
+
+    json.unmarkedElems = _.filter(json.students, function(s) { return !s.isMarked; })
+    json.markedElems = _.filter(json.students, function(s) { return s.isMarked; })
+
+    return 'handins.marking.index';
+}
+
+function markingStudentsQuestion(json) {
+    json.subPanel = true;
+
+    var bin = getRouteParams()[0];
+
+    json.elems = json.studentQuestions;
+    _.each(json.elems, function(elem) {
+        elem.id = elem.questionId;
+        elem.name = elem.questionName;
+
+        elem.download = "/marking/bin/" + bin + "/question/" + elem.id + "/student/" + json.student;
+        elem.marking = "bla";
+    })
+
+    return 'shared.handins.generic.listPanel';
+}
+
+function markingQuestion(json) {
+
+    _.each(json.questionList,  function(elem) {
+        elem.name = elem.questionName;
+        elem.id = elem.questionId;
+        elem.download = "/marking/bin/" + json.bin.id + "/question/" + elem.id + "/download";
+        elem.sublist = "marking/bin/" + json.bin.id + "/question/" + elem.id;
+        elem.sublistTemplateFunction = "markingQuestionStudents";
+        elem.marking= "bla";
+    })
+
+    json.unmarkedElems = _.filter(json.questionList, function(s) { return !s.isMarked; })
+    json.markedElems = _.filter(json.questionList, function(s) { return s.isMarked; })
+
+    return 'handins.marking.index';
+}
+
+function markingQuestionStudents(json) {
+    json.subPanel = true;
+    json.elems = json.studentList;
+    var bin = getRouteParams()[0];
+
+    _.each(json.elems, function(elem){
+        elem.name = elem.owner;
+        elem.download = "/marking/bin/" + bin + "/question/" + json.question + "/student/" + elem.owner;
+        elem.marking = "bla";
+    })
+    return 'shared.handins.generic.listPanel';
+}
+
 $(document).ready(function() {
     router = Router({
-        //"tester": function(json) { return json['isSupervisor'] ? "a" : "b";}
-        // Use the last line to redirect unmatched routes to an error page
         "submission/bin/:id": combine(submissionList, binInjector("handins.submission.index")),
-
-        //"bin": "handins.bin.index",
         "bin": binList,
-        "marking/:binId/student": binInjector("handins.marking.student"),
+        "marking/bin/:binId/student": combine(binInjector(), markingStudents),
+        "marking/bin/:binId/question": combine(binInjector(), markingQuestion)
 
-
-        //"*undefined": "main.test"
     })
 })
 
