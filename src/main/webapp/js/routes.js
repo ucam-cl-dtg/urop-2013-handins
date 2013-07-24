@@ -59,7 +59,7 @@ function submissionSubList(json) {
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submission/" + elem.id;
-        elem.download = "/submission/" + elem.id;
+        elem.download = "/submission/" + elem.id + "/download";
 
     })
 
@@ -72,7 +72,7 @@ function submissionList(json) {
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submission/" + elem.id;
-        elem.download = "/submission/" + elem.id;
+        elem.download = "/submission/" + elem.id + "/download";
     })
 }
 
@@ -151,7 +151,8 @@ $(document).ready(function() {
         "submission/bin/:id": combine(submissionList, binInjector("handins.submission.index")),
         "bin": binList,
         "marking/bin/:binId/student": combine(binInjector(), markingStudents),
-        "marking/bin/:binId/question": combine(binInjector(), markingQuestion)
+        "marking/bin/:binId/question": combine(binInjector(), markingQuestion),
+        "test": "main.index2"
 
     })
 })

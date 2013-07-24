@@ -33,11 +33,6 @@ function uploadedSubmission(data) {
     router.navigate(window.location.hash, {trigger: true});
 }
 
-$(".upload-marked-work-form form").ajaxForm(function() {
-    console.log(data);
-    Backbone.history.fragment = null;
-    router.navigate(window.location.hash, {trigger: true});
-})
 
 
 
@@ -95,3 +90,15 @@ $(document).on("click", ".toggle-mark", function () {
         $.post(markLink, updateUI).fail(updateUI);
     }
 })
+
+moduleScripts['handins'] = {
+    'marking': {
+        'index': [function () {
+            $(".upload-marked-work-form form").ajaxForm(function(data) {
+                console.log(data);
+                Backbone.history.fragment = null;
+                router.navigate(window.location.hash, {trigger: true});
+            })
+        }]
+    }
+}

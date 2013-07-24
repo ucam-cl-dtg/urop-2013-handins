@@ -64,10 +64,11 @@ public class MarkingController {
 
         session.update(markedSubmission);
 
-        List<String> listOfUploads = null;
+        //List<String> listOfUploads = null;
         FilesManip.distributeSubmission(markedSubmission);
 
-        return ImmutableMap.of("id", markedSubmission.getId(), "List of Student/Question", listOfUploads);
+        return ImmutableMap.of("id", markedSubmission.getId());
+        // /, "List of Student/Question", listOfUploads);
     }
 
     @DELETE
@@ -367,7 +368,7 @@ public class MarkingController {
         Bin bin = BinController.getBin(binId);
 
         if (bin == null)
-            return Response.status(401).build();
+            return Response.status(404).build();
 
         if (session.createCriteria(Answer.class)
                    .add(Restrictions.eq("bin", bin))
@@ -380,7 +381,7 @@ public class MarkingController {
                                         .add(Restrictions.eq("owner", studentCrsId))
                                         .list().get(0);
 
-            if (bin.canSeeAnswer(user, answer))
+            if (!bin.canSeeAnswer(user, answer))
                 return Response.status(401).build();
 
             List<Marking> markingList = new LinkedList<Marking>();

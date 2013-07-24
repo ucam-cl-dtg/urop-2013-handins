@@ -78,7 +78,7 @@
   @param elem
 */
 {template .listElementSubPanel}
-<li class="list-sub-panel delete-me">
+<li class="list-sub-panel delete-me {if $elem.isMarked } marked {else} unmarked {/if} ">
     <div class="row list-inner-sub-panel">
         {call .elementContents data="$elem"}
         {/call}
