@@ -9,7 +9,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.controllers.BinController;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
@@ -34,6 +33,7 @@ public class FilesManip {
         // Create directory
         String directory = "temp/";
         File fileDirectory = new File(directory);
+        //noinspection ResultOfMethodCallIgnored
         fileDirectory.mkdirs();
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
@@ -87,7 +87,6 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + markedAnswer.getId() + ".pdf";
-        PDFManip pdfManip = new PDFManip(filePath);
         new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
 
         markedAnswer.setFilePath(filePath);
@@ -98,6 +97,7 @@ public class FilesManip {
                                       .add(Restrictions.eq("owner", distribution.getStudent()))
                                       .add(Restrictions.eq("question", distribution.getQuestion()))
                                       .list().get(0));
+        markedAnswer.getAnswer().setAnnotated(true);
 
         session.update(markedAnswer);
     }
@@ -109,6 +109,7 @@ public class FilesManip {
 
         // Split the file
 
+        @SuppressWarnings("unchecked")
         List <Distribution> distributions = submission.getSubmissionDistribution();
 
         for (Distribution distribution : distributions)
@@ -116,6 +117,7 @@ public class FilesManip {
             // Create directory
             String directory = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
             File fileDirectory = new File(directory);
+            //noinspection ResultOfMethodCallIgnored
             fileDirectory.mkdirs();
 
             if (submission instanceof UnmarkedSubmission)
@@ -179,6 +181,7 @@ public class FilesManip {
     public static void fileDelete(String filePath) {
         File f = new File(filePath);
 
+        //noinspection ResultOfMethodCallIgnored
         f.delete();
     }
 
@@ -201,6 +204,7 @@ public class FilesManip {
         File destinationFile = new File(destination);
 
         FileUtils.copyFile(sourceFile, destinationFile);
+        //noinspection ResultOfMethodCallIgnored
         sourceFile.delete();
     }
 }
