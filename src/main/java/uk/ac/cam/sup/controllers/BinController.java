@@ -5,17 +5,19 @@ import com.itextpdf.text.DocumentException;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
+import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
-import uk.ac.cam.sup.models.Bin;
-import uk.ac.cam.sup.models.BinPermission;
-import uk.ac.cam.sup.models.MarkedAnswer;
-import uk.ac.cam.sup.models.ProposedQuestion;
-import uk.ac.cam.sup.structures.Marking;
+import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.tools.FilesManip;
+import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -23,74 +25,102 @@ import java.util.*;
 @Produces("application/json")
 public class BinController {
 
-    /*
-    ToDo: COMPLETE AND MOVE THE NEXT 2 FUNCTIONS
-     */
-
-    @GET
-    @Path("/{binId}/marked/{markedAnswerId}/download")
-    @Produces("application/pdf")
-    public Object getMarkedAnswer(@PathParam("binId") long binId, @PathParam("markedAnswerId") long markedAnswerId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-        MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
-
-        if (bin.canSeeAnnotated(user, markedAnswer)) {
-            List<Marking> markedList = new LinkedList<Marking>();
-
-            markedList.add(new Marking(markedAnswer.getFilePath()));
-
-            return FilesManip.resultingFile(markedList);
-        }
-
-        return Response.status(401).build();
-    }
-
-    @GET
-    @Path("/{binId}/marked/download")
-    @Produces("application/pdf")
-    public Object getMarkedAnswers(@PathParam("binId") long binId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-        List<MarkedAnswer> markedAnswers = session.createCriteria(MarkedAnswer.class)
-                                                     .add(Restrictions.eq("bin", bin))
-                                                     .add(Restrictions.eq("owner", user))
-                                                     .list();
-
-        List<Marking> markedList = new LinkedList<Marking>();
-
-
-        for (MarkedAnswer markedAnswer : markedAnswers)
-            if (bin.canSeeAnnotated(user, markedAnswer)) {
-
-                markedList.add(new Marking(markedAnswer.getFilePath()));
-
-                return FilesManip.resultingFile(markedList);
-            }
-
-        return Response.status(401).build();
-    }
-
     public static Bin getBin(long id) {
         // Set Hibernate
         Session session = HibernateUtil.getSession();
 
         return (Bin) session.createCriteria(Bin.class)
-                            .add(Restrictions.eq("id", id))
-                            .setFetchMode("permissions", FetchMode.JOIN)
-                            .uniqueResult();
+                .add(Restrictions.eq("id", id))
+                .setFetchMode("permissions", FetchMode.JOIN)
+                .uniqueResult();
+    }
+
+    /*
+    ToDo: COMPLETE AND MOVE THE NEXT 2 FUNCTIONS
+     */
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    @Path("/{binId}")
+    public Object addSubmission(@MultipartForm FileUploadForm uploadForm, @PathParam("binId") long binId) throws IOException, MetadataNotFoundException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(404).build();
+        if (!bin.canAddSubmission(user))
+            return Response.status(401).build();
+
+        // New unmarkedSubmission and get id
+        UnmarkedSubmission unmarkedSubmission = new UnmarkedSubmission();
+        session.save(unmarkedSubmission);
+
+        // Create dir
+        String directory = "temp/" + user + "/submissions/answers/";
+        File fileDirectory = new File(directory);
+        //noinspection ResultOfMethodCallIgnored
+        fileDirectory.mkdirs();
+
+        String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
+
+        FilesManip.fileSave(uploadForm.file, directory + fileName);
+
+        unmarkedSubmission.setBin(bin);
+        unmarkedSubmission.setOwner(user);
+        unmarkedSubmission.setFilePath(directory + fileName);
+
+        session.update(unmarkedSubmission);
+
+        // todo: convert the received files
+
+        PDFManip pdfManip = new PDFManip(directory + fileName);
+
+        // ToDo: Redirect to splitting screen
+
+        for (int i = 1; i <= pdfManip.getPageCount(); i++)
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, (long) i), i, i);
+
+        FilesManip.distributeSubmission(unmarkedSubmission);
+
+        return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
+                "link", unmarkedSubmission.getId()));
+    }
+
+    @GET
+    @Path("/{binId}")
+    @Produces("application/json")
+    public Object viewSubmissionList(@PathParam("binId") long binId) {
+
+        // Get user
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(404).build();
+
+        List<UnmarkedSubmission> allUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>(bin.getUnmarkedSubmissions());
+        List<UnmarkedSubmission> accessibleUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>();
+
+        for (UnmarkedSubmission unmarkedSubmission : allUnmarkedSubmissions)
+            if (bin.canSeeSubmission(user, unmarkedSubmission))
+                accessibleUnmarkedSubmissions.add(unmarkedSubmission);
+
+        List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();
+
+        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions)
+            mapList.add(ImmutableMap.of("link", unmarkedSubmission.getId(),
+                    "id", Long.toString(unmarkedSubmission.getId())));
+
+        return ImmutableMap.of("submissions", mapList);
     }
 
     @GET
@@ -101,6 +131,7 @@ public class BinController {
 
         String user = UserHelper.getCurrentUser();
 
+        @SuppressWarnings("unchecked")
         List<Bin> binList = session.createCriteria(Bin.class).list();
         List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
 
@@ -177,7 +208,7 @@ public class BinController {
     }
 
     @DELETE
-    @Path("/{binId}/")
+    @Path("/{binId}")
     public Response deleteBin(@PathParam("binId") long binId,
                               @QueryParam("token") String token) {
 
@@ -202,7 +233,7 @@ public class BinController {
 
     @GET
     @Path("/{id}")
-    public Object showBin(@PathParam("id") long id) {
+    public Object viewBin(@PathParam("id") long id) {
         Bin bin = getBin(id);
 
         if (bin == null)
@@ -215,7 +246,7 @@ public class BinController {
 
     @GET
     @Path("/{id}/permission/")
-    public List<String> listPermissions(@PathParam("id") long id) {
+    public List<String> viewBinPermissionsList(@PathParam("id") long id) {
         Bin bin = getBin(id);
 
         if (bin == null)
@@ -260,7 +291,7 @@ public class BinController {
 
     @DELETE
     @Path("/{id}/permission")
-    public Response removePermissions(@PathParam("id") long id,
+    public Response deletePermissions(@PathParam("id") long id,
                                       @QueryParam("users[]") String[] users,
                                       @QueryParam("token") String token) {
         Bin bin = getBin(id);

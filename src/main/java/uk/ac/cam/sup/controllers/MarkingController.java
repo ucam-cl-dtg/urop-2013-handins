@@ -21,14 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@Path("/marking")
+@Path("/marking/bin/{binId}")
 public class MarkingController {
 
     /*
     Done?
      */
     @POST
-    @Path("/bin/{binId}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm,
@@ -54,7 +53,8 @@ public class MarkingController {
         // Create directory
         String directory = "temp/" + user + "/submissions/annotated/";
         File fileDirectory = new File(directory);
-        boolean ok = fileDirectory.mkdirs();
+        //noinspection ResultOfMethodCallIgnored
+        fileDirectory.mkdirs();
 
         String fileName = "submission_" + markedSubmission.getId() + ".pdf";
 
@@ -64,14 +64,13 @@ public class MarkingController {
 
         session.update(markedSubmission);
 
-        List<String> listOfUploads = null;
         FilesManip.distributeSubmission(markedSubmission);
 
-        return ImmutableMap.of("id", markedSubmission.getId(), "List of Student/Question", listOfUploads);
+        return ImmutableMap.of("id", markedSubmission.getId());
     }
 
     @DELETE
-    @Path("bin/{binId}/{submissionId}")
+    @Path("/{submissionId}")
     @Produces("application/json")
     public Object deleteSubmission(@PathParam("binId") long binId,
                                    @PathParam("submissionId") long submissionId) {
@@ -87,7 +86,7 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get Bin and check
-        Bin bin = markedSubmission.getBin();
+        Bin bin = (Bin) session.get(Bin.class, binId);
 
         if (!bin.canDeleteSubmission(user, markedSubmission))
             return Response.status(401).build();
@@ -108,7 +107,7 @@ public class MarkingController {
     Done
      */
     @GET
-    @Path("/bin/{binId}/student")
+    @Path("/student")
     @Produces("application/json")
     public Object viewAllStudentSubmissions(@PathParam("binId") long binId) {
 
@@ -130,6 +129,7 @@ public class MarkingController {
             String student = permission.getUser();
             boolean isMarked = true;
 
+            @SuppressWarnings("unchecked")
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", student))
@@ -155,7 +155,7 @@ public class MarkingController {
     Done
      */
     @GET
-    @Path("bin/{binId}/student/{studentCrsId}")
+    @Path("/{studentCrsId}")
     @Produces("application/json")
     public Object viewStudent(@PathParam("binId") long binId,
                               @PathParam("studentCrsId") String studentCrsId) {
@@ -175,6 +175,8 @@ public class MarkingController {
         List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<ImmutableMap<String, ?>>();
 
         for (ProposedQuestion question : questions) {
+
+            @SuppressWarnings("unchecked")
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", studentCrsId))
@@ -200,48 +202,7 @@ public class MarkingController {
     Done
      */
     @GET
-    @Path("/bin/{binId}/student/{studentCrsId}/download")
-    @Produces("application/pdf")
-    public Object getStudent(@PathParam("binId") long binId,
-                             @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
-
-        // Get user
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(404).build();
-
-        List<Answer> answers = new LinkedList<Answer>(bin.getAnswers());
-
-        List<Marking> markingList = new LinkedList<Marking>();
-        int actualPage = 1;
-        for (Answer answer : answers)
-            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answer))
-            {
-                Marking marking = new Marking();
-
-                marking.setFilePath(answer.getFilePath());
-                marking.setFirst(actualPage);
-
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
-                marking.setLast(actualPage - 1);
-                marking.setOwner(studentCrsId);
-                marking.setQuestion(answer.getQuestion());
-
-                markingList.add(marking);
-            }
-
-        return FilesManip.resultingFile(markingList);
-    }
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/bin/{binId}/question")
+    @Path("/question")
     @Produces("application/json")
     public Object viewAllQuestionSubmissions(@PathParam("binId") long binId) {
 
@@ -258,6 +219,7 @@ public class MarkingController {
         List<ImmutableMap<String, ?>> questionList = new LinkedList<ImmutableMap<String, ?>>();
 
         for (ProposedQuestion question : questions) {
+
             List <Answer> answers = new LinkedList<Answer>(question.getAnswers());
 
             boolean available = false;
@@ -281,7 +243,7 @@ public class MarkingController {
     Done
      */
     @GET
-    @Path("/bin/{binId}/question/{questionId}")
+    @Path("/question/{questionId}")
     @Produces("application/json")
     public Object viewQuestion(@PathParam("binId") long binId,
                                @PathParam("questionId") long questionId) {
@@ -310,7 +272,7 @@ public class MarkingController {
     }
 
     @GET
-    @Path("/bin/{binId}/question/{questionId}/download")
+    @Path("/question/{questionId}/download")
     @Produces("application/pdf")
     public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") long questionId) throws IOException, DocumentException {
 
@@ -325,117 +287,11 @@ public class MarkingController {
         if (bin == null)
             return Response.status(401).build();
 
+        @SuppressWarnings("unchecked")
         List<Answer> answers = session.createCriteria(Answer.class)
                                       .add(Restrictions.eq("bin", bin))
                                       .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
                                       .list();
-
-        List<Marking> markingList = new LinkedList<Marking>();
-        int actualPage = 1;
-        for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer))
-            {
-                Marking marking = new Marking();
-
-                marking.setFilePath(answer.getFilePath());
-                marking.setFirst(actualPage);
-
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
-                marking.setLast(actualPage - 1);
-                marking.setOwner(answer.getOwner());
-                marking.setQuestion(answer.getQuestion());
-
-                markingList.add(marking);
-            }
-
-        return FilesManip.resultingFile(markingList);
-    }
-
-    @GET
-    @Path("/bin/{binId}/student/{studentCrsId}/question/{questionId}")
-    @Produces("application/pdf")
-    public Object getStudentQuestion(@PathParam("binId") long binId,
-                                      @PathParam("studentCrsId") String studentCrsId,
-                                      @PathParam("questionId}") long questionId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(401).build();
-
-        if (session.createCriteria(Answer.class)
-                   .add(Restrictions.eq("bin", bin))
-                   .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                   .add(Restrictions.eq("owner", studentCrsId))
-                   .list().size() > 0) {
-            Answer answer = (Answer) session.createCriteria(Answer.class)
-                                        .add(Restrictions.eq("bin", bin))
-                                        .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                                        .add(Restrictions.eq("owner", studentCrsId))
-                                        .list().get(0);
-
-            if (bin.canSeeAnswer(user, answer))
-                return Response.status(401).build();
-
-            List<Marking> markingList = new LinkedList<Marking>();
-            Marking marking = new Marking();
-
-            marking.setFilePath(answer.getFilePath());
-            marking.setFirst(1);
-
-            marking.setLast(new PDFManip(answer.getFilePath()).getPageCount());
-            marking.setOwner(answer.getOwner());
-            marking.setQuestion(answer.getQuestion());
-
-            markingList.add(marking);
-
-            return FilesManip.resultingFile(markingList);
-        }
-
-        return Response.status(404).build();
-    }
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/bin/{binId}/question/{questionId}/student/{studentCrsId}")
-    @Produces("application/pdf")
-    public Object getQuestionStudent(@PathParam("binId") long binId,
-                                      @PathParam("questionId") long questionId,
-                                      @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
-
-        return getStudentQuestion(binId, studentCrsId, questionId);
-    }
-
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/bin/{binId}/all")
-    @Produces("application/pdf")
-    public Object viewAll(@PathParam("binId") long binId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(401).build();
-
-        List<Answer> answers = session.createCriteria(Answer.class)
-                                      .add(Restrictions.eq("bin", bin)).list();
 
         List<Marking> markingList = new LinkedList<Marking>();
         int actualPage = 1;
