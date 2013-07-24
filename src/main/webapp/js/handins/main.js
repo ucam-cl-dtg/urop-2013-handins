@@ -33,6 +33,12 @@ function uploadedSubmission(data) {
     router.navigate(window.location.hash, {trigger: true});
 }
 
+$(".upload-marked-work-form form").ajaxForm(function() {
+    console.log(data);
+    Backbone.history.fragment = null;
+    router.navigate(window.location.hash, {trigger: true});
+})
+
 
 
 $(document).on("click", ".expand-sub-list", function() {
@@ -54,4 +60,38 @@ $(document).on("click", ".expand-sub-list", function() {
     elem.slideToggle();
   });
   elem.attr("loaded", "true");
+})
+
+$(document).on("click", ".toggle-mark", function () {
+    var $this = $(this),
+        markLink = $this.attr("marking-link"),
+        elem = $this.closest('li'),
+        isSubPanel = elem.parents('.sublist-container').size() > 0,
+        marked = $this.parents('.marked').size() > 0,
+        updateUI = function () {
+            var clone = elem.clone(),
+                parentElem = marked ? $('.unmarked') : $('.marked'),
+                container = parentElem.find(".panels");
+
+
+            clone.find(".sublist-container").attr("loaded", false).css("display", "none");
+            clone.css("display", "none");
+
+            clone.prependTo(container);
+
+            elem.fadeOut(function() {
+                clone.fadeIn("slow");
+            })
+        },
+        updateUISubPanel = function() {
+            if (marked)
+                elem.removeClass("marked").addClass("unmarked");
+            else
+                elem.removeClass("unmarked").addClass("marked");
+        }
+    if (isSubPanel) {
+        $.post(markLink, updateUISubPanel).fail(updateUISubPanel);
+    } else {
+        $.post(markLink, updateUI).fail(updateUI);
+    }
 })
