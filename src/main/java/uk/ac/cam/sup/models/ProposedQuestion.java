@@ -24,9 +24,6 @@ public class ProposedQuestion {
     @OneToMany(mappedBy = "question")
     private Set<Answer> answers;
 
-    @OneToMany(mappedBy = "question")
-    private Set<MarkedAnswer> markedAnswers;
-
     // Constructors
     public ProposedQuestion() {
 
@@ -62,14 +59,5 @@ public class ProposedQuestion {
 
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
-    }
-
-    // MarkedAnswers
-    public Set<MarkedAnswer> getMarkedAnswers() {
-        return markedAnswers;
-    }
-
-    public void setMarkedAnswers(Set<MarkedAnswer> markedAnswers) {
-        this.markedAnswers = markedAnswers;
     }
 }

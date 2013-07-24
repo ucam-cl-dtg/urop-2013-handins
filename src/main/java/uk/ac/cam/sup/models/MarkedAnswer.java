@@ -14,8 +14,8 @@ public class MarkedAnswer {
     private long id;
 
     private String owner;
-    private String annotator;
     private String filePath;
+    private String annotator;
 
     @ManyToOne
     private MarkedSubmission markedSubmission;
