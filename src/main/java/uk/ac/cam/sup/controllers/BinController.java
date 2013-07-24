@@ -99,7 +99,7 @@ public class BinController {
     Done
      */
     @GET
-    @Path("/{binId}")
+    @Path("/{binId}/submissions")
     @Produces("application/json")
     public Object viewSubmissionList(@PathParam("binId") long binId) {
 
@@ -255,9 +255,9 @@ public class BinController {
     Done
      */
     @GET
-    @Path("/{id}")
-    public Object viewBin(@PathParam("id") long id) {
-        Bin bin = getBin(id);
+    @Path("/{binId}")
+    public Object viewBin(@PathParam("binId") long binId) {
+        Bin bin = getBin(binId);
 
         if (bin == null)
             throw new NotFoundException();
@@ -271,9 +271,9 @@ public class BinController {
     Done
      */
     @GET
-    @Path("/{id}/permission/")
-    public List<String> viewBinPermissionsList(@PathParam("id") long id) {
-        Bin bin = getBin(id);
+    @Path("/{binId}/permission/")
+    public List<String> viewBinPermissionsList(@PathParam("binId") long binId) {
+        Bin bin = getBin(binId);
 
         if (bin == null)
             throw new NotFoundException();
@@ -291,11 +291,11 @@ public class BinController {
     Done
      */
     @POST
-    @Path("/{id}/permission/")
-    public Response addPermissions(@PathParam("id") long id,
+    @Path("/{binId}/permission/")
+    public Response addPermissions(@PathParam("binId") long binId,
                                    @FormParam("users[]") String[] users,
                                    @FormParam("token") String token) {
-        Bin bin = getBin(id);
+        Bin bin = getBin(binId);
 
         if (bin == null)
             return Response.status(404).build();
@@ -322,11 +322,11 @@ public class BinController {
     Done
      */
     @DELETE
-    @Path("/{id}/permission")
-    public Response deletePermissions(@PathParam("id") long id,
+    @Path("/{binId}/permission")
+    public Response deletePermissions(@PathParam("binId") long binId,
                                       @QueryParam("users[]") String[] users,
                                       @QueryParam("token") String token) {
-        Bin bin = getBin(id);
+        Bin bin = getBin(binId);
 
         if (bin == null)
             return Response.status(404).build();
