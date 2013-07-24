@@ -193,7 +193,7 @@ public class MarkingController {
                 }
         }
 
-        return ImmutableMap.of("studentQuestions", studentQuestions);
+        return ImmutableMap.of("studentQuestions", studentQuestions, "student", studentCrsId);
     }
 
     /*
@@ -306,13 +306,13 @@ public class MarkingController {
             if (bin.canSeeAnswer(user, answer))
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(), "isMarked", answer.getMarkedAnswers().size() > 0));
 
-        return ImmutableMap.of("studentList", studentList);
+        return ImmutableMap.of("studentList", studentList, "question", questionId);
     }
 
     @GET
     @Path("/bin/{binId}/question/{questionId}/download")
     @Produces("application/pdf")
-    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") String questionId) throws IOException, DocumentException {
+    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") long questionId) throws IOException, DocumentException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
