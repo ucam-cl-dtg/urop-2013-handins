@@ -30,7 +30,7 @@ $(".upload-work-form form").ajaxForm(uploadedSubmission);
 function uploadedSubmission(data) {
     Backbone.history.fragment = null;
     router.navigate(window.location.hash, {trigger: true});
-    showSelectingModal(data.unmarkedSubmission.id, data.bin);
+    showSelectingModal(data.bin, data.unmarkedSubmission.id);
 }
 
 
