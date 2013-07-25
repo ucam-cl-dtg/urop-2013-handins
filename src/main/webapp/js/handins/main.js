@@ -28,9 +28,9 @@ $(document).on("click", ".upload-work-for-bin", function() {
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
 
 function uploadedSubmission(data) {
-    console.log(data);
     Backbone.history.fragment = null;
     router.navigate(window.location.hash, {trigger: true});
+    showSelectingModal(data.unmarkedSubmission.id, data.bin);
 }
 
 
@@ -90,6 +90,54 @@ $(document).on("click", ".toggle-mark", function () {
         $.post(markLink, updateUI).fail(updateUI);
     }
 })
+
+function addSelectingModal(bin, submission) {
+    var html = shared.handins.selectingModal({bin: bin, submission: submission}),
+        elem = $(html);
+
+    elem.prependTo($('body')).foundation().foundation("reveal","open");
+    return elem;
+}
+
+function showSelectingModal(bin, submission) {
+    $('#selectingModal').remove();
+    addSelectingModal(bin, submission);
+    showPdf(submission);
+    $('#selectingModal form').ajaxForm(function(){
+        $('#selectingModal').foundation("reveal", "close");
+    });
+
+    $('#selectingModal .more-inputs').click(function() {
+        $(shared.handins.selectingLine()).appendTo($('#selectingModal .input-line-container'));
+    });
+
+}
+function showPdf(submission) {
+    PDFJS.disableWorker = true;
+    PDFJS.getDocument("/submission/" + submission + "/download").then(function (pdf){
+        var numPages = pdf.numPages;
+
+        for (var i=0; i < numPages; i++) {
+            $('<div class="page page-' + i + '"><canvas></canvas></div>' ).appendTo($('.pdf-container'));
+
+            pdf.getPage(i).then(function(i){ return function(page) {
+                var scale = 1;
+                var viewport = page.getViewport(scale);
+
+                var canvas = $(".page-" + i +" canvas")[0];
+                var context = canvas.getContext('2d');
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                page.render({canvasContext: context, viewport: viewport});
+
+            }}(i))
+
+        }
+
+    })
+}
 
 moduleScripts['handins'] = {
     'marking': {

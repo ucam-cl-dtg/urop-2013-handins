@@ -1,0 +1,48 @@
+{namespace shared.handins}
+
+/**
+*/
+{template .selectingLine}
+<div class="row">
+    <div class="columns large-4">
+        <label>Q:</label> <input type="text" name="id[]"/>
+    </div>
+    <div class="columns large-4">
+        <label>S:</label> <input type="text" name="start[]"/>
+    </div>
+    <div class="columns large-4">
+        <label>E:</label> <input type="text" name="end[]"/>
+    </div>
+</div>
+{/template}
+/**
+* @param bin
+* @param submission
+*/
+{template .selectingModal}
+<div id="selectingModal" class="reveal-modal expand">
+    <div class="row">
+        <div class="columns large-8">
+            <div class="pdf-container" style="overflow: scroll; height:600px;">
+            </div>
+        </div>
+        <div class="columns large-4">
+            <form action="/bin/{$bin}/submission/{$submission}" method="post">
+                <fieldset>
+                    <legend> Select questions by page </legend>
+                    <div class="input-line-container">
+                        {call .selectingLine}
+                        {/call}
+                    </div>
+                    <div class="row">
+                        <div class="button small more-inputs">
+                            Add
+                        </div>
+                        <input type="submit" class="button small"/>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{/template}

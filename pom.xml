@@ -14,6 +14,7 @@
             <![CDATA[
                 <script type="text/javascript" src="/js/vendor/jquery.form.min.js"></script>
                 <script src="/js/handins/main.js"></script>
+                <script type="text/javascript" src="/js/vendor/pdf.js"></script>
 			]]>
         </custom_scripts>
         <custom_templates>

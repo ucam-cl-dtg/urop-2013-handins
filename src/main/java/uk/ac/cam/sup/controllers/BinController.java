@@ -82,16 +82,16 @@ public class BinController {
 
         // todo: convert the received files
 
-        return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
-                "link", unmarkedSubmission.getId()));
+        return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId()),
+                               "bin", bin.getId());
     }
 
     @POST
     @Path("/{binId}/submission/{submissionId}")
     public Object splitSubmission (@PathParam("submissionId") long submissionId,
-                                   @FormParam("questionIds") long[] questionId,
-                                   @FormParam("startPages") int[] startPage,
-                                   @FormParam("endPages") int[] endPage) throws IOException, DocumentException, MetadataNotFoundException {
+                                   @FormParam("id[]") long[] questionId,
+                                   @FormParam("start[]") int[] startPage,
+                                   @FormParam("end[]") int[] endPage) throws IOException, DocumentException, MetadataNotFoundException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -101,7 +101,7 @@ public class BinController {
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
         PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
 
-        for (int i = 1; i < questionId.length; i++)
+        for (int i = 0; i < questionId.length; i++)
             FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
 
         FilesManip.distributeSubmission(unmarkedSubmission);
