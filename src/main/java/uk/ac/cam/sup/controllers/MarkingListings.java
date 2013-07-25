@@ -9,6 +9,6 @@ public class MarkingListings {
     @GET
     @Produces("application/json")
     public Object showBinsToMark() {
-        return (new BinController()).listBins();
+        return (new BinController()).viewBinList();
     }
 }
