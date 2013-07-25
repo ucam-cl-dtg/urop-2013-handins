@@ -6,6 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class PDFManip {
     // Fields
     private String filePath;
 
-    public PDFManip(String filePath) throws IOException {
+    public PDFManip(String filePath) throws Exception {
         setFilePath(filePath);
     }
 
@@ -23,7 +24,7 @@ public class PDFManip {
         return filePath;
     }
 
-    public void setFilePath(String filePath) throws IOException {
+    public void setFilePath(String filePath) throws Exception {
         File file = new File(filePath);
 
         if (!file.exists())
@@ -38,7 +39,7 @@ public class PDFManip {
     /*
     FixMe: This function should be rewritten because it behaves badly in general
      */
-    public void addHeader(String content) throws IOException, DocumentException {
+    public void addHeader(String content) throws Exception {
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -85,6 +86,7 @@ public class PDFManip {
     of the PDF and returns the value contained in the queried key or
     throws Exception MetadataNotFound otherwise.
     Done
+
      */
     public String queryMetadata(String key) throws MetadataNotFoundException, IOException {
 
@@ -102,8 +104,9 @@ public class PDFManip {
     The injecter takes the pair (key, value) of strings and the path for
     the PDF and inserts metadata according to the input pair.
     Done
+
      */
-    public void injectMetadata(String key, String value) throws IOException, DocumentException {
+    public void injectMetadata(String key, String value) throws Exception {
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -126,8 +129,9 @@ public class PDFManip {
     The function takes the interval of pages between start and end from the contained PDF
     and stores them in a new PDF created at the destinationPath.
     Done
+
      */
-    public void takePages(int start, int end, String destinationPath) throws IOException, DocumentException {
+    public void takePages(int start, int end, String destinationPath) throws Exception {
 
         Document document = new Document();
 
@@ -137,8 +141,8 @@ public class PDFManip {
 
         PdfReader reader = new PdfReader(filePath);
 
-       for (int pn = start; pn <= end; )
-           copy.addPage(copy.getImportedPage(reader, pn++));
+        for (int pn = start; pn <= end; )
+            copy.addPage(copy.getImportedPage(reader, pn++));
 
         document.close();
     }
@@ -147,8 +151,9 @@ public class PDFManip {
     The adder takes a new filePath of the source PDF which should be
     added at the end of the initial pdf
     Done
+
      */
-    public void add(String sourcePath) throws IOException, DocumentException {
+    public void add(String sourcePath) throws Exception {
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -178,6 +183,7 @@ public class PDFManip {
     /*
     The function returns the number of pages of the pdf whose path is stored.
     Done
+
     */
     public int getPageCount() {
 

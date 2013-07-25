@@ -1,6 +1,5 @@
 package uk.ac.cam.sup.controllers;
 
-import com.itextpdf.text.DocumentException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
@@ -12,52 +11,60 @@ import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 @Path("/marking/bin/{binId}")
 public class MarkingQueryController {
+    @Context
+    private HttpServletRequest request;
 
     /*
     Done
-     */
-    @GET
-    @Path("/download")
-    @Produces("application/pdf")
-    public Object viewAll(@PathParam("binId") long binId) throws IOException, DocumentException {
 
-        // Set Hibernate and get user
+    Checked
+     */
+    private Object getQuery(long binId, Long questionId, String studentCrsId) {
+
+        // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
+        String user = UserHelper.getCurrentUser(request);
 
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
+        Bin bin = (Bin) session.get(Bin.class, binId);
 
+        // Check the existence of the bin
         if (bin == null)
-            return Response.status(401).build();
+            return Response.status(404).build();
 
-        @SuppressWarnings("unchecked")
-        List<Answer> answers = session.createCriteria(Answer.class)
-                .add(Restrictions.eq("bin", bin)).list();
+        // Get all answers from the bin
+        List<Answer> answers = new LinkedList<Answer>(bin.getAnswers());
 
+        // Create the marking list for the file
         List<Marking> markingList = new LinkedList<Marking>();
         int actualPage = 1;
         for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer))
+            if (bin.canSeeAnswer(user, answer) &&
+                    (questionId == null || answer.getQuestion().getId() == questionId) &&
+                    (studentCrsId == null || answer.getOwner().equals(studentCrsId)))
             {
                 Marking marking = new Marking();
 
                 marking.setFilePath(answer.getFilePath());
                 marking.setFirst(actualPage);
 
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
+                try {
+                    actualPage += new PDFManip(answer.getFilePath()).getPageCount();
+                } catch (Exception e) {
+                    continue;
+                }
                 marking.setLast(actualPage - 1);
                 marking.setOwner(answer.getOwner());
                 marking.setQuestion(answer.getQuestion());
@@ -66,47 +73,34 @@ public class MarkingQueryController {
             }
 
         return FilesManip.resultingFile(markingList);
+
     }
 
     /*
     Done
+
+    Checked
+     */
+    @GET
+    @Path("/download")
+    @Produces("application/pdf")
+    public Object viewAll(@PathParam("binId") long binId) {
+
+        return getQuery(binId, null, null);
+    }
+
+    /*
+    Done
+
+    Checked
      */
     @GET
     @Path("/student/{studentCrsId}/download")
     @Produces("application/pdf")
     public Object downloadStudentAnswers(@PathParam("binId") long binId,
-                                         @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
+                                         @PathParam("studentCrsId") String studentCrsId) {
 
-        // Get user
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(404).build();
-
-        List<Answer> answers = new LinkedList<Answer>(bin.getAnswers());
-
-        List<Marking> markingList = new LinkedList<Marking>();
-        int actualPage = 1;
-        for (Answer answer : answers)
-            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answer))
-            {
-                Marking marking = new Marking();
-
-                marking.setFilePath(answer.getFilePath());
-                marking.setFirst(actualPage);
-
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
-                marking.setLast(actualPage - 1);
-                marking.setOwner(studentCrsId);
-                marking.setQuestion(answer.getQuestion());
-
-                markingList.add(marking);
-            }
-
-        return FilesManip.resultingFile(markingList);
+        return getQuery(binId, null, studentCrsId);
     }
 
     /*
@@ -117,49 +111,9 @@ public class MarkingQueryController {
     @Produces("application/pdf")
     public Object downloadStudentQuestionAnswer(@PathParam("binId") long binId,
                                                 @PathParam("studentCrsId") String studentCrsId,
-                                                @PathParam("questionId}") long questionId) throws IOException, DocumentException {
+                                                @PathParam("questionId}") long questionId) {
 
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(401).build();
-
-        if (session.createCriteria(Answer.class)
-                   .add(Restrictions.eq("bin", bin))
-                   .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                   .add(Restrictions.eq("owner", studentCrsId))
-                   .list().size() > 0) {
-            Answer answer = (Answer) session.createCriteria(Answer.class)
-                                            .add(Restrictions.eq("bin", bin))
-                                            .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                                            .add(Restrictions.eq("owner", studentCrsId))
-                                            .list().get(0);
-
-            if (!bin.canSeeAnswer(user, answer))
-                return Response.status(401).build();
-
-            List<Marking> markingList = new LinkedList<Marking>();
-            Marking marking = new Marking();
-
-            marking.setFilePath(answer.getFilePath());
-            marking.setFirst(1);
-
-            marking.setLast(new PDFManip(answer.getFilePath()).getPageCount());
-            marking.setOwner(answer.getOwner());
-            marking.setQuestion(answer.getQuestion());
-
-            markingList.add(marking);
-
-            return FilesManip.resultingFile(markingList);
-        }
-
-        return Response.status(404).build();
+        return getQuery(binId, questionId, studentCrsId);
     }
 
     /*
@@ -168,44 +122,11 @@ public class MarkingQueryController {
     @GET
     @Path("/question/{questionId}/download")
     @Produces("application/pdf")
-    public Object getQuestion(@PathParam("binId") long binId, @PathParam("questionId") long questionId) throws IOException, DocumentException {
+    public Object getQuestion(@PathParam("binId") long binId,
+                              @PathParam("questionId") long questionId) {
 
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(401).build();
-
-        @SuppressWarnings("unchecked")
-        List<Answer> answers = session.createCriteria(Answer.class)
-                .add(Restrictions.eq("bin", bin))
-                .add(Restrictions.eq("question", session.get(ProposedQuestion.class, questionId)))
-                .list();
-
-        List<Marking> markingList = new LinkedList<Marking>();
-        int actualPage = 1;
-        for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer))
-            {
-                Marking marking = new Marking();
-
-                marking.setFilePath(answer.getFilePath());
-                marking.setFirst(actualPage);
-
-                actualPage += new PDFManip(answer.getFilePath()).getPageCount();
-                marking.setLast(actualPage - 1);
-                marking.setOwner(answer.getOwner());
-                marking.setQuestion(answer.getQuestion());
-
-                markingList.add(marking);
-            }
-
-        return FilesManip.resultingFile(markingList);
+        return getQuery(binId, questionId, null);
     }
 
     /*
@@ -216,8 +137,8 @@ public class MarkingQueryController {
     @Produces("application/pdf")
     public Object downloadQuestionStudentAnswer(@PathParam("binId") long binId,
                                                 @PathParam("questionId") long questionId,
-                                                @PathParam("studentCrsId") String studentCrsId) throws IOException, DocumentException {
+                                                @PathParam("studentCrsId") String studentCrsId) {
 
-        return downloadStudentQuestionAnswer(binId, studentCrsId, questionId);
+        return getQuery(binId, questionId, studentCrsId);
     }
 }

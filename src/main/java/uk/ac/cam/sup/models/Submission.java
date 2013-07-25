@@ -9,7 +9,6 @@ import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -87,14 +86,20 @@ public abstract class Submission<T> {
     /*
 
      */
-    public List<Distribution> getSubmissionDistribution() throws IOException {
+    public List<Distribution> getSubmissionDistribution() {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
         List<Distribution> distributionList = new LinkedList<Distribution>();
 
-        PDFManip pdfManip = new PDFManip(getFilePath());
+        PDFManip pdfManip;
+        try {
+            pdfManip = new PDFManip(getFilePath());
+        }
+        catch (Exception e) {
+            return null;
+        }
 
         int pages = pdfManip.getPageCount();
 
@@ -123,6 +128,9 @@ public abstract class Submission<T> {
             }
             catch (MetadataNotFoundException e) {
 
+            }
+            catch (Exception e) {
+                return null;
             }
         }
 
