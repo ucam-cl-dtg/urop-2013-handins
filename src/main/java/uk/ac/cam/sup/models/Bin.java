@@ -237,12 +237,12 @@ public class Bin {
     /*
      Only by using a valid token can people modify the bin permissions
      */
-    public boolean canAddPermission(String token) {
-        return this.token.equals(token);
+    public boolean canAddPermission(String user, String token) {
+        return this.owner.equals(user) || this.token.equals(token);
     }
 
-    public boolean canDeletePermission(String token) {
-        return this.token.equals(token);
+    public boolean canDeletePermission(String user, String token) {
+        return this.owner.equals(user) || this.token.equals(token);
     }
 
     /*

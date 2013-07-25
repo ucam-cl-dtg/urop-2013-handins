@@ -244,7 +244,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canAddPermission(user))
+        if (!bin.canAddPermission(user, token))
             return Response.status(401).build();
 
         // Get all existing users
@@ -281,7 +281,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDeletePermission(user))
+        if (!bin.canDeletePermission(user, token))
             return Response.status(401).build();
 
         // Get all BinPermissions

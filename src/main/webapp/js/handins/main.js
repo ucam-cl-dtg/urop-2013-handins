@@ -139,14 +139,14 @@ function showPdf(submission) {
     })
 }
 
-$(document).on("click", ".update-permissions .add-user", function() {
-    var user = $(this).closest(".row").find('input[name="user"]').val();
-
-    var userField = $(handins.bin.editPermission({user: user}));
-    userField.appendTo($('.update-permissions .permissions-container'));
-})
-
-$(document).on("click", ".send-update-permissions", function() {
+$(document).on("click", ".delete-user-perm", function() {
+    var user = $(this).attr("data-delete");
+    $.ajax({
+        url: "/bins/" + getRouteParams()[0] + "/permissions?users[]=" + user,
+        method: 'DELETE'
+    }).done(function() {
+       asyncLoad($('.permissions-container.async-loader'));
+    })
     $('.update-permissions form').ajaxSubmit();
 })
 
@@ -169,7 +169,8 @@ moduleScripts['handins'] = {
         }],
         'permissions': [function(){
             $(".update-permissions form").ajaxForm(function() {
-               console.log("Permissions updated");
+               asyncLoad($('.permissions-container.async-loader'));
+               $('.update-permissions form input[type="text"]').val("");
             });
         }]
     }

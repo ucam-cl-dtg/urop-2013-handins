@@ -7,13 +7,13 @@
 {template .create}
 
 <div class="create-bin">
-    <form action="/bin" method="post">
+    <form action="/bins" method="post">
         <fieldset>
             <legend> Create a new Bin </legend>
             <div class="row">
                 <div class="columns">
                     <label>Bin name</label>
-                    <input type="text" name="questionSetName" />
+                    <input type="text" name="questionSet" />
                 </div>
             </div>
             <div class="row">
@@ -30,21 +30,33 @@
 * @param user
 */
 {template .editPermission}
-    <div class="row">
-        <div class="columns">
-            <input type="hidden" name="users[]" value="{$user}">
-            {$user}
+
+<li class="panel-wrapper columns">
+    <div class="list-panel">
+        <div class="row list-inner-panel">
+            <div class="columns large-7 small-7">{$user}</div>
+            <div class="columns large-5 small-5 text-right">
+                <div class="icon-button-wrapper">
+                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array delete-user-perm" data-delete="{$user}">'</a>
+                </div>
+            </div>
         </div>
     </div>
+ </li>
 {/template}
+
 /**
 * @param users
 */
 {template .editPermissions}
+    <div class="row">
+        <ul class="panels">
 
     {foreach $user in $users}
         {call .editPermission}
             {param user: $user/}
         {/call}
     {/foreach}
+         </ul>
+      </div>
 {/template}
