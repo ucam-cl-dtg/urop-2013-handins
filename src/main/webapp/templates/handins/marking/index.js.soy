@@ -15,20 +15,20 @@
 	<div class="columns large-8 small-12">
 		<div class="button-bar">
 			<ul class="button-group">
-				<li><a href="#marking/bin/{$bin.id}/student" class="medium secondary button">Student</a></li>
-				<li><a href="#marking/bin/{$bin.id}/question" class="medium secondary button">Question</a></li>
+				<li><a href="#marking/bins/{$bin.id}/students" class="medium secondary button">Student</a></li>
+				<li><a href="#marking/bins/{$bin.id}/questions" class="medium secondary button">Question</a></li>
 			</ul>
 			<a class="medium secondary button upload-marked-work">Upload</a>
 		</div>
 	</div>
 	<div class="columns large-4 small-12">
-		<input type="text" placeholder="Search..." class="input-search">
+		<input type="text" disabled="true" placeholder="Search..." class="input-search">
 	</div>
 </div>
 
 <div class="row upload-marked-work-form">
 	<div class="columns large-12">
-		<form action="/marking/bin/{$bin.id}" method="post" enctype="multipart/form-data">
+		<form action="/marking/bins/{$bin.id}" method="post" enctype="multipart/form-data">
 			<fieldset>
 				<legend>Upload marked work</legend>
 				<input type="file" name="file"><input type="submit" name="submit" value="Upload">
