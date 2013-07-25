@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
 
-@Path("/marking/bin/{binId}")
+@Path("/marking/bins/{binId}")
 public class MarkingController {
     @Context
     private HttpServletRequest request;
