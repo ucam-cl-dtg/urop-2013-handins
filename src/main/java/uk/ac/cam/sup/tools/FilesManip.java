@@ -1,7 +1,7 @@
 package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.BadPdfFormatException;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.io.FileUtils;
@@ -9,17 +9,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.structures.Marking;
 
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +24,7 @@ public class FilesManip {
     /*
     Done
      */
-    public static Object resultingFile(List<Marking> questionList) throws IOException, DocumentException {
+    public static Object resultingFile(List<Marking> questionList) {
 
         // Create directory
         String directory = "temp/";
@@ -42,19 +38,29 @@ public class FilesManip {
         for (Marking marking : questionList)
             questionPathList.add(marking.getFilePath());
 
-        FilesManip.mergePdf(questionPathList, randomTemp);
-        PDFManip pdfManip = new PDFManip(randomTemp);
+        PDFManip pdfManip;
+        try {
+            FilesManip.mergePdf(questionPathList, randomTemp);
+
+            pdfManip = new PDFManip(randomTemp);
+        } catch (Exception e) {
+            return Response.status(345).build();
+        }
 
         for (Marking marking : questionList)
             FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
 
-        return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+        try {
+            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+        } catch (Exception e) {
+            return Response.status(345).build();
+        }
     }
 
     /*
     Done
      */
-    private static void rememberAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
+    private static void rememberAnswer(Distribution distribution, String directory, Submission submission) {
 
         // Set Hibernate
         Session session = HibernateUtil.getSession();
@@ -65,9 +71,14 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + answer.getId() + ".pdf";
-        PDFManip pdfManip = new PDFManip(filePath);
-        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
-        pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
+        PDFManip pdfManip;
+        try {
+            pdfManip = new PDFManip(filePath);
+            new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+            pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
+        } catch (Exception e) {
+
+        }
 
         answer.setBin(submission.getBin());
         answer.setFilePath(filePath);
@@ -82,7 +93,7 @@ public class FilesManip {
     /*
     Done
      */
-    private static void rememberMarkedAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
+    private static void rememberMarkedAnswer(String user, Distribution distribution, String directory, Submission submission) {
 
         // Set Hibernate
         Session session = HibernateUtil.getSession();
@@ -93,11 +104,15 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + markedAnswer.getId() + ".pdf";
-        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+        try {
+            new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
+        } catch (Exception e) {
+
+        }
 
         markedAnswer.setFilePath(filePath);
         markedAnswer.setOwner(distribution.getStudent());
-        markedAnswer.setAnnotator(UserHelper.getCurrentUser());
+        markedAnswer.setAnnotator(user);
         markedAnswer.setMarkedSubmission((MarkedSubmission) submission);
         markedAnswer.setAnswer((Answer) session.createCriteria(Answer.class)
                                       .add(Restrictions.eq("owner", distribution.getStudent()))
@@ -111,7 +126,7 @@ public class FilesManip {
     /*
     Done
      */
-    public static void distributeSubmission(Submission submission) throws IOException, DocumentException {
+    public static void distributeSubmission(String user, Submission submission) {
 
         // Split the file
 
@@ -129,14 +144,14 @@ public class FilesManip {
             if (submission instanceof UnmarkedSubmission)
                 rememberAnswer(distribution, directory, submission);
             if (submission instanceof MarkedSubmission)
-                rememberMarkedAnswer(distribution, directory, submission);
+                rememberMarkedAnswer(user, distribution, directory, submission);
         }
     }
 
     /*
     Done
      */
-    public static void mergePdf(List<String> filePaths, String destination) throws IOException, DocumentException {
+    public static void mergePdf(List<String> filePaths, String destination) throws Exception {
 
         if (filePaths.size() == 0)
             return;
@@ -149,11 +164,20 @@ public class FilesManip {
 
         for (String filePath : filePaths) {
 
-            PdfReader reader = new PdfReader(filePath);
+            PdfReader reader = null;
+            try {
+                reader = new PdfReader(filePath);
+            } catch (IOException e) {
+                continue;
+            }
             int n = reader.getNumberOfPages();
 
             for (int pn = 0; pn < n; )
-                copy.addPage(copy.getImportedPage(reader, ++pn));
+                try {
+                    copy.addPage(copy.getImportedPage(reader, ++pn));
+                } catch (Exception e) {
+
+                }
         }
 
         document.close();
@@ -162,10 +186,14 @@ public class FilesManip {
     /*
     Todo: maybe delete or change the function
      */
-    public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) throws IOException, DocumentException {
+    public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) {
         for (int i = firstPage; i <= lastPage; i++) {
-            pdfManip.injectMetadata("page.owner." + i, owner);
-            pdfManip.injectMetadata("page.question." + i, Long.toString(question.getId()));
+            try {
+                pdfManip.injectMetadata("page.owner." + i, owner);
+                pdfManip.injectMetadata("page.question." + i, Long.toString(question.getId()));
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -174,7 +202,7 @@ public class FilesManip {
     and writes the data to the new file created.
     Done
      */
-    public static void fileSave(byte[] data, String destination) throws IOException {
+    public static void fileSave(byte[] data, String destination) throws Exception {
         File destinationFile = new File(destination);
         OutputStream outputStream = new FileOutputStream(destinationFile);
 
@@ -196,7 +224,7 @@ public class FilesManip {
     /*
     Done
      */
-    public static void fileCopy(String source, String destination) throws IOException {
+    public static void fileCopy(String source, String destination) throws Exception {
         File sourceFile = new File(source);
         File destinationFile = new File(destination);
 
@@ -208,7 +236,7 @@ public class FilesManip {
     Copies the file to the new location and deletes the original one.
     Done
      */
-    public static void fileMove(String source, String destination) throws IOException {
+    public static void fileMove(String source, String destination) throws Exception {
         File sourceFile = new File(source);
         File destinationFile = new File(destination);
 

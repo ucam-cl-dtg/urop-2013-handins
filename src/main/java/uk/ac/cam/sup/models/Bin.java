@@ -161,7 +161,7 @@ public class Bin {
         return user.equals(owner);
     }
 
-    public boolean canDelete(String user) {
+    public boolean canDelete(String user, String token) {
 
         // return token.equals(this.token);
         // FIXME Is there any reason to allow deletion of bins?

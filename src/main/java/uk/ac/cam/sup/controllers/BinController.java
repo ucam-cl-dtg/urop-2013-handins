@@ -102,7 +102,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDelete(user)) {
+        if (!bin.canDelete(user, token)) {
             return Response.status(401).build();
         }
 
@@ -135,8 +135,8 @@ public class BinController {
 
         // Return bin details
         return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
-                                                      "name", bin.getName(),
-                                                      "token", bin.getToken()));
+                "name", bin.getName(),
+                "token", bin.getToken()));
     }
 
     /*
@@ -176,7 +176,11 @@ public class BinController {
 
         // Save the submission
         String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
-        FilesManip.fileSave(uploadForm.file, directory + fileName);
+        try {
+            FilesManip.fileSave(uploadForm.file, directory + fileName);
+        } catch (Exception e) {
+            return Response.status(345).build();
+        }
 
         // Add the submission to the database
         unmarkedSubmission.setFilePath(directory + fileName);
@@ -330,7 +334,7 @@ public class BinController {
     Checked
      */
     @POST
-    @Path("/{binId}/submission/{submissionId}")
+    @Path("/{binId}/submissions/{submissionId}")
     public Object splitSubmission (@PathParam("submissionId") long submissionId,
                                    @FormParam("id[]") long[] questionId,
                                    @FormParam("start[]") int[] startPage,
@@ -345,12 +349,17 @@ public class BinController {
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
         // Inject the pdf with the metadata needed to split it
-        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
+        PDFManip pdfManip = null;
+        try {
+            pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
+        } catch (Exception e) {
+            return Response.status(404).build();
+        }
         for (int i = 0; i < questionId.length; i++)
             FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
 
         // Split the resulting pdf
-        FilesManip.distributeSubmission(unmarkedSubmission);
+        FilesManip.distributeSubmission(user, unmarkedSubmission);
 
         return Response.ok().build();
     }

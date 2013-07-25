@@ -9,26 +9,32 @@ import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
 
 @Path ("/submission")
 public class SubmissionController {
+    @Context
+    private HttpServletRequest request;
 
     /*
     Done
+
+    Checked
      */
     @GET
     @Path("/{submissionId}")
     @Produces("application/json")
     public Object viewSubmission(@PathParam("submissionId") long submissionId) {
 
-        // Set Hibernate and get user
+        // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
+        String user = UserHelper.getCurrentUser(request);
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -50,16 +56,18 @@ public class SubmissionController {
 
     /*
     Done
+
+    Checked
      */
     @DELETE
     @Path("/{submissionId}")
     @Produces("application/json")
     public Object deleteSubmission(@PathParam("submissionId") long submissionId) {
 
-        // Set Hibernate and get user
+        // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
+        String user = UserHelper.getCurrentUser(request);
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -72,8 +80,8 @@ public class SubmissionController {
         if (!bin.canDeleteSubmission(user, unmarkedSubmission))
             return Response.status(401).build();
 
+        // See if there are annotated answers
         boolean canDelete = true;
-
         for (Answer answer : unmarkedSubmission.getAllAnswers())
             if (answer.isAnnotated())
                 canDelete = false;
@@ -81,29 +89,33 @@ public class SubmissionController {
         if (!canDelete)
             return Response.status(401).build();
 
+        // Delete all answers from the submission
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {
             FilesManip.fileDelete(answer.getFilePath());
             session.delete(answer);
         }
 
+        // Delete the actual submission
         FilesManip.fileDelete(unmarkedSubmission.getFilePath());
         session.delete(unmarkedSubmission);
 
-        return Response.status(200).build();
+        return Response.ok().build();
     }
 
     /*
     Done
+
+    Checked
      */
     @GET
     @Path("/{submissionId}/download")
     @Produces("application/pdf")
     public Object downloadSubmission(@PathParam("submissionId") long submissionId) {
 
-        // Set Hibernate and get user
+        // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
+        String user = UserHelper.getCurrentUser(request);
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -116,21 +128,24 @@ public class SubmissionController {
         if (!bin.canSeeSubmission(user, unmarkedSubmission))
             return Response.status(401).build();
 
+        // returning the queried file
         return Response.ok(new File(unmarkedSubmission.getFilePath())).build();
     }
 
     /*
     Done
+
+    Checked
      */
     @GET
     @Path("/{submissionId}/{answerId}/download")
     @Produces("application/pdf")
     public Object downloadAnswer(@PathParam("answerId") long answerId) {
 
-        // Set Hibernate and get user
+        // Set Hibernate and get user and answer
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser();
+        String user = UserHelper.getCurrentUser(request);
 
         Answer answer = (Answer) session.get(Answer.class, answerId);
 
@@ -143,6 +158,7 @@ public class SubmissionController {
         if (!bin.canSeeAnswer(user, answer))
             return Response.status(401).build();
 
+        // returning the queried file
         return Response.ok(new File(answer.getFilePath())).build();
     }
 }
