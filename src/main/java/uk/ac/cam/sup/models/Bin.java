@@ -118,7 +118,7 @@ public class Bin {
 
     @Transient
     public String getName() {
-        return "Bin " + getId();
+        return getQuestionSetName();
     }
 
     // MarkedSubmissions
@@ -161,7 +161,7 @@ public class Bin {
         return user.equals(owner);
     }
 
-    public boolean canDelete(String user, String token) {
+    public boolean canDelete(String user) {
 
         // return token.equals(this.token);
         // FIXME Is there any reason to allow deletion of bins?
@@ -212,6 +212,13 @@ public class Bin {
 
         return unmarkedSubmission.getOwner().equals(user);
     }
+
+    // TODO: COMPLETE THE FUNCTION
+
+    public boolean canSeeBin(String user) {
+        return true;
+    }
+
 
     /*
     The Owner SHOULDN'T be able to delete the unmarkedSubmission
