@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
 
-@Path("/marking/bin/{binId}")
+@Path("/marking/bins/{binId}")
 public class MarkingQueryController {
     @Context
     private HttpServletRequest request;
@@ -95,7 +95,7 @@ public class MarkingQueryController {
     Checked
      */
     @GET
-    @Path("/student/{studentCrsId}/download")
+    @Path("/students/{studentCrsId}/download")
     @Produces("application/pdf")
     public Object downloadStudentAnswers(@PathParam("binId") long binId,
                                          @PathParam("studentCrsId") String studentCrsId) {
@@ -107,7 +107,7 @@ public class MarkingQueryController {
     Done
      */
     @GET
-    @Path("/student/{studentCrsId}/question/{questionId}/download")
+    @Path("/students/{studentCrsId}/questions/{questionId}/download")
     @Produces("application/pdf")
     public Object downloadStudentQuestionAnswer(@PathParam("binId") long binId,
                                                 @PathParam("studentCrsId") String studentCrsId,
@@ -120,7 +120,7 @@ public class MarkingQueryController {
     Done
      */
     @GET
-    @Path("/question/{questionId}/download")
+    @Path("/questions/{questionId}/download")
     @Produces("application/pdf")
     public Object getQuestion(@PathParam("binId") long binId,
                               @PathParam("questionId") long questionId) {
@@ -133,7 +133,7 @@ public class MarkingQueryController {
     Done
      */
     @GET
-    @Path("/question/{questionId}/student/{studentCrsId}/download")
+    @Path("/questions/{questionId}/students/{studentCrsId}/download")
     @Produces("application/pdf")
     public Object downloadQuestionStudentAnswer(@PathParam("binId") long binId,
                                                 @PathParam("questionId") long questionId,
