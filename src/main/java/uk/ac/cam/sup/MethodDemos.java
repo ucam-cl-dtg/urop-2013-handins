@@ -14,12 +14,11 @@ public class MethodDemos extends Application {
 		Set<Class<?>> myServices = new HashSet<Class<?>>();
 		
 		myServices.add(BinController.class);
-        myServices.add(TestUploadWorkController.class);
+        myServices.add(login.class);
         myServices.add(SubmissionController.class);
         myServices.add(MarkingController.class);
         myServices.add(MarkingQueryController.class);
         myServices.add(AnnotatedAnswersController.class);
-		myServices.add(TestUploadAnnotatedWorkController.class);
 
 		// Add Htmleasy Providers
 		myServices.addAll(HtmleasyProviders.getClasses());

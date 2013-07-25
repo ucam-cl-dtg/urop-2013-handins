@@ -82,18 +82,33 @@ public class BinController {
 
         // todo: convert the received files
 
-        PDFManip pdfManip = new PDFManip(directory + fileName);
-
-        // ToDo: Redirect to splitting screen
-
-        for (int i = 1; i <= pdfManip.getPageCount(); i++)
-            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, (long) i), i, i);
-
-        FilesManip.distributeSubmission(unmarkedSubmission);
-
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId(),
                 "link", unmarkedSubmission.getId()));
     }
+
+    @POST
+    @Path("/{binId}/submission/{submissionId}")
+    public Object splitSubmission (@PathParam("submissionId") long submissionId,
+                                   @FormParam("questionIds") long[] questionId,
+                                   @FormParam("startPages") int[] startPage,
+                                   @FormParam("endPages") int[] endPage) throws IOException, DocumentException, MetadataNotFoundException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
+
+        for (int i = 1; i < questionId.length; i++)
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
+
+        FilesManip.distributeSubmission(unmarkedSubmission);
+
+        return Response.ok().build();
+    }
+
 
     /*
     Done
