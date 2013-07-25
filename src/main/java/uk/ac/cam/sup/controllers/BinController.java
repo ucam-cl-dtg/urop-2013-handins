@@ -63,6 +63,12 @@ public class BinController {
         return ImmutableMap.of("bins", finalBinList);
     }
 
+    @Path("/create")
+    @GET
+    public Object viewForCreateBin() {
+            return Response.status(200).build();
+    }
+
     /*
     Done
      */
