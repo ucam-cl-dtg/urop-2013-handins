@@ -29,7 +29,7 @@ public class BinPermission {
         setUser(user);
     }
 
-    //Getters
+    // Id
     public long getId() {
         return id;
     }
