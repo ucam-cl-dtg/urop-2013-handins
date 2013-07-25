@@ -87,7 +87,7 @@ public abstract class Submission<T> {
     /*
 
      */
-    public List<Distribution> getSubmissionDistribution() throws MetadataNotFoundException, IOException {
+    public List<Distribution> getSubmissionDistribution() throws IOException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -101,22 +101,28 @@ public abstract class Submission<T> {
         ProposedQuestion prevQuestion = null;
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
-            ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("page.question." + i)));
-            if (prevQuestion != null && question.getId() == prevQuestion.getId())
-                distribution.setEndPage(i);
-            else {
-                if (distribution != null)
-                    distributionList.add(distribution);
+            try {
+                ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("page.question." + i)));
 
-                prevQuestion = question;
+                if (prevQuestion != null && question.getId() == prevQuestion.getId())
+                    distribution.setEndPage(i);
+                else {
+                    if (distribution != null)
+                        distributionList.add(distribution);
 
-                distribution = new Distribution();
+                    prevQuestion = question;
 
-                distribution.setSubmission(this);
-                distribution.setStartPage(i);
-                distribution.setEndPage(i);
-                distribution.setQuestion(question);
-                distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
+                    distribution = new Distribution();
+
+                    distribution.setSubmission(this);
+                    distribution.setStartPage(i);
+                    distribution.setEndPage(i);
+                    distribution.setQuestion(question);
+                    distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
+                }
+            }
+            catch (MetadataNotFoundException e) {
+
             }
         }
 

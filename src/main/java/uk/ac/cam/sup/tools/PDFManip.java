@@ -14,11 +14,6 @@ public class PDFManip {
     // Fields
     private String filePath;
 
-    // Constructors
-    public PDFManip() {
-
-    }
-
     public PDFManip(String filePath) throws IOException {
         setFilePath(filePath);
     }
@@ -130,6 +125,7 @@ public class PDFManip {
     /*
     The function takes the interval of pages between start and end from the contained PDF
     and stores them in a new PDF created at the destinationPath.
+    Done
      */
     public void takePages(int start, int end, String destinationPath) throws IOException, DocumentException {
 

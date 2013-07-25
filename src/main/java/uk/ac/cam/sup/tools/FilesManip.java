@@ -51,6 +51,9 @@ public class FilesManip {
         return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
     }
 
+    /*
+    Done
+     */
     private static void rememberAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
 
         // Set Hibernate
@@ -76,6 +79,9 @@ public class FilesManip {
         session.update(answer);
     }
 
+    /*
+    Done
+     */
     private static void rememberMarkedAnswer(Distribution distribution, String directory, Submission submission) throws IOException, DocumentException {
 
         // Set Hibernate
@@ -103,9 +109,9 @@ public class FilesManip {
     }
 
     /*
-
+    Done
      */
-    public static void distributeSubmission(Submission submission) throws MetadataNotFoundException, IOException, DocumentException {
+    public static void distributeSubmission(Submission submission) throws IOException, DocumentException {
 
         // Split the file
 
@@ -128,7 +134,7 @@ public class FilesManip {
     }
 
     /*
-
+    Done
      */
     public static void mergePdf(List<String> filePaths, String destination) throws IOException, DocumentException {
 
@@ -166,6 +172,7 @@ public class FilesManip {
     /*
     Takes the array of bytes representing the data to be written and the destination path
     and writes the data to the new file created.
+    Done
      */
     public static void fileSave(byte[] data, String destination) throws IOException {
         File destinationFile = new File(destination);
@@ -177,6 +184,7 @@ public class FilesManip {
 
     /*
     Takes the path of a file and deletes the file.
+    Done
      */
     public static void fileDelete(String filePath) {
         File f = new File(filePath);
@@ -186,7 +194,7 @@ public class FilesManip {
     }
 
     /*
-
+    Done
      */
     public static void fileCopy(String source, String destination) throws IOException {
         File sourceFile = new File(source);
@@ -198,6 +206,7 @@ public class FilesManip {
     /*
     Takes the path of the source and the destination where the file should be moved.
     Copies the file to the new location and deletes the original one.
+    Done
      */
     public static void fileMove(String source, String destination) throws IOException {
         File sourceFile = new File(source);

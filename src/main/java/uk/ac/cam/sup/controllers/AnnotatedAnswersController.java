@@ -19,35 +19,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+@Path("/bin")
 public class AnnotatedAnswersController {
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/{binId}/marked/{markedAnswerId}/download")
-    @Produces("application/pdf")
-    public Object downloadMarkedAnswer(@PathParam("binId") long binId, @PathParam("markedAnswerId") long markedAnswerId) throws IOException, DocumentException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-        MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
-
-        if (bin.canSeeAnnotated(user, markedAnswer)) {
-            List<Marking> markedList = new LinkedList<Marking>();
-
-            markedList.add(new Marking(markedAnswer.getFilePath()));
-
-            return FilesManip.resultingFile(markedList);
-        }
-
-        return Response.status(401).build();
-    }
 
     /*
     Done
@@ -84,4 +57,31 @@ public class AnnotatedAnswersController {
         return Response.status(401).build();
     }
 
+    /*
+    Done
+     */
+    @GET
+    @Path("/{binId}/marked/{markedAnswerId}/download")
+    @Produces("application/pdf")
+    public Object downloadMarkedAnswer(@PathParam("binId") long binId, @PathParam("markedAnswerId") long markedAnswerId) throws IOException, DocumentException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
+
+        if (bin.canSeeAnnotated(user, markedAnswer)) {
+            List<Marking> markedList = new LinkedList<Marking>();
+
+            markedList.add(new Marking(markedAnswer.getFilePath()));
+
+            return FilesManip.resultingFile(markedList);
+        }
+
+        return Response.status(401).build();
+    }
 }

@@ -29,7 +29,7 @@ public class MarkingController {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public Object createMarkedSubmission(@MultipartForm FileUploadForm uploadForm,
-                                         @PathParam("binId") long binId) throws IOException, MetadataNotFoundException, DocumentException {
+                                         @PathParam("binId") long binId) throws IOException, DocumentException {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -186,17 +186,55 @@ public class MarkingController {
             boolean exists = answers.size() > 0;
 
             if (exists)
-                if (bin.canSeeAnswer(user, answers.get(0))) {
-                    boolean isMarked = answers.get(0).getMarkedAnswers().size() > 0;
-
+                if (bin.canSeeAnswer(user, answers.get(0)))
                     studentQuestions.add(ImmutableMap.of("questionName", question.getName(),
                                                          "questionId", question.getId(),
                                                          "exists", exists,
-                                                         "isMarked", isMarked));
-                }
+                                                         "isMarked", answers.get(0).isAnnotated()));
         }
 
         return ImmutableMap.of("studentQuestions", studentQuestions, "student", studentCrsId);
+    }
+
+    /*
+    Done
+     */
+    @POST
+    @Path("student/{studentCrsId}")
+    @Produces("application/json")
+    public Object annotateStudent(@PathParam("binId") long binId,
+                                  @PathParam("studentCrsId") String studentCrsId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(401).build();
+
+        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+        List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<ImmutableMap<String, ?>>();
+
+        for (ProposedQuestion question : questions) {
+
+            @SuppressWarnings("unchecked")
+            List<Answer> answers = session.createCriteria(Answer.class)
+                    .add(Restrictions.eq("bin", bin))
+                    .add(Restrictions.eq("owner", studentCrsId))
+                    .add(Restrictions.eq("question", question)).list();
+
+            boolean exists = answers.size() > 0;
+
+            if (exists)
+                if (bin.canSeeAnswer(user, answers.get(0)))
+                    answers.get(0).setAnnotated(!answers.get(0).isAnnotated());
+        }
+
+        return Response.ok().build();
     }
 
     /*

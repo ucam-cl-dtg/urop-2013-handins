@@ -41,6 +41,92 @@ public class BinController {
     /*
     Done
      */
+    @GET
+    public Object viewBinList() {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        @SuppressWarnings("unchecked")
+        List<Bin> binList = session.createCriteria(Bin.class).list();
+        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+
+        for (Bin bin : binList)
+            if (bin.canAddSubmission(user))
+                finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                        "name", bin.getName(),
+                        "isArchived", bin.isArchived(),
+                        "questions", bin.getQuestionCount()));
+
+        return ImmutableMap.of("bins", finalBinList);
+    }
+
+    /*
+    Done
+     */
+    @POST
+    public Map<String, ?> addBin(@FormParam("owner") String owner,
+                                 @FormParam("questionSet") String questionSet ) {
+
+        // Set Hibernate
+        Session session = HibernateUtil.getSession();
+
+        Bin bin = new Bin(owner, questionSet);
+
+        session.save(bin);
+
+        return ImmutableMap.of("id", bin.getId(),
+                "token", bin.getToken());
+    }
+
+    /*
+    Done
+     */
+    @DELETE
+    @Path("/{binId}")
+    public Response deleteBin(@PathParam("binId") long binId,
+                              @QueryParam("token") String token) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+
+        if (bin == null)
+            return Response.status(404).build();
+        if (!bin.canDelete(user, token)) {
+            return Response.status(401).build();
+        }
+
+        session.delete(bin);
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+     */
+    @GET
+    @Path("/{binId}")
+    public Object viewBin(@PathParam("binId") long binId) {
+        Bin bin = getBin(binId);
+
+        if (bin == null)
+            throw new NotFoundException();
+
+        return ImmutableMap.of("bin", ImmutableMap.of(
+                "id", bin.getId(),
+                "name", bin.getName()));
+    }
+
+    /*
+    Done
+     */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
@@ -84,202 +170,6 @@ public class BinController {
 
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId()),
                                "bin", bin.getId());
-    }
-
-    @POST
-    @Path("/{binId}/submission/{submissionId}")
-    public Object splitSubmission (@PathParam("submissionId") long submissionId,
-                                   @FormParam("id[]") long[] questionId,
-                                   @FormParam("start[]") int[] startPage,
-                                   @FormParam("end[]") int[] endPage) throws IOException, DocumentException, MetadataNotFoundException {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
-        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
-
-        for (int i = 0; i < questionId.length; i++)
-            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
-
-        FilesManip.distributeSubmission(unmarkedSubmission);
-
-        return Response.ok().build();
-    }
-
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/{binId}/submissions")
-    @Produces("application/json")
-    public Object viewSubmissionList(@PathParam("binId") long binId) {
-
-        // Get user
-        String user = UserHelper.getCurrentUser();
-
-        // Get Bin and check
-        Bin bin = BinController.getBin(binId);
-
-        if (bin == null)
-            return Response.status(404).build();
-
-        List<UnmarkedSubmission> allUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>(bin.getUnmarkedSubmissions());
-        List<UnmarkedSubmission> accessibleUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>();
-
-        for (UnmarkedSubmission unmarkedSubmission : allUnmarkedSubmissions)
-            if (bin.canSeeSubmission(user, unmarkedSubmission))
-                accessibleUnmarkedSubmissions.add(unmarkedSubmission);
-
-        List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();
-
-        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions)
-            mapList.add(ImmutableMap.of("link", unmarkedSubmission.getId(),
-                    "id", Long.toString(unmarkedSubmission.getId())));
-
-        return ImmutableMap.of("submissions", mapList);
-    }
-
-    /*
-    Done
-     */
-    @GET
-    public Object listBins() {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        @SuppressWarnings("unchecked")
-        List<Bin> binList = session.createCriteria(Bin.class).list();
-        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
-
-        for (Bin bin : binList)
-            if (bin.canAddSubmission(user))
-                finalBinList.add(ImmutableMap.of("id", bin.getId(),
-                                                 "name", bin.getName(),
-                                                 "isArchived", bin.isArchived(),
-                                                 "questions", bin.getQuestionCount()));
-
-        return ImmutableMap.of("bins", finalBinList);
-    }
-
-    /*
-    Done
-     */
-    @POST
-    public Map<String, ?> createBin(@FormParam("owner") String owner,
-                                    @FormParam("questionSet") String questionSet ) {
-
-        // Set Hibernate
-        Session session = HibernateUtil.getSession();
-
-        Bin bin = new Bin(owner, questionSet);
-
-        session.save(bin);
-
-        return ImmutableMap.of("id", bin.getId(),
-                               "token", bin.getToken());
-    }
-
-    /*
-    Done
-     */
-    @POST
-    @Path("/{binId}/change")
-    public Object changeArchiveBin(@PathParam("binId") long binId) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-        if (!bin.isOwner(user))
-            return Response.status(401).build();
-
-        bin.setArchived(!bin.isArchived());
-
-        session.update(bin);
-
-        return Response.ok().build();
-    }
-
-    /*
-    Done
-     */
-    @POST
-    @Path("/{binId}/add")
-    public Object addBinQuestion(@PathParam("binId") long binId,
-                                 @FormParam("questionName") String questionName) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-        if (!bin.isOwner(user))
-            return Response.status(401).build();
-
-        ProposedQuestion question = new ProposedQuestion();
-        session.save(question);
-
-        question.setName(questionName);
-        question.setBin(bin);
-
-        session.update(question);
-
-        return Response.ok().build();
-    }
-
-    /*
-    Done
-     */
-    @DELETE
-    @Path("/{binId}")
-    public Response deleteBin(@PathParam("binId") long binId,
-                              @QueryParam("token") String token) {
-
-        // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
-
-        String user = UserHelper.getCurrentUser();
-
-        Bin bin = (Bin) session.get(Bin.class, binId);
-
-
-        if (bin == null)
-            return Response.status(404).build();
-        if (!bin.canDelete(user, token)) {
-            return Response.status(401).build();
-        }
-
-        session.delete(bin);
-
-        return Response.ok().build();
-    }
-
-    /*
-    Done
-     */
-    @GET
-    @Path("/{binId}")
-    public Object viewBin(@PathParam("binId") long binId) {
-        Bin bin = getBin(binId);
-
-        if (bin == null)
-            throw new NotFoundException();
-
-        return ImmutableMap.of("bin", ImmutableMap.of(
-                               "id", bin.getId(),
-                               "name", bin.getName()));
     }
 
     /*
@@ -352,13 +242,122 @@ public class BinController {
         Session session = HibernateUtil.getSession();
 
         List permissions = session.createCriteria(BinPermission.class)
-                                  .add(Restrictions.in("user", users))
-                                  .add(Restrictions.eq("bin", bin))
-                                  .list();
+                .add(Restrictions.in("user", users))
+                .add(Restrictions.eq("bin", bin))
+                .list();
 
         for (Object perm: permissions) {
             session.delete(perm);
         }
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+     */
+    @GET
+    @Path("/{binId}/submissions")
+    @Produces("application/json")
+    public Object viewSubmissionList(@PathParam("binId") long binId) {
+
+        // Get user
+        String user = UserHelper.getCurrentUser();
+
+        // Get Bin and check
+        Bin bin = BinController.getBin(binId);
+
+        if (bin == null)
+            return Response.status(404).build();
+
+        List<UnmarkedSubmission> allUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>(bin.getUnmarkedSubmissions());
+        List<UnmarkedSubmission> accessibleUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>();
+
+        for (UnmarkedSubmission unmarkedSubmission : allUnmarkedSubmissions)
+            if (bin.canSeeSubmission(user, unmarkedSubmission))
+                accessibleUnmarkedSubmissions.add(unmarkedSubmission);
+
+        List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();
+
+        for (UnmarkedSubmission unmarkedSubmission : accessibleUnmarkedSubmissions)
+            mapList.add(ImmutableMap.of("link", unmarkedSubmission.getId(),
+                    "id", Long.toString(unmarkedSubmission.getId())));
+
+        return ImmutableMap.of("submissions", mapList);
+    }
+
+    @POST
+    @Path("/{binId}/submission/{submissionId}")
+    public Object splitSubmission (@PathParam("submissionId") long submissionId,
+                                   @FormParam("id[]") long[] questionId,
+                                   @FormParam("start[]") int[] startPage,
+                                   @FormParam("end[]") int[] endPage) throws IOException, DocumentException, MetadataNotFoundException {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+        PDFManip pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
+
+        for (int i = 0; i < questionId.length; i++)
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
+
+        FilesManip.distributeSubmission(unmarkedSubmission);
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+     */
+    @POST
+    @Path("/{binId}/change")
+    public Object changeArchiveBin(@PathParam("binId") long binId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        if (!bin.isOwner(user))
+            return Response.status(401).build();
+
+        bin.setArchived(!bin.isArchived());
+
+        session.update(bin);
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+     */
+    @POST
+    @Path("/{binId}/add")
+    public Object addBinQuestion(@PathParam("binId") long binId,
+                                 @FormParam("questionName") String questionName) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser();
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        if (!bin.isOwner(user))
+            return Response.status(401).build();
+
+        ProposedQuestion question = new ProposedQuestion();
+        session.save(question);
+
+        question.setName(questionName);
+        question.setBin(bin);
+
+        session.update(question);
 
         return Response.ok().build();
     }
