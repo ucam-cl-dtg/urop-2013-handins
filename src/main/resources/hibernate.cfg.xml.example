@@ -31,9 +31,9 @@
     <session-factory>
 
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://localhost/handins-devel</property>
-        <property name="connection.username">hadesgames</property>
-        <!--<property name="connection.password">questions</property> -->
+        <property name="connection.url">jdbc:postgresql://localhost/handins</property>
+        <property name="connection.username">handins</property>
+        <property name="connection.password">handins</property>
         <!-- JDBC connection pool (use the built-in)  -->
         <property name="connection.pool_size">1</property>
 
