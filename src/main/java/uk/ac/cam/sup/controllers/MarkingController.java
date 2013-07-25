@@ -156,7 +156,7 @@ public class MarkingController {
     Done
      */
     @GET
-    @Path("/{studentCrsId}")
+    @Path("student/{studentCrsId}")
     @Produces("application/json")
     public Object viewStudent(@PathParam("binId") long binId,
                               @PathParam("studentCrsId") String studentCrsId) {

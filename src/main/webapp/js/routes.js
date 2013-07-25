@@ -44,7 +44,7 @@ function binList (json) {
     json.elems = json.bins;
     _.map(json.elems, function(elem) {
         elem.uploadTo = elem.id;
-        elem.sublist = "submission/bin/" + elem.id;
+        elem.sublist = "bin/" + elem.id + "/submissions";
         elem.sublistTemplateFunction = "submissionSubList";
 
         return elem;
@@ -108,7 +108,7 @@ function markingStudentsQuestion(json) {
         elem.id = elem.questionId;
         elem.name = elem.questionName;
 
-        elem.download = "/marking/bin/" + bin + "/question/" + elem.id + "/student/" + json.student;
+        elem.download = "/marking/bin/" + bin + "/question/" + elem.id + "/student/" + json.student + "/download";
         elem.marking = "bla";
     })
 
@@ -139,7 +139,7 @@ function markingQuestionStudents(json) {
 
     _.each(json.elems, function(elem){
         elem.name = elem.owner;
-        elem.download = "/marking/bin/" + bin + "/question/" + json.question + "/student/" + elem.owner;
+        elem.download = "/marking/bin/" + bin + "/question/" + json.question + "/student/" + elem.owner + "/download";
         elem.marking = "bla";
     })
     return 'shared.handins.generic.listPanel';
@@ -147,7 +147,7 @@ function markingQuestionStudents(json) {
 
 $(document).ready(function() {
     router = Router({
-        "submission/bin/:id": combine(submissionList, binInjector("handins.submission.index")),
+        "bin/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bin": binList,
         "marking/bin/:binId/student": combine(binInjector(), markingStudents),
         "marking/bin/:binId/question": combine(binInjector(), markingQuestion),

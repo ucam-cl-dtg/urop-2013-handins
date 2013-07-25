@@ -18,6 +18,7 @@ public class TemporaryFileInputStream extends FileInputStream {
     public void close() throws IOException {
         super.close();
 
+        //noinspection ResultOfMethodCallIgnored
         file.delete();
     }
 }

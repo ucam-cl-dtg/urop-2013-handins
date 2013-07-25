@@ -97,7 +97,7 @@ public class MarkingQueryController {
                                             .add(Restrictions.eq("owner", studentCrsId))
                                             .list().get(0);
 
-            if (bin.canSeeAnswer(user, answer))
+            if (!bin.canSeeAnswer(user, answer))
                 return Response.status(401).build();
 
             List<Marking> markingList = new LinkedList<Marking>();

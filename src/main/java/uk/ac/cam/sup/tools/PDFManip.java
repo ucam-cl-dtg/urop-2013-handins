@@ -8,7 +8,6 @@ import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class PDFManip {
@@ -33,6 +32,7 @@ public class PDFManip {
         File file = new File(filePath);
 
         if (!file.exists())
+            //noinspection ResultOfMethodCallIgnored
             file.createNewFile();
 
         this.filePath = filePath;

@@ -17,6 +17,8 @@ public class MethodDemos extends Application {
         myServices.add(TestUploadWorkController.class);
         myServices.add(SubmissionController.class);
         myServices.add(MarkingController.class);
+        myServices.add(MarkingQueryController.class);
+        myServices.add(AnnotatedAnswersController.class);
 		myServices.add(TestUploadAnnotatedWorkController.class);
 
 		// Add Htmleasy Providers
