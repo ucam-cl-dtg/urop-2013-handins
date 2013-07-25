@@ -46,10 +46,21 @@ function binList (json) {
         elem.uploadTo = elem.id;
         elem.sublist = "bin/" + elem.id + "/submissions";
         elem.sublistTemplateFunction = "submissionSubList";
+        elem.linkTo = "bin/" + elem.id + "/submissions";
 
         return elem;
     });
     return "shared.handins.generic.listPanel";
+}
+
+function markingList(json) {
+    json.elems = json.bins;
+    _.map(json.elems, function(elem) {
+        elem.linkTo = "marking/bin/" + elem.id + "/student";
+        return elem;
+    });
+    return "shared.handins.generic.listPanel";
+
 }
 
 function submissionSubList(json) {
@@ -71,9 +82,24 @@ function submissionList(json) {
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submission/" + elem.id;
+        elem.sublist = "submission/" + elem.id;
+        elem.sublistTemplateFunction = "questionList";
         elem.download = "/submission/" + elem.id + "/download";
     })
 }
+
+function questionList(json) {
+    json.elems = json.answers;
+    json.subPanel = true;
+
+    _.map(json.elems, function(elem) {
+        elem.name = elem.question;
+        elem.download = elem.link;
+    })
+
+    return "shared.handins.generic.listPanel";
+}
+
 
 function combine(f1 , f2) {
     return function(json) {
@@ -151,6 +177,7 @@ $(document).ready(function() {
         "bin": binList,
         "marking/bin/:binId/student": combine(binInjector(), markingStudents),
         "marking/bin/:binId/question": combine(binInjector(), markingQuestion),
+        "marking": markingList,
         "test": "main.index2"
 
     })

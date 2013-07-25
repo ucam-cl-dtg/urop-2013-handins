@@ -11,9 +11,16 @@
 * @param sublistTemplateFunction
 * @param marking - link
 * @param isMarked - boolean
+* @param linkTo
 */
 {template .elementContents}
-    <div class="columns large-7 small-7">{$name}</div>
+    <div class="columns large-7 small-7">
+    {if $linkTo }
+        <a href="#{$linkTo}">{$name}</a>
+    {else}
+        {$name}
+    {/if}
+    </div>
     <div class="columns large-5 small-5 text-right">
         <div class="icon-button-wrapper">
 
