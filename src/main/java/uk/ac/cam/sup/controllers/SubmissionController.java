@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
 
-@Path ("/submission")
+@Path ("/submissions")
 public class SubmissionController {
     @Context
     private HttpServletRequest request;
