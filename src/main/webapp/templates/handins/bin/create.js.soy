@@ -1,0 +1,50 @@
+{namespace handins.bin}
+
+
+/**
+*
+*/
+{template .create}
+
+<div class="create-bin">
+    <form action="/bin" method="post">
+        <fieldset>
+            <legend> Create a new Bin </legend>
+            <div class="row">
+                <div class="columns">
+                    <label>Bin name</label>
+                    <input type="text" name="questionSetName" />
+                </div>
+            </div>
+            <div class="row">
+                <input type="submit" />
+            </div>
+        </fieldset>
+    </form>
+ </div>
+
+{/template}
+
+
+/**
+* @param user
+*/
+{template .editPermission}
+    <div class="row">
+        <div class="columns">
+            <input type="hidden" name="users[]" value="{$user}">
+            {$user}
+        </div>
+    </div>
+{/template}
+/**
+* @param users
+*/
+{template .editPermissions}
+
+    {foreach $user in $users}
+        {call .editPermission}
+            {param user: $user/}
+        {/call}
+    {/foreach}
+{/template}

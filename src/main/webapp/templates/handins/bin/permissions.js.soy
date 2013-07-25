@@ -1,0 +1,38 @@
+{namespace handins.bin}
+
+/**
+* @param bin
+*/
+{template .permissions}
+    <div class="update-permissions">
+        <form action="/bins/{$bin.id}/permissions" method="post">
+            <fieldset>
+                <legend>Users who can upload to the bin</legend>
+                <div class="permissions-container async-loader" data-path="bins/{$bin.id}/permissions" template-name="handins.bin.editPermissions">
+
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="row">
+            <div class="columns large-9">
+                <input type="text" name="user"/>
+            </div>
+            <div class="columns large-3">
+                <div class="button add-user">
+                    Add user
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="columns">
+                <div class="button send-update-permissions">
+                    Save
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/template}
+

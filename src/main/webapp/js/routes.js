@@ -17,7 +17,7 @@ function binInjector(templateName) {
     }
 
     updateBin = function() {
-        $.ajax("/bin/" + getRouteParams()[0], {
+        $.ajax("/bins/" + getRouteParams()[0], {
             async: false,
             success: function(res) {
                bin = res.bin;
@@ -44,9 +44,9 @@ function binList (json) {
     json.elems = json.bins;
     _.map(json.elems, function(elem) {
         elem.uploadTo = elem.id;
-        elem.sublist = "bin/" + elem.id + "/submissions";
+        elem.sublist = "bins/" + elem.id + "/submissions";
         elem.sublistTemplateFunction = "submissionSubList";
-        elem.linkTo = "bin/" + elem.id + "/submissions";
+        elem.linkTo = "bins/" + elem.id + "/submissions";
 
         return elem;
     });
@@ -56,7 +56,7 @@ function binList (json) {
 function markingList(json) {
     json.elems = json.bins;
     _.map(json.elems, function(elem) {
-        elem.linkTo = "marking/bin/" + elem.id + "/student";
+        elem.linkTo = "marking/bins/" + elem.id + "/students";
         return elem;
     });
     return "shared.handins.generic.listPanel";
@@ -69,8 +69,8 @@ function submissionSubList(json) {
 
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
-        elem.delete = "/submission/" + elem.id;
-        elem.download = "/submission/" + elem.id + "/download";
+        elem.delete = "/submissions/" + elem.id;
+        elem.download = "/submissions/" + elem.id + "/download";
     })
 
     return "shared.handins.generic.listPanel";
@@ -81,10 +81,10 @@ function submissionList(json) {
 
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
-        elem.delete = "/submission/" + elem.id;
-        elem.sublist = "submission/" + elem.id;
+        elem.delete = "/submissions/" + elem.id;
+        elem.sublist = "submissions/" + elem.id;
         elem.sublistTemplateFunction = "questionList";
-        elem.download = "/submission/" + elem.id + "/download";
+        elem.download = "/submissions/" + elem.id + "/download";
     })
 }
 
@@ -112,8 +112,8 @@ function markingStudents (json) {
 
     _.each(json.students,  function(elem) {
         elem.name = elem.student;
-        elem.download = "/marking/bin/" + json.bin.id + "/student/" + elem.student + "/download";
-        elem.sublist = "marking/bin/" + json.bin.id + "/student/" + elem.student;
+        elem.download = "/marking/bins/" + json.bin.id + "/students/" + elem.student + "/download";
+        elem.sublist = "marking/bins/" + json.bin.id + "/students/" + elem.student;
         elem.sublistTemplateFunction = "markingStudentsQuestion"
         elem.marking = "bla";
     })
@@ -134,7 +134,7 @@ function markingStudentsQuestion(json) {
         elem.id = elem.questionId;
         elem.name = elem.questionName;
 
-        elem.download = "/marking/bin/" + bin + "/question/" + elem.id + "/student/" + json.student + "/download";
+        elem.download = "/marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student + "/download";
         elem.marking = "bla";
     })
 
@@ -146,8 +146,8 @@ function markingQuestion(json) {
     _.each(json.questionList,  function(elem) {
         elem.name = elem.questionName;
         elem.id = elem.questionId;
-        elem.download = "/marking/bin/" + json.bin.id + "/question/" + elem.id + "/download";
-        elem.sublist = "marking/bin/" + json.bin.id + "/question/" + elem.id;
+        elem.download = "/marking/bins/" + json.bin.id + "/questions/" + elem.id + "/download";
+        elem.sublist = "marking/bins/" + json.bin.id + "/questions/" + elem.id;
         elem.sublistTemplateFunction = "markingQuestionStudents";
         elem.marking= "bla";
     })
@@ -165,18 +165,20 @@ function markingQuestionStudents(json) {
 
     _.each(json.elems, function(elem){
         elem.name = elem.owner;
-        elem.download = "/marking/bin/" + bin + "/question/" + json.question + "/student/" + elem.owner + "/download";
-        elem.marking = "bla";
+        elem.download = "/marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner + "/download";
+        elem.marking = "blas";
     })
     return 'shared.handins.generic.listPanel';
 }
 
 $(document).ready(function() {
     router = Router({
-        "bin/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
-        "bin": binList,
-        "marking/bin/:binId/student": combine(binInjector(), markingStudents),
-        "marking/bin/:binId/question": combine(binInjector(), markingQuestion),
+        "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
+        "bins": binList,
+        "bins/create": "handins.bin.create",
+        "bins/:binId": "handins.bin.permissions",
+        "marking/bins/:binId/students": combine(binInjector(), markingStudents),
+        "marking/bins/:binId/questions": combine(binInjector(), markingQuestion),
         "marking": markingList,
         "test": "main.index2"
 

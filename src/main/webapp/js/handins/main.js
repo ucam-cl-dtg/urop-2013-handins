@@ -20,7 +20,7 @@ $(document).on("click", ".upload-work-for-bin", function() {
     var elem = $(this),
         bin = elem.attr("bin");
 
-    loadModule($('.upload-work').first(), "bin/" + bin, "shared.handins.uploadForm", function() {
+    loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
         this.slideToggle();
     });
 })
@@ -114,7 +114,7 @@ function showSelectingModal(bin, submission) {
 }
 function showPdf(submission) {
     PDFJS.disableWorker = true;
-    PDFJS.getDocument("/submission/" + submission + "/download").then(function (pdf){
+    PDFJS.getDocument("/submissions/" + submission + "/download").then(function (pdf){
         var numPages = pdf.numPages;
 
         for (var i=0; i < numPages; i++) {
@@ -139,6 +139,17 @@ function showPdf(submission) {
     })
 }
 
+$(document).on("click", ".update-permissions .add-user", function() {
+    var user = $(this).closest(".row").find('input[name="user"]').val();
+
+    var userField = $(handins.bin.editPermission({user: user}));
+    userField.appendTo($('.update-permissions .permissions-container'));
+})
+
+$(document).on("click", ".send-update-permissions", function() {
+    $('.update-permissions form').ajaxSubmit();
+})
+
 moduleScripts['handins'] = {
     'marking': {
         'index': [function () {
@@ -147,6 +158,19 @@ moduleScripts['handins'] = {
                 Backbone.history.fragment = null;
                 router.navigate(window.location.hash, {trigger: true});
             })
+        }]
+    },
+    'bin': {
+        'create': [function() {
+            $(".create-bin form").ajaxForm(function(data) {
+                var id = data.id;
+                router.navigate("/bins/" + id, { trigger: true });
+            })
+        }],
+        'permissions': [function(){
+            $(".update-permissions form").ajaxForm(function() {
+               console.log("Permissions updated");
+            });
         }]
     }
 }

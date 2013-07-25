@@ -17,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Path("/bins")
@@ -54,6 +55,12 @@ public class BinController {
         return ImmutableMap.of("bins", finalBinList);
     }
 
+    @Path("/create")
+    @GET
+    public Object viewForCreateBin() {
+            return Response.status(200).build();
+    }
+
     /*
     Done
 
@@ -74,7 +81,7 @@ public class BinController {
         session.save(bin);
 
         return ImmutableMap.of("id", bin.getId(),
-                               "token", bin.getToken());
+                "token", bin.getToken());
     }
 
     /*
@@ -123,7 +130,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canSeeBin(user))
+        if (! bin.canSeeBin(user))
             return Response.status(401).build();
 
         // Return bin details
@@ -213,7 +220,7 @@ public class BinController {
         for (BinPermission binPermission: bin.getPermissions())
             res.add(binPermission.getUser());
 
-        return res;
+        return ImmutableMap.of("users", res);
     }
 
     /*
@@ -356,7 +363,6 @@ public class BinController {
 
         return Response.ok().build();
     }
-
     /*
     Done
      */

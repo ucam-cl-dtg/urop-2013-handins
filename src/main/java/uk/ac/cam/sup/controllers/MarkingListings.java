@@ -1,5 +1,7 @@
 package uk.ac.cam.sup.controllers;
 
+import com.googlecode.htmleasy.RedirectException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,6 +16,7 @@ public class MarkingListings {
     @GET
     @Produces("application/json")
     public Object showBinsToMark() {
-        return (new BinController()).viewBinList();
+        throw new RedirectException("/bins");
+        //return (new BinController()).viewBinList();
     }
 }
