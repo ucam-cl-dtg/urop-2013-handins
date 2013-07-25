@@ -60,7 +60,6 @@ function submissionSubList(json) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submission/" + elem.id;
         elem.download = "/submission/" + elem.id + "/download";
-
     })
 
     return "shared.handins.generic.listPanel";
