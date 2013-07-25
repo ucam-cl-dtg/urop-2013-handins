@@ -139,6 +139,17 @@ function showPdf(submission) {
     })
 }
 
+$(document).on("click", ".update-permissions .add-user", function() {
+    var user = $(this).closest(".row").find('input[name="user"]').val();
+
+    var userField = $(handins.bin.editPermission({user: user}));
+    userField.appendTo($('.update-permissions .permissions-container'));
+})
+
+$(document).on("click", ".send-update-permissions", function() {
+    $('.update-permissions form').ajaxSubmit();
+})
+
 moduleScripts['handins'] = {
     'marking': {
         'index': [function () {
@@ -147,6 +158,19 @@ moduleScripts['handins'] = {
                 Backbone.history.fragment = null;
                 router.navigate(window.location.hash, {trigger: true});
             })
+        }]
+    },
+    'bin': {
+        'create': [function() {
+            $(".create-bin form").ajaxForm(function(data) {
+                var id = data.id;
+                router.navigate("/bin/" + id, { trigger: true });
+            })
+        }],
+        'permissions': [function(){
+            $(".update-permissions form").ajaxForm(function() {
+               console.log("Permissions updated");
+            });
         }]
     }
 }

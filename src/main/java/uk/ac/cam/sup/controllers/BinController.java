@@ -17,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Path("/bins")
@@ -80,7 +81,7 @@ public class BinController {
         session.save(bin);
 
         return ImmutableMap.of("id", bin.getId(),
-                               "token", bin.getToken());
+                "token", bin.getToken());
     }
 
     /*
@@ -129,7 +130,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (bin.canSeeBin(user))
+        if (! bin.canSeeBin(user))
             return Response.status(401).build();
 
         // Return bin details
@@ -194,7 +195,7 @@ public class BinController {
     Checked
      */
     @GET
-    @Path("/{binId}/permission/")
+    @Path("/{binId}/permissions/")
     public Object viewBinPermissionsList(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user and bin
@@ -215,7 +216,7 @@ public class BinController {
         for (BinPermission binPermission: bin.getPermissions())
             res.add(binPermission.getUser());
 
-        return res;
+        return ImmutableMap.of("users", res);
     }
 
     /*
@@ -224,7 +225,7 @@ public class BinController {
     Checked
      */
     @POST
-    @Path("/{binId}/permission/")
+    @Path("/{binId}/permissions/")
     public Response addPermissions(@PathParam("binId") long binId,
                                    @FormParam("users[]") String[] newUsers,
                                    @QueryParam("token") String token) {
@@ -261,7 +262,7 @@ public class BinController {
     Checked
      */
     @DELETE
-    @Path("/{binId}/permission")
+    @Path("/{binId}/permissions")
     public Response deletePermissions(@PathParam("binId") long binId,
                                       @QueryParam("users[]") String[] users,
                                       @QueryParam("token") String token) {
@@ -353,7 +354,6 @@ public class BinController {
 
         return Response.ok().build();
     }
-
     /*
     Done
      */

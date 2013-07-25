@@ -173,8 +173,10 @@ function markingQuestionStudents(json) {
 
 $(document).ready(function() {
     router = Router({
-        "bin/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
-        "bin": binList,
+        "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
+        "bins": binList,
+        "bins/create": "handins.bin.create",
+        "bins/:binId": "handins.bin.permissions",
         "marking/bin/:binId/student": combine(binInjector(), markingStudents),
         "marking/bin/:binId/question": combine(binInjector(), markingQuestion),
         "marking": markingList,
