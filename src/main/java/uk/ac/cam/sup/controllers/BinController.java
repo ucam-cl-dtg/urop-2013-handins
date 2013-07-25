@@ -99,7 +99,7 @@ public class BinController {
     Done
      */
     @GET
-    @Path("/{binId}/submissions")
+    @Path("/{binId}")
     @Produces("application/json")
     public Object viewSubmissionList(@PathParam("binId") long binId) {
 
