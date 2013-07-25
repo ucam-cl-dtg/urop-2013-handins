@@ -6,10 +6,10 @@ import com.googlecode.htmleasy.ViewWith;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-@Path("/testx")
-public class TestUploadAnnotatedWorkController {
+@Path("/test")
+public class login {
     @GET
-    @ViewWith("/soy/main.indexx")
+    @ViewWith("/soy/main.index")
     public Object bla(){
         return ImmutableMap.of();
     }
