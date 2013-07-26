@@ -1,7 +1,10 @@
 package uk.ac.cam.sup.controllers;
 
+import com.google.common.collect.ImmutableMap;
 import com.itextpdf.text.DocumentException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
@@ -44,12 +47,16 @@ public class AnnotatedAnswersController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+        // WTF canDeletePermission !?!
+        /*
         if (!bin.canDeletePermission(user, null))
             return Response.status(401).build();
+        */
 
         @SuppressWarnings("unchecked")
-        List<MarkedAnswer> markedAnswers = session.createCriteria(MarkedAnswer.class)
-                .add(Restrictions.eq("bin", bin))
+        List<MarkedAnswer> markedAnswers = session.createCriteria(MarkedAnswer.class, "marked")
+                .createAlias("marked.answer", "answer")
+                .add(Restrictions.eq("answer.bin", bin))
                 .add(Restrictions.eq("owner", user))
                 .list();
 
@@ -61,10 +68,32 @@ public class AnnotatedAnswersController {
 
                 markedList.add(new Marking(markedAnswer.getFilePath()));
 
-                return FilesManip.resultingFile(markedList);
             }
+        return FilesManip.resultingFile(markedList);
+    }
 
-        return Response.status(401).build();
+    @GET
+    @Path("/{binId}/marked")
+    @Produces("application/json")
+    public Object viewMarkedAnswers(@PathParam("binId") long binId) {
+        Session session = HibernateUtil.getTransaction();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        List res = session.createCriteria(MarkedAnswer.class, "marked")
+                .createAlias("marked.answer", "answer")
+                .add(Restrictions.eq("owner", user))
+                .add(Restrictions.eq("answer.bin", bin))
+                .setProjection(Projections.distinct(Projections.property("annotator")))
+                .list();
+
+        return ImmutableMap.of("annotators", res, "bin", binId);
     }
 
     /*
@@ -86,9 +115,13 @@ public class AnnotatedAnswersController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
+        // TODO WTF canDeletePermission ?!?!
+        /*
         if (!bin.canDeletePermission(user, null))
             return Response.status(401).build();
-
+       */
+        // TODO Security leak
         MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
 
         if (bin.canSeeAnnotated(user, markedAnswer)) {

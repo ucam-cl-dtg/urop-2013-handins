@@ -15,4 +15,25 @@
 {call shared.handins.generic.listPanel}
     {param elems: $elems /}
 {/call}
+<h3> Marked Work: <h3>
+<div class="async-loader" data-path="bins/{$bin.id}/marked" template-name="handins.submission.markedWork">
+    Loading ...
+</div>
+{/template}
+
+
+/**
+* @param annotators
+* @param bin
+*/
+{template .markedWork}
+<div class="row">
+    {foreach $annotator in $annotators}
+        <div class="columns large-3">
+            <a class="button" href="/bins/{$bin}/marked/download" >
+                {$annotator}
+            </a>
+        </div>
+    {/foreach}
+</div>
 {/template}
