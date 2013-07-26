@@ -44,7 +44,7 @@ public class AnnotatedAnswersController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDeletePermission(user))
+        if (!bin.canDeletePermission(user, null))
             return Response.status(401).build();
 
         @SuppressWarnings("unchecked")
@@ -86,7 +86,7 @@ public class AnnotatedAnswersController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDeletePermission(user))
+        if (!bin.canDeletePermission(user, null))
             return Response.status(401).build();
 
         MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);

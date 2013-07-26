@@ -4,6 +4,7 @@
 * @param bin
 */
 {template .permissions}
+<div class="container">
     <div class="update-permissions">
         <div class="row">
             <div class="large-12">
@@ -29,5 +30,30 @@
         </form>
     </div>
 
+    <div class="update-problems">
+        <div class="row">
+            <div class="large-12">
+            <fieldset>
+                <legend>Users with permission</legend>
+                <div class="problems-container async-loader" data-path="bins/{$bin.id}/questions" template-name="handins.bin.showQuestions">
+
+                </div>
+             </fieldset>
+             </div>
+        </div>
+
+        <form action="/bins/{$bin.id}/questions" method="post">
+            <div class="row">
+                <div class="columns large-9">
+                    <input type="text" name="questionName"/>
+                </div>
+                <div class="columns large-3">
+                    <input type="submit" value="Add Question" class="button"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
 {/template}
 

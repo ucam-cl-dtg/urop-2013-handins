@@ -85,7 +85,7 @@
   @param elem
 */
 {template .listElementSubPanel}
-{if $elem.exists==undefined or $elem.exists}
+{if $elem.exists ?: true}
 <li class="list-sub-panel delete-me {if $elem.isMarked } marked {else} unmarked {/if} ">
     <div class="row list-inner-sub-panel">
         {call .elementContents data="$elem"}

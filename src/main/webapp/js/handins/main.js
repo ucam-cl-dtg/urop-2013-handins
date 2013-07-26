@@ -168,9 +168,9 @@ moduleScripts['handins'] = {
             })
         }],
         'permissions': [function(){
-            $(".update-permissions form").ajaxForm(function() {
-               asyncLoad($('.permissions-container.async-loader'));
-               $('.update-permissions form input[type="text"]').val("");
+            $("form").ajaxForm(function() {
+               asyncLoad($('.container .async-loader'));
+               $('.container form input[type="text"]').val("");
             });
         }]
     }

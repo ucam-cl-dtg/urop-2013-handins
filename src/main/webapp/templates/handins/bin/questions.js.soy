@@ -1,0 +1,38 @@
+{namespace handins.bin}
+
+/**
+* @param question
+*/
+{template .showQuestion}
+
+<li class="panel-wrapper columns">
+    <div class="list-panel">
+        <div class="row list-inner-panel">
+            <div class="columns large-7 small-7">{$question.name}</div>
+            <div class="columns large-5 small-5 text-right">
+                <div class="icon-button-wrapper">
+                    <!--
+                    <a class="icon-button panel-icon-button websymbols-icon icon-button-array delete-user-perm" data-delete="">'</a>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+ </li>
+{/template}
+
+/**
+* @param questions
+*/
+{template .showQuestions}
+    <div class="row">
+        <ul class="panels">
+
+    {foreach $question in $questions}
+        {call .showQuestion}
+            {param question: $question/}
+        {/call}
+    {/foreach}
+         </ul>
+      </div>
+{/template}

@@ -395,7 +395,7 @@ public class BinController {
     Done
      */
     @POST
-    @Path("/{binId}/add")
+    @Path("/{binId}/questions")
     public Object addBinQuestion(@PathParam("binId") long binId,
                                  @FormParam("questionName") String questionName) {
 
@@ -405,6 +405,9 @@ public class BinController {
         String user = UserHelper.getCurrentUser(request);
 
         Bin bin = (Bin) session.get(Bin.class, binId);
+
+        if (bin == null)
+            return Response.status(404).build();
 
         if (!bin.isOwner(user))
             return Response.status(401).build();
@@ -421,4 +424,31 @@ public class BinController {
 
         return Response.ok().build();
     }
+
+    @GET
+    @Path("/{binId}/questions")
+    public Object viewBinQuestions(@PathParam("binId") long binId) {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        List<ProposedQuestion> questions = session.createCriteria(ProposedQuestion.class)
+                .add(Restrictions.eq("bin", bin))
+                .list();
+        List result = new LinkedList();
+
+        for (ProposedQuestion question: questions) {
+            result.add(ImmutableMap.of("id", question.getId(),
+                                       "name", question.getName(),
+                                       "bin", binId));
+        }
+
+        return ImmutableMap.of("questions", result);
+    }
+
+
 }

@@ -115,7 +115,7 @@ function markingStudents (json) {
         elem.download = "/marking/bins/" + json.bin.id + "/students/" + elem.student + "/download";
         elem.sublist = "marking/bins/" + json.bin.id + "/students/" + elem.student;
         elem.sublistTemplateFunction = "markingStudentsQuestion"
-        elem.marking = "bla";
+        elem.marking = "/marking/bins/" + json.bin.id + "/students/" + elem.student;
     })
 
     json.unmarkedElems = _.filter(json.students, function(s) { return !s.isMarked; })
@@ -135,7 +135,7 @@ function markingStudentsQuestion(json) {
         elem.name = elem.questionName;
 
         elem.download = "/marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student + "/download";
-        elem.marking = "bla";
+        elem.marking = "/marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student;
     })
 
     return 'shared.handins.generic.listPanel';
@@ -149,7 +149,7 @@ function markingQuestion(json) {
         elem.download = "/marking/bins/" + json.bin.id + "/questions/" + elem.id + "/download";
         elem.sublist = "marking/bins/" + json.bin.id + "/questions/" + elem.id;
         elem.sublistTemplateFunction = "markingQuestionStudents";
-        elem.marking= "bla";
+        elem.marking= "/marking/bins/" + json.bin.id + "/questions/" + elem.id;
     })
 
     json.unmarkedElems = _.filter(json.questionList, function(s) { return !s.isMarked; })
@@ -166,7 +166,7 @@ function markingQuestionStudents(json) {
     _.each(json.elems, function(elem){
         elem.name = elem.owner;
         elem.download = "/marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner + "/download";
-        elem.marking = "blas";
+        elem.marking = "/marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner;
     })
     return 'shared.handins.generic.listPanel';
 }
