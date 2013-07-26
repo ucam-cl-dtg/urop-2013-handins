@@ -95,14 +95,14 @@ public class BinTest {
 
     @Test
     public void testCanAddPermission() throws Exception {
-        Assert.assertTrue(testBin.canAddPermission(testBin.getToken()));
-        Assert.assertFalse(testBin.canAddPermission("asdadas"));
+        Assert.assertTrue(testBin.canAddPermission("user",testBin.getToken()));
+        Assert.assertFalse(testBin.canAddPermission("user", "asdadas"));
 
     }
 
     @Test
     public void testCanDeletePermission() throws Exception {
-        Assert.assertTrue(testBin.canDeletePermission(testBin.getToken()));
-        Assert.assertFalse(testBin.canDeletePermission("asdadas"));
+        Assert.assertTrue(testBin.canDeletePermission("user", testBin.getToken()));
+        Assert.assertFalse(testBin.canDeletePermission("user", "asdadas"));
     }
 }
