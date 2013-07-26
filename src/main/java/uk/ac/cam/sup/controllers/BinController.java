@@ -349,7 +349,7 @@ public class BinController {
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
         // Inject the pdf with the metadata needed to split it
-        PDFManip pdfManip = null;
+        PDFManip pdfManip;
         try {
             pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
         } catch (Exception e) {
@@ -365,6 +365,8 @@ public class BinController {
     }
     /*
     Done
+
+    Checked
      */
     @POST
     @Path("/{binId}/change")
@@ -393,6 +395,8 @@ public class BinController {
 
     /*
     Done
+
+    Checked
      */
     @POST
     @Path("/{binId}/questions")
@@ -425,6 +429,11 @@ public class BinController {
         return Response.ok().build();
     }
 
+    /*
+    Done
+
+    Checked
+     */
     @GET
     @Path("/{binId}/questions")
     public Object viewBinQuestions(@PathParam("binId") long binId) {
@@ -436,11 +445,12 @@ public class BinController {
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
-        List<ProposedQuestion> questions = session.createCriteria(ProposedQuestion.class)
-                .add(Restrictions.eq("bin", bin))
-                .list();
-        List result = new LinkedList();
+        if (!bin.canSeeBin(user))
+            return Response.status(401).build();
 
+        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+
+        List<ImmutableMap> result = new LinkedList<ImmutableMap>();
         for (ProposedQuestion question: questions) {
             result.add(ImmutableMap.of("id", question.getId(),
                                        "name", question.getName(),
