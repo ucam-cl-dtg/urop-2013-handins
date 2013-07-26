@@ -96,6 +96,7 @@ function addSelectingModal(bin, submission) {
         elem = $(html);
 
     elem.prependTo($('body')).foundation().foundation("reveal","open");
+    asyncLoad(elem.find(".async-loader"));
     return elem;
 }
 
@@ -108,17 +109,31 @@ function showSelectingModal(bin, submission) {
     });
 
     $('#selectingModal .more-inputs').click(function() {
-        $(shared.handins.selectingLine()).appendTo($('#selectingModal .input-line-container'));
+        var id = $('#selectingModal select').val();
+        var name = $('#selectingModal select option[value="' + id + '"]').text();
+        var start = $('#selectingModal input[name="start"]').val();
+        var end = $('#selectingModal input[name="end"]').val();
+
+        var elem = $(shared.handins.inputLine({
+            "question": { id: id, name: name},
+            "start": start,
+            "end": end
+        }))
+        elem.appendTo($('.input-line-container'))
     });
 
 }
+
+$(document).on("click", ".input-line a", function() {
+    $(this).closest('.input-line').remove();
+})
 function showPdf(submission) {
     PDFJS.disableWorker = true;
     PDFJS.getDocument("/submissions/" + submission + "/download").then(function (pdf){
         var numPages = pdf.numPages;
 
         for (var i=0; i < numPages; i++) {
-            $('<div class="page page-' + i + '"><canvas></canvas></div>' ).appendTo($('.pdf-container'));
+            $('<div class="pdf-page page-' + i + '"><canvas></canvas></div>' ).appendTo($('.pdf-container'));
 
             pdf.getPage(i).then(function(i){ return function(page) {
                 var scale = 1;

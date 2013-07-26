@@ -1,17 +1,28 @@
 {namespace shared.handins}
 
 /**
+ @param question
+ @param start
+ @param end
+*/
+{template .inputLine}
+<div class="input-line">
+    {$question.name}: {$start} - {$end} <a>X</a>
+    <input type="hidden" name="id[]" value="{$question.id}"/>
+    <input type="hidden" name="start[]" value="{$start}"/>
+    <input type="hidden" name="end[]" value="{$end}"/>
+</div>
+{/template}
+
+/**
 */
 {template .selectingLine}
 <div class="row">
-    <div class="columns large-4">
-        <label>Q:</label> <input type="text" name="id[]"/>
+    <div class="columns large-6">
+        <label>Start:</label> <input type="text" name="start"/>
     </div>
-    <div class="columns large-4">
-        <label>S:</label> <input type="text" name="start[]"/>
-    </div>
-    <div class="columns large-4">
-        <label>E:</label> <input type="text" name="end[]"/>
+    <div class="columns large-6">
+        <label>End:</label> <input type="text" name="end"/>
     </div>
 </div>
 {/template}
@@ -29,20 +40,43 @@
         <div class="columns large-4">
             <form action="/bins/{$bin}/submissions/{$submission}" method="post">
                 <fieldset>
-                    <legend> Select questions by page </legend>
+                    <legend> Selected questions</legend>
                     <div class="input-line-container">
-                        {call .selectingLine}
-                        {/call}
                     </div>
                     <div class="row">
-                        <div class="button small more-inputs">
-                            Add
-                        </div>
-                        <input type="submit" class="button small"/>
+                        <input type="submit" class="button small" value="Save"/>
                     </div>
                 </fieldset>
+            </form>
+            <fieldset>
+                <legend> Select a question</legend>
+                <div class="row">
+                    <div class="async-loader" data-path="bins/{$bin}/questions" template-name="shared.handins.selectQuestion">
+                    </div>
+                </div>
+                {call .selectingLine}
+                {/call}
+                <div class="row">
+                    <div class="button small more-inputs">
+                        Add
+                    </div>
+                    <!--<input type="submit" class="button small"/> -->
+                </div>
+            </fieldset>
             </form>
         </div>
     </div>
 </div>
+{/template}
+
+/**
+* @param questions
+*/
+{template .selectQuestion}
+
+<select>
+    {foreach $question in $questions}
+        <option value="{$question.id}">{$question.name}</option>
+    {/foreach}
+</select>
 {/template}
