@@ -302,6 +302,21 @@ public class MarkingController {
 
     Checked
      */
+    @POST
+    @Path("students/{studentCrsId}/questions/{questionId}")
+    @Produces("application/json")
+    public Object annotateStudentQuestion(@PathParam("binId") long binId,
+                                          @PathParam("questionId") long questionId,
+                                          @PathParam("studentCrsId") String studentCrsId) {
+
+        return annotateQuestionStudent(binId, questionId, studentCrsId);
+    }
+
+    /*
+    Done
+
+    Checked
+     */
     @GET
     @Path("/questions")
     @Produces("application/json")
@@ -384,7 +399,9 @@ public class MarkingController {
 
         return ImmutableMap.of("studentList", studentList,
                                "question", questionId);
-    }  /*
+    }
+
+    /*
     Done
 
     Checked
@@ -419,6 +436,48 @@ public class MarkingController {
          */
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answers.get(0)))
+                answer.setAnnotated(!answer.isAnnotated());
+            else return Response.status(401).build();
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+
+    Checked
+     */
+    @POST
+    @Path("questions/{questionId}/students/{studentCrsId}")
+    @Produces("application/json")
+    public Object annotateQuestionStudent(@PathParam("binId") long binId,
+                                          @PathParam("questionId") long questionId,
+                                          @PathParam("studentCrsId") String studentCrsId) {
+
+        // Set Hibernate and get user, bin and question
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
+
+        // Get the answers
+        List<Answer> answers = new LinkedList<Answer>(proposedQuestion.getAnswers());
+
+        /*
+        And now change the answers
+        if it exists and it is visible then change the annotation
+        if it is no visible then return 401
+        if it doesn't exist then do nothing
+         */
+        for (Answer answer : answers)
+            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answers.get(0)))
                 answer.setAnnotated(!answer.isAnnotated());
             else return Response.status(401).build();
 
