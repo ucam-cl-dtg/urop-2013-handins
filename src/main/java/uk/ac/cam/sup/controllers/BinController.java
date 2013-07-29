@@ -247,7 +247,7 @@ public class BinController {
             return Response.status(401).build();
 
         // Get all existing users
-        Set<String> usersWithPermission = new HashSet<String>();
+        Set<String> usersWithPermission = new TreeSet<String>();
         for (BinPermission perm: bin.getPermissions())
             usersWithPermission.add(perm.getUser());
 

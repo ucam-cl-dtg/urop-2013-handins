@@ -290,9 +290,9 @@ public class MarkingController {
                 else return Response.status(401).build();
         }
 
-        // Set the newState to all the Answers
+        // Set the !newState to all the Answers
         for (Answer answer : answerList)
-            answer.setAnnotated(newState);
+            answer.setAnnotated(!newState);
 
         return Response.ok().build();
     }
