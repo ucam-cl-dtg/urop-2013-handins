@@ -264,7 +264,9 @@ public class MarkingController {
         // Get all the questions associated to the bin
         List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
 
-        // And now filter the questions
+        // And now filter the questions and get the newState
+        List<Answer> answerList = new LinkedList<Answer>();
+        boolean newState = true;
         for (ProposedQuestion question : questions) {
 
             // Query the database
@@ -280,10 +282,17 @@ public class MarkingController {
             if it doesn't exist then do nothing
              */
             if (answers.size() > 0)
-                if (bin.canSeeAnswer(user, answers.get(0)))
-                    answers.get(0).setAnnotated(!answers.get(0).isAnnotated());
+                if (bin.canSeeAnswer(user, answers.get(0))) {
+                    answerList.add(answers.get(0));
+
+                    newState &= answers.get(0).isAnnotated();
+                }
                 else return Response.status(401).build();
         }
+
+        // Set the newState to all the Answers
+        for (Answer answer : answerList)
+            answer.setAnnotated(newState);
 
         return Response.ok().build();
     }
@@ -384,7 +393,7 @@ public class MarkingController {
     @Path("questions/{questionId}")
     @Produces("application/json")
     public Object annotateQuestion(@PathParam("binId") long binId,
-                                  @PathParam("questionId") long questionId) {
+                                   @PathParam("questionId") long questionId) {
 
         // Set Hibernate and get user, bin and question
         Session session = HibernateUtil.getSession();

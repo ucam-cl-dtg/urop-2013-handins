@@ -1,7 +1,6 @@
 package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.BadPdfFormatException;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.io.FileUtils;
@@ -9,7 +8,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.structures.Marking;
@@ -164,7 +162,7 @@ public class FilesManip {
 
         for (String filePath : filePaths) {
 
-            PdfReader reader = null;
+            PdfReader reader;
             try {
                 reader = new PdfReader(filePath);
             } catch (IOException e) {

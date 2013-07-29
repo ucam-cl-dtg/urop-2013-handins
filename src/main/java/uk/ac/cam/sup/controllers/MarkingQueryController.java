@@ -1,12 +1,10 @@
 package uk.ac.cam.sup.controllers;
 
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
-import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
@@ -78,8 +76,6 @@ public class MarkingQueryController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/download")
@@ -91,8 +87,6 @@ public class MarkingQueryController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/students/{studentCrsId}/download")
