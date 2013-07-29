@@ -108,7 +108,7 @@ function combine(f1 , f2) {
     }
 }
 
-function markingStudents (json) {
+markingStudents = combine(binInjector(), function (json) {
 
     _.each(json.students,  function(elem) {
         elem.name = elem.student;
@@ -121,8 +121,9 @@ function markingStudents (json) {
     json.unmarkedElems = _.filter(json.students, function(s) { return !s.isMarked; })
     json.markedElems = _.filter(json.students, function(s) { return s.isMarked; })
 
-    return 'handins.marking.index';
-}
+    return 'handins.marking.listElems';
+})
+
 
 function markingStudentsQuestion(json) {
     json.subPanel = true;
@@ -141,7 +142,7 @@ function markingStudentsQuestion(json) {
     return 'shared.handins.generic.listPanel';
 }
 
-function markingQuestion(json) {
+markingQuestions = combine(binInjector(), function(json) {
 
     _.each(json.questionList,  function(elem) {
         elem.name = elem.questionName;
@@ -155,8 +156,8 @@ function markingQuestion(json) {
     json.unmarkedElems = _.filter(json.questionList, function(s) { return !s.isMarked; })
     json.markedElems = _.filter(json.questionList, function(s) { return s.isMarked; })
 
-    return 'handins.marking.index';
-}
+    return 'handins.marking.listElems';
+})
 
 function markingQuestionStudents(json) {
     json.subPanel = true;
@@ -171,14 +172,22 @@ function markingQuestionStudents(json) {
     return 'shared.handins.generic.listPanel';
 }
 
+function marking(students) {
+    return function (json) {
+        json.students = students;
+        return "handins.marking.index";
+    }
+}
+
+
 $(document).ready(function() {
     router = Router({
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins": binList,
         "bins/:binId": "handins.bin.permissions",
         "bins/create": "handins.bin.create",
-        "marking/bins/:binId/students": combine(binInjector(), markingStudents),
-        "marking/bins/:binId/questions": combine(binInjector(), markingQuestion),
+        "marking/bins/:binId/students": combine(binInjector(), marking(true)),
+        "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
         "marking": markingList,
         "test": "main.index2"
 

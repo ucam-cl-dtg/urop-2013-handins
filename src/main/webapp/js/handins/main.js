@@ -165,6 +165,18 @@ $(document).on("click", ".delete-user-perm", function() {
     $('.update-permissions form').ajaxSubmit();
 })
 
+$(document).on("click", ".tabs.magic-tabs .title a", function(evt){
+    var link = $(this).attr("href");
+    router.navigate(link);
+
+    var  sublists = $(this).closest('section').find('.sublist-container');
+    sublists.css("display", "none");
+
+    var loaders = $(this).closest('section').find('.async-loader');
+    asyncLoad(loaders);
+
+})
+
 moduleScripts['handins'] = {
     'marking': {
         'index': [function () {

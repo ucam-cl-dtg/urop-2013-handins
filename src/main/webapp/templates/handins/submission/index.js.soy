@@ -12,6 +12,15 @@
 {/call}
 
 <h3> Already uploaded submissions: </h3>
+<div class="row">
+    <div class="columns">
+        <div class="button-bar">
+            <ul class="button-group">
+                <li><a href="/marking/bins/{$bin.id}/download" class="medium secondary button">Download all</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
 {call shared.handins.generic.listPanel}
     {param elems: $elems /}
 {/call}

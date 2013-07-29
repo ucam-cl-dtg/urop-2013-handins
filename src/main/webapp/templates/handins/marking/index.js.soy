@@ -4,13 +4,27 @@
 /**
 * param students
 * @param bin
-* @param markedElems
-* @param unmarkedElems
+* param markedElems
+* param unmarkedElems
+* @param students
 */
 {template .index}
-
-<h2> {$bin.name} </h2>
-
+<div class="row">
+    <div class="columns small-12 large-12">
+        <h2> {$bin.name} </h2>
+    </div>
+</div>
+<div class="row">
+    <div class="columns small-12 large-12">
+        <div class="button-bar">
+            <ul class="button-group">
+                <li><a href="/marking/bins/{$bin.id}/download" class="medium secondary button">Download all</a></li>
+                <li><a class="medium secondary button upload-marked-work">Upload</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--
 <div class="row">
 	<div class="columns large-8 small-12">
 		<div class="button-bar">
@@ -25,6 +39,7 @@
 		<input type="text" disabled="true" placeholder="Search..." class="input-search">
 	</div>
 </div>
+-->
 
 <div class="row upload-marked-work-form">
 	<div class="columns large-12">
@@ -36,20 +51,61 @@
 		</form>
 	</div>
 </div>
-
-<h3> Unmarked </h3>
-<div class="unmarked">
-    {call shared.handins.generic.listPanel}
-        {param elems: $unmarkedElems /}
-    {/call}
+<div class="row">
+    <div class="columns large-12 small-12">
+        <div class="section-container tabs magic-tabs" data-section="tabs">
+            {if $students}
+                <section class="active">
+            {else}
+                <section>
+            {/if}
+                <p class="title" data-section-title="">
+                    <a href="#marking/bins/{$bin.id}/students">Filter by user</a>
+                </p>
+                <div class="content" data-section-content="">
+                    <div class="async-loader" data-path="marking/bins/{$bin.id}/students" template-function="markingStudents">
+                        Loading...
+                    </div>
+                </div>
+            </section>
+            {if not $students}
+                <section class="active">
+            {else}
+                <section>
+            {/if}
+                <p class="title" data-section-title="">
+                    <a href="#marking/bins/{$bin.id}/questions">Filter by question</a>
+                </p>
+                <div class="content" data-section-content="">
+                    <div class="async-loader" data-path="marking/bins/{$bin.id}/questions" template-function="markingQuestions">
+                        Loading...
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
 
-<h3> Marked </h3>
-<div class="marked">
-    {call shared.handins.generic.listPanel}
-        {param elems: $markedElems /}
-    {/call}
-</div>
+
+{/template}
 
 
+/**
+* @param markedElems
+* @param unmarkedElems
+*/
+{template .listElems}
+    <h3> Unmarked </h3>
+    <div class="unmarked">
+        {call shared.handins.generic.listPanel}
+            {param elems: $unmarkedElems /}
+        {/call}
+    </div>
+
+    <h3> Marked </h3>
+    <div class="marked">
+        {call shared.handins.generic.listPanel}
+            {param elems: $markedElems /}
+        {/call}
+    </div>
 {/template}
