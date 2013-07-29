@@ -56,7 +56,7 @@ $(document).on("click", ".expand-sub-list", function() {
   });
   elem.attr("loaded", "true");
 })
-
+/*
 $(document).on("click", ".toggle-mark", function () {
     var $this = $(this),
         markLink = $this.attr("marking-link"),
@@ -64,7 +64,7 @@ $(document).on("click", ".toggle-mark", function () {
         isSubPanel = elem.parents('.sublist-container').size() > 0,
         marked = $this.parents('.marked').size() > 0,
         updateUI = function () {
-            var clone = elem.clone(),
+            var clone = elem.clone().removeClass("marked").removeClass("unmarked"),
                 parentElem = marked ? $('.unmarked') : $('.marked'),
                 container = parentElem.find(".panels");
 
@@ -79,15 +79,97 @@ $(document).on("click", ".toggle-mark", function () {
             })
         },
         updateUISubPanel = function() {
-            if (marked)
+            if (marked) {
                 elem.removeClass("marked").addClass("unmarked");
-            else
+            }
+            else {
                 elem.removeClass("unmarked").addClass("marked");
+            }
         }
     if (isSubPanel) {
         $.post(markLink, updateUISubPanel).fail(updateUISubPanel);
     } else {
         $.post(markLink, updateUI).fail(updateUI);
+    }
+})*/
+
+var isTogglingMark = false;
+
+function toggleMarkPanel(elem, marked) {
+
+    var clone = elem.clone().removeClass("marked").removeClass("unmarked"),
+        parentSection = elem.closest('section'),
+        parentElem = marked ? parentSection.find('.unmarked-top') : parentSection.find('.marked-top'),
+        container = parentElem.find(".panels");
+
+
+    clone.find(".sublist-container").attr("loaded", false).css("display", "none");
+    clone.css("display", "none");
+
+
+    var toggleButton = clone.find('.list-panel .toggle-mark');
+    if (marked) {
+        toggleButton.text('.');
+    } else {
+        toggleButton.text("'");
+    }
+
+    clone.prependTo(container);
+
+
+
+    elem.fadeOut(function() {
+        clone.fadeIn("slow", function() {
+            isTogglingMark = false;
+        });
+    })
+}
+
+function toggleMarkSubPanel(elem, marked) {
+    var toggleButton = elem.find('.list-inner-sub-panel .toggle-mark');
+    if (marked) {
+        elem.removeClass("marked").addClass("unmarked");
+        toggleButton.text('.');
+    }
+    else {
+        elem.removeClass("unmarked").addClass("marked");
+        toggleButton.text("'");
+    }
+
+    var parentElem = elem.parents('li').first();
+    var shouldUpdateParent = false;
+    if (marked) {
+        shouldUpdateParent = parentElem.parents('.marked').size() != 0;
+    } else {
+        shouldUpdateParent = parentElem.find('.unmarked').size() == 0;
+    }
+
+    if (shouldUpdateParent) {
+        toggleMarkPanel(parentElem, marked);
+    } else {
+        isTogglingMark = false;
+    }
+
+
+}
+
+
+$(document).on("click", ".toggle-mark", function () {
+    var $this = $(this),
+        markLink = $this.attr("marking-link"),
+        elem = $this.closest('li'),
+        isSubPanel = elem.parents('.sublist-container').size() > 0,
+        marked = $this.parents('.marked').size() > 0;
+
+    if (isTogglingMark) {
+        return false;
+    }
+    console.log("muie", isTogglingMark);
+    isTogglingMark = true;
+    if (isSubPanel) {
+        $.post(markLink, function() { toggleMarkSubPanel(elem, marked);})
+    } else {
+        $.post(markLink, function() { toggleMarkPanel(elem, marked);})
     }
 })
 
@@ -127,6 +209,7 @@ function showSelectingModal(bin, submission) {
 $(document).on("click", ".input-line a", function() {
     $(this).closest('.input-line').remove();
 })
+
 function showPdf(submission) {
     PDFJS.disableWorker = true;
     PDFJS.getDocument("/submissions/" + submission + "/download").then(function (pdf){

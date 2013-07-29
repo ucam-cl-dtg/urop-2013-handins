@@ -96,14 +96,14 @@
 */
 {template .listElems}
     <h3> Unmarked </h3>
-    <div class="unmarked">
+    <div class="unmarked unmarked-top">
         {call shared.handins.generic.listPanel}
             {param elems: $unmarkedElems /}
         {/call}
     </div>
 
     <h3> Marked </h3>
-    <div class="marked">
+    <div class="marked marked-top">
         {call shared.handins.generic.listPanel}
             {param elems: $markedElems /}
         {/call}

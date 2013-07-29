@@ -63,11 +63,7 @@
 */
 {template .listElement}
 <li class="panel-wrapper columns large-12 delete-me">
-    {if $elem.isMarked}
-        <div class="list-panel success">
-    {else}
-        <div class="list-panel">
-    {/if}
+    <div class="list-panel">
         <div class="row list-inner-panel">
             {call .elementContents data="$elem"}
             {/call}
