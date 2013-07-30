@@ -103,19 +103,22 @@ public abstract class Submission<T> {
 
         int pages = pdfManip.getPageCount();
 
+        String prevStudent = null;
         ProposedQuestion prevQuestion = null;
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
             try {
                 ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
+                String student = pdfManip.queryMetadata("pageOwner" + i);
 
-                if (prevQuestion != null && question.getId() == prevQuestion.getId())
+                if (prevQuestion != null && question.getId() == prevQuestion.getId() && student == prevStudent)
                     distribution.setEndPage(i);
                 else {
                     if (distribution != null)
                         distributionList.add(distribution);
 
                     prevQuestion = question;
+                    prevStudent = student;
 
                     distribution = new Distribution();
 
@@ -123,7 +126,7 @@ public abstract class Submission<T> {
                     distribution.setStartPage(i);
                     distribution.setEndPage(i);
                     distribution.setQuestion(question);
-                    distribution.setStudent(pdfManip.queryMetadata("pageOwner" + i));
+                    distribution.setStudent(student);
                 }
             }
             catch (Exception e) {
