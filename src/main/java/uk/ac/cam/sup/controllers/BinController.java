@@ -2,6 +2,7 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
@@ -42,7 +43,9 @@ public class BinController {
 
         // Get list of bins
         @SuppressWarnings("unchecked")
-        List<Bin> binList = session.createCriteria(Bin.class).list();
+        List<Bin> binList = session.createCriteria(Bin.class)
+                                   .addOrder(Order.desc("id"))
+                                   .list();
 
         // Filter all visible bins and return them
         List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
@@ -317,7 +320,11 @@ public class BinController {
         Bin bin = (Bin) session.get(Bin.class, binId);
 
         // Get all submissions from the list
-        List<UnmarkedSubmission> allUnmarkedSubmissions = new LinkedList<UnmarkedSubmission>(bin.getUnmarkedSubmissions());
+        @SuppressWarnings("unchecked")
+        List<UnmarkedSubmission> allUnmarkedSubmissions = session.createCriteria(UnmarkedSubmission.class)
+                                                                 .add(Restrictions.eq("bin", bin))
+                                                                 .addOrder(Order.asc("id"))
+                                                                 .list();
 
         // Filter all visible submissions and get their link and Id
         List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();

@@ -2,6 +2,7 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
@@ -209,7 +210,11 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get all the questions associated to the bin
-        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+        @SuppressWarnings("unchecked")
+        List<ProposedQuestion> questions = session.createCriteria(ProposedQuestion.class)
+                                                  .add(Restrictions.eq("bin", bin))
+                                                  .addOrder(Order.asc("id"))
+                                                  .list();
 
         // And now filter for the student
         List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<ImmutableMap<String, ?>>();
@@ -336,7 +341,11 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get all the questions associated to the bin
-        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+        @SuppressWarnings("unchecked")
+        List<ProposedQuestion> questions = session.createCriteria(ProposedQuestion.class)
+                                                  .add(Restrictions.eq("bin", bin))
+                                                  .addOrder(Order.asc("id"))
+                                                  .list();
 
         // And now filter the questions
         List<ImmutableMap<String, ?>> questionList = new LinkedList<ImmutableMap<String, ?>>();
