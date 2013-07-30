@@ -107,7 +107,7 @@ public abstract class Submission<T> {
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
             try {
-                ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("page.question." + i)));
+                ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
 
                 if (prevQuestion != null && question.getId() == prevQuestion.getId())
                     distribution.setEndPage(i);
@@ -123,14 +123,11 @@ public abstract class Submission<T> {
                     distribution.setStartPage(i);
                     distribution.setEndPage(i);
                     distribution.setQuestion(question);
-                    distribution.setStudent(pdfManip.queryMetadata("page.owner." + i));
+                    distribution.setStudent(pdfManip.queryMetadata("pageOwner" + i));
                 }
             }
-            catch (MetadataNotFoundException e) {
-
-            }
             catch (Exception e) {
-                return null;
+                e.printStackTrace();
             }
         }
 

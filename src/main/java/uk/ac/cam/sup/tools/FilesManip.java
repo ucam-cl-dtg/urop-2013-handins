@@ -187,8 +187,8 @@ public class FilesManip {
     public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) {
         for (int i = firstPage; i <= lastPage; i++) {
             try {
-                pdfManip.injectMetadata("page.owner." + i, owner);
-                pdfManip.injectMetadata("page.question." + i, Long.toString(question.getId()));
+                pdfManip.injectMetadata("pageOwner" + i, owner);
+                pdfManip.injectMetadata("pageQuestion" + i, Long.toString(question.getId()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

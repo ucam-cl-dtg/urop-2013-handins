@@ -1,14 +1,18 @@
 package uk.ac.cam.sup.tools;
 
+import com.google.common.io.Files;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.RandomStringUtils;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PDFManip {
     // Fields
@@ -74,9 +78,8 @@ public class PDFManip {
     /*
     Metadata table:
         Submission:
-            "type" - "marked" / "unmarked"
-            "page.owner.X" - crsId of the solver of page X
-            "page.question.X" - question solved on page X
+            "pageOwnerX" - crsId of the solver of page X
+            "pageQuestionX" - question solved on page X
 
      */
 
@@ -87,14 +90,24 @@ public class PDFManip {
     Done
 
      */
-    public String queryMetadata(String key) throws MetadataNotFoundException, IOException {
+    public String queryMetadata(String key) throws IOException {
 
         PdfReader reader = new PdfReader(filePath);
 
         Map <String, String> info = reader.getInfo();
 
-        if (!info.containsKey(key))
-            throw new MetadataNotFoundException();
+        if (!info.containsKey(key)) {
+            List<String> lines = Files.readLines(new File(filePath), Charset.defaultCharset());
+
+            String patternString = "\\([\\w]{4,9}\\)";
+            Pattern pattern = Pattern.compile(key + patternString);
+            for (String line : lines) {
+                Matcher matcher = pattern.matcher(line);
+
+                if (matcher.find())
+                    return matcher.group().substring(key.length() + 1, matcher.group().length() - 1);
+            }
+        }
 
         return info.get(key);
     }
