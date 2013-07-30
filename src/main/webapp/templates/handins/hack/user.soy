@@ -1,0 +1,12 @@
+{namespace handins.hack}
+
+/**
+* @param user
+*/
+{template .user}
+    <h3> Currently logged in as {$user} </h3>
+    <form action="/hack/user" method="post">
+        <input type="text" name="user"/>
+        <input type="submit"/>
+    </form>
+{/template}

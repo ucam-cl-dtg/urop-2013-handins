@@ -51,7 +51,7 @@ public class SubmissionController {
 
         List<ImmutableMap<String, String>> answerList = new LinkedList<ImmutableMap<String, String>>();
         for (Answer answer : unmarkedSubmission.getAllAnswers())
-            answerList.add(ImmutableMap.of("question", answer.getQuestion().getName(), "link", "/submission/" + submissionId + "/" + answer.getId() + "/download", "bin", Long.toString(bin.getId())));
+            answerList.add(ImmutableMap.of("question", answer.getQuestion().getName(), "link", "/submissions/" + submissionId + "/" + answer.getId() + "/download", "bin", Long.toString(bin.getId())));
 
         return ImmutableMap.of("answers", answerList);
     }

@@ -20,6 +20,8 @@ public class MethodDemos extends Application {
         myServices.add(MarkingListings.class);
         myServices.add(AnnotatedAnswersController.class);
 
+        myServices.add(HackController.class);
+
 		// Add Htmleasy Providers
 		myServices.addAll(HtmleasyProviders.getClasses());
 		
