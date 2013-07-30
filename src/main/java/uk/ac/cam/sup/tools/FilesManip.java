@@ -113,9 +113,9 @@ public class FilesManip {
         markedAnswer.setAnnotator(user);
         markedAnswer.setMarkedSubmission((MarkedSubmission) submission);
         markedAnswer.setAnswer((Answer) session.createCriteria(Answer.class)
-                                      .add(Restrictions.eq("owner", distribution.getStudent()))
-                                      .add(Restrictions.eq("question", distribution.getQuestion()))
-                                      .list().get(0));
+                                               .add(Restrictions.eq("owner", distribution.getStudent()))
+                                               .add(Restrictions.eq("question", distribution.getQuestion()))
+                                               .list().get(0));
         markedAnswer.getAnswer().setAnnotated(true);
 
         session.update(markedAnswer);

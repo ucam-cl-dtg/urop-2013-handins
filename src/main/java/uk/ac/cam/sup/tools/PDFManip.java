@@ -96,20 +96,22 @@ public class PDFManip {
 
         Map <String, String> info = reader.getInfo();
 
-        if (!info.containsKey(key)) {
+        if (info.containsKey(key))
+            return info.get(key);
+        else {
             List<String> lines = Files.readLines(new File(filePath), Charset.defaultCharset());
 
-            String patternString = "\\([\\w]{4,9}\\)";
-            Pattern pattern = Pattern.compile(key + patternString);
+            String patternString = "(\\()" + "(\\w{1,9}?)" + "(\\))";
+            Pattern pattern = Pattern.compile("(" + key + ")" + patternString);
             for (String line : lines) {
                 Matcher matcher = pattern.matcher(line);
 
                 if (matcher.find())
-                    return matcher.group().substring(key.length() + 1, matcher.group().length() - 1);
+                    return matcher.group(3);
             }
         }
 
-        return info.get(key);
+        return "0";
     }
 
     /*
