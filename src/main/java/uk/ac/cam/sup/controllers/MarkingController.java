@@ -20,6 +20,8 @@ import java.util.*;
 
 @Path("/marking/bins/{binId}")
 public class MarkingController {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 

@@ -23,6 +23,8 @@ import java.util.List;
 
 @Path("/bins")
 public class AnnotatedAnswersController {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 
@@ -47,10 +49,10 @@ public class AnnotatedAnswersController {
 
         @SuppressWarnings("unchecked")
         List<MarkedAnswer> markedAnswers = session.createCriteria(MarkedAnswer.class, "marked")
-                .createAlias("marked.answer", "answer")
-                .add(Restrictions.eq("answer.bin", bin))
-                .add(Restrictions.eq("owner", user))
-                .list();
+                                                  .createAlias("marked.answer", "answer")
+                                                  .add(Restrictions.eq("answer.bin", bin))
+                                                  .add(Restrictions.eq("owner", user))
+                                                  .list();
 
         List<Marking> markedList = new LinkedList<Marking>();
 
@@ -68,6 +70,8 @@ public class AnnotatedAnswersController {
     @Path("/{binId}/marked")
     @Produces("application/json")
     public Object viewMarkedAnswers(@PathParam("binId") long binId) {
+
+        // Set Hibernate and get user and bin
         Session session = HibernateUtil.getTransaction();
 
         String user = UserHelper.getCurrentUser(request);
@@ -78,6 +82,7 @@ public class AnnotatedAnswersController {
         if (bin == null)
             return Response.status(404).build();
 
+        // Voodoo
         List res = session.createCriteria(MarkedAnswer.class, "marked")
                           .createAlias("marked.answer", "answer")
                           .add(Restrictions.eq("owner", user))

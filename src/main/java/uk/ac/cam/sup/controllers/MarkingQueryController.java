@@ -21,6 +21,8 @@ import java.util.List;
 
 @Path("/marking/bins/{binId}")
 public class MarkingQueryController {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 

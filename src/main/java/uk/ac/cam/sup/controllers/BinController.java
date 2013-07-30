@@ -22,6 +22,8 @@ import java.util.*;
 @Path("/bins")
 @Produces("application/json")
 public class BinController {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 
@@ -57,7 +59,7 @@ public class BinController {
     @Path("/create")
     @GET
     public Object viewForCreateBin() {
-            return Response.status(200).build();
+        return Response.status(200).build();
     }
 
     /*
@@ -80,7 +82,7 @@ public class BinController {
         session.save(bin);
 
         return ImmutableMap.of("id", bin.getId(),
-                "token", bin.getToken());
+                               "token", bin.getToken());
     }
 
     /*

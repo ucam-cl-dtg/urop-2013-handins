@@ -6,7 +6,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;

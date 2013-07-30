@@ -75,7 +75,7 @@ public class FilesManip {
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
             pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         answer.setBin(submission.getBin());
@@ -105,7 +105,7 @@ public class FilesManip {
         try {
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         markedAnswer.setFilePath(filePath);
@@ -174,7 +174,7 @@ public class FilesManip {
                 try {
                     copy.addPage(copy.getImportedPage(reader, ++pn));
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
         }
 
@@ -190,7 +190,7 @@ public class FilesManip {
                 pdfManip.injectMetadata("page.owner." + i, owner);
                 pdfManip.injectMetadata("page.question." + i, Long.toString(question.getId()));
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -221,14 +221,14 @@ public class FilesManip {
 
     /*
     Done
-     */
+     /
     public static void fileCopy(String source, String destination) throws Exception {
         File sourceFile = new File(source);
         File destinationFile = new File(destination);
 
         FileUtils.copyFile(sourceFile, destinationFile);
     }
-
+    */
     /*
     Takes the path of the source and the destination where the file should be moved.
     Copies the file to the new location and deletes the original one.

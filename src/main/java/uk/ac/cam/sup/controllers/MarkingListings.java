@@ -10,6 +10,8 @@ import javax.ws.rs.core.Context;
 
 @Path("/marking")
 public class MarkingListings {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 
@@ -17,6 +19,5 @@ public class MarkingListings {
     @Produces("application/json")
     public Object showBinsToMark() {
         throw new RedirectException("/bins");
-        //return (new BinController()).viewBinList();
     }
 }

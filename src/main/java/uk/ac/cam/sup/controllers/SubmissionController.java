@@ -18,6 +18,8 @@ import java.util.*;
 
 @Path ("/submissions")
 public class SubmissionController {
+
+    @SuppressWarnings({"UnusedDeclaration"})
     @Context
     private HttpServletRequest request;
 
