@@ -245,7 +245,6 @@ $(document).on("click", ".delete-user-perm", function() {
     }).done(function() {
        asyncLoad($('.permissions-container.async-loader'));
     })
-    $('.update-permissions form').ajaxSubmit();
 })
 
 $(document).on("click", ".tabs.magic-tabs .title a", function(evt){
@@ -261,23 +260,6 @@ $(document).on("click", ".tabs.magic-tabs .title a", function(evt){
 })
 
 function setupAutocomplete() {
-    /*
-    $(".token-user-input").tokenInput("/hack/users", {
-      method: "post",
-      tokenValue: "crsid",
-      propertyToSearch: "crsid",
-      theme: "facebook",
-      minChars: 3,
-      hintText: "Search for a user",
-      resultsLimit: 10,
-      preventDuplicates: true,
-
-      resultsFormatter: function(item){ return "<li>" + "<div style='display: inline-block; padding-left: 10px;'><div class='full_name'>" + item.name + " (" + item.crsid + ")</div><div class='email'>" + item.crsid + "@cam.ac.uk</div></div></li>" },
-      tokenFormatter: function(item) { return "<li> item.crsid; </li>"; },
-      onAdd: function() {
-        return false;
-      }
-    });*/
 
     $('.token-user-input').autocomplete({
         source: "/hack/users",
