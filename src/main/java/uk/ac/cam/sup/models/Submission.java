@@ -3,7 +3,6 @@ package uk.ac.cam.sup.models;
 import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.tools.PDFManip;
 
@@ -107,30 +106,32 @@ public abstract class Submission<T> {
         ProposedQuestion prevQuestion = null;
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
+            ProposedQuestion question;
+            String student;
             try {
-                ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
-                String student = pdfManip.queryMetadata("pageOwner" + i);
-
-                if (prevQuestion != null && question.getId() == prevQuestion.getId() && student == prevStudent)
-                    distribution.setEndPage(i);
-                else {
-                    if (distribution != null)
-                        distributionList.add(distribution);
-
-                    prevQuestion = question;
-                    prevStudent = student;
-
-                    distribution = new Distribution();
-
-                    distribution.setSubmission(this);
-                    distribution.setStartPage(i);
-                    distribution.setEndPage(i);
-                    distribution.setQuestion(question);
-                    distribution.setStudent(student);
-                }
+                question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
+                student = pdfManip.queryMetadata("pageOwner" + i);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                continue;
+            }
+
+            if (prevQuestion != null && question.getId() == prevQuestion.getId() && student.equals(prevStudent))
+                distribution.setEndPage(i);
+            else {
+                if (distribution != null)
+                    distributionList.add(distribution);
+
+                prevQuestion = question;
+                prevStudent = student;
+
+                distribution = new Distribution();
+
+                distribution.setSubmission(this);
+                distribution.setStartPage(i);
+                distribution.setEndPage(i);
+                distribution.setQuestion(question);
+                distribution.setStudent(student);
             }
         }
 

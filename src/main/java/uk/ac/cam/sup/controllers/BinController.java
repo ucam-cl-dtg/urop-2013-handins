@@ -139,8 +139,8 @@ public class BinController {
 
         // Return bin details
         return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
-                "name", bin.getName(),
-                "token", bin.getToken()));
+                                                      "name", bin.getName(),
+                                                      "token", bin.getToken()));
     }
 
     /*
