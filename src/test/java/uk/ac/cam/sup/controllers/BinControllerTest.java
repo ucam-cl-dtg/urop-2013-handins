@@ -143,7 +143,7 @@ public class BinControllerTest {
 
     @Test
     public void testAddPermissionsWithOutAuthorization () throws Exception {
-        request = MockHttpRequest.post("/bin/" + testBin.getId() + "/permission");
+        request = MockHttpRequest.post("/bins/" + testBin.getId() + "/permissions");
         request.addFormHeader("token", "bAfsadaDas");
         request.addFormHeader("users", randomUser);
 
@@ -163,7 +163,7 @@ public class BinControllerTest {
 
     @Test
     public void testDeletePermissionsWithAuthorization () throws Exception {
-        request = MockHttpRequest.delete("/bin/" + testBin.getId() + "/permission"
+        request = MockHttpRequest.delete("/bins/" + testBin.getId() + "/permissions"
                 + "?token=" + testBin.getToken()
                 + "&users[]=" + perm1u);
 

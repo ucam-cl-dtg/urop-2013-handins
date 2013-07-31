@@ -8,6 +8,7 @@ import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,8 @@ public abstract class Submission<T> {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    private Date dateCreated;
+
     @NotNull
     private String owner;
     @NotNull
@@ -31,10 +34,12 @@ public abstract class Submission<T> {
 
     // Constructors
     public Submission() {
-
+        dateCreated = new Date();
     }
 
     public Submission(String owner) {
+        dateCreated = new Date();
+
         setOwner(owner);
     }
 
@@ -72,6 +77,15 @@ public abstract class Submission<T> {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
     // Actual useful functions

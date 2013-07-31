@@ -106,11 +106,19 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
-        if (!bin.canDelete(user, token)) {
+        if (!bin.canDelete(user, token) || bin.getUnmarkedSubmissions().size() > 0)
             return Response.status(401).build();
-        }
 
-        // ToDo: Delete all answers
+        // Delete all questions from the bin
+        for (ProposedQuestion proposedQuestion : bin.getQuestionSet())
+            session.delete(proposedQuestion);
+
+        // Delete the permissions of the bin
+        for (BinPermission binPermission : bin.getPermissions())
+            session.delete(binPermission);
+
+        // Delete the bin
+        session.delete(bin);
 
         return Response.ok().build();
     }
@@ -285,6 +293,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.canDeletePermission(user, token))
             return Response.status(401).build();
 
@@ -319,6 +328,13 @@ public class BinController {
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.canSeeBin(user))
+            return Response.status(401).build();
+
         // Get all submissions from the list
         @SuppressWarnings("unchecked")
         List<UnmarkedSubmission> allUnmarkedSubmissions = session.createCriteria(UnmarkedSubmission.class)
@@ -343,7 +359,8 @@ public class BinController {
      */
     @POST
     @Path("/{binId}/submissions/{submissionId}")
-    public Object splitSubmission (@PathParam("submissionId") long submissionId,
+    public Object splitSubmission (@PathParam("binId") long binId,
+                                   @PathParam("submissionId") long submissionId,
                                    @FormParam("id[]") long[] questionId,
                                    @FormParam("start[]") int[] startPage,
                                    @FormParam("end[]") int[] endPage) {
@@ -353,8 +370,20 @@ public class BinController {
 
         String user = UserHelper.getCurrentUser(request);
 
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.canAddSubmission(user))
+            return Response.status(401).build();
+
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+
+        if (!unmarkedSubmission.getOwner().equals(user))
+            return Response.status(401).build();
 
         // Inject the pdf with the metadata needed to split it
         PDFManip pdfManip;
@@ -390,6 +419,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.isOwner(user))
             return Response.status(401).build();
 
@@ -418,6 +448,7 @@ public class BinController {
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
+        // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
 
@@ -450,12 +481,21 @@ public class BinController {
         String user = UserHelper.getCurrentUser(request);
 
         Bin bin = (Bin) session.get(Bin.class, binId);
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
 
         if (!bin.canSeeBin(user))
             return Response.status(401).build();
 
-        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+        // Query for all the questions in the bin
+        @SuppressWarnings("unchecked")
+        List<ProposedQuestion> questions = session.createCriteria(ProposedQuestion.class)
+                                                  .add(Restrictions.eq("bin", bin))
+                                                  .addOrder(Order.asc("id"))
+                                                  .list();
 
+        // Create the list of questions as json
         List<ImmutableMap> result = new LinkedList<ImmutableMap>();
         for (ProposedQuestion question: questions) {
             result.add(ImmutableMap.of("id", question.getId(),
@@ -466,5 +506,42 @@ public class BinController {
         return ImmutableMap.of("questions", result);
     }
 
+    /*
+    Done
+     */
+    @DELETE
+    @Path("/{binId}/questions/{questionId}")
+    public Object deleteBinQuestions(@PathParam("binId") long binId,
+                                     @PathParam("questionId[]") long[] questionIds) {
 
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.isOwner(user))
+            return Response.status(401).build();
+
+        // Get the question and delete it or add it to the list of undeletable
+        List<ImmutableMap> unDel = new LinkedList<ImmutableMap>();
+        for (long questionId : questionIds) {
+            ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
+
+            // Check if has any answers
+            if (proposedQuestion.getAnswers().size() > 0)
+                unDel.add(ImmutableMap.of("id", questionId,
+                                          "name", proposedQuestion.getName()));
+            else session.delete(proposedQuestion);
+        }
+
+        if (unDel.size() > 0)
+            return ImmutableMap.of("unDel", unDel);
+        return Response.ok().build();
+    }
 }

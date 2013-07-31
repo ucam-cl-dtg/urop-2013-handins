@@ -12,7 +12,7 @@ public class UnmarkedSubmission extends Submission<Answer> {
 
     // Constructors
     public UnmarkedSubmission() {
-
+        super();
     }
 
     public UnmarkedSubmission(String owner) {

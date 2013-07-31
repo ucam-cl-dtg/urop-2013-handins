@@ -3,6 +3,7 @@ package uk.ac.cam.sup.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -13,6 +14,8 @@ public class Answer {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
+
+    private Date dateCreated;
 
     private String owner;
     private String filePath;
@@ -34,7 +37,7 @@ public class Answer {
 
     // Constructors
     public Answer() {
-
+        dateCreated = new Date();
     }
 
     // Id
@@ -115,5 +118,14 @@ public class Answer {
 
     public void setAnnotated(boolean annotated) {
         this.annotated = annotated;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 }
