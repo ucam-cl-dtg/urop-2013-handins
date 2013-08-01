@@ -14,7 +14,10 @@
             <![CDATA[
                 <script type="text/javascript" src="/js/vendor/jquery.form.min.js"></script>
                 <script src="/js/handins/main.js"></script>
+                <script type="text/javascript" src="/js/handins/l10n.js"></script>
                 <script type="text/javascript" src="/js/vendor/pdf.js"></script>
+                <script type="text/javascript" src="/js/handins/viewer.js"></script>
+                <script src="/js/handins/pdf-selector.js"></script>
 			]]>
         </custom_scripts>
         <custom_templates>
