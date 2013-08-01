@@ -165,6 +165,9 @@ public class BinController {
     public Object addSubmission(@MultipartForm FileUploadForm uploadForm,
                                 @PathParam("binId") long binId) {
 
+        if (uploadForm.file.length == 0)
+            return Response.status(401).build();
+
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
@@ -231,9 +234,16 @@ public class BinController {
         if (!bin.isOwner(user))
             return Response.status(401).build();
 
+        // Get the list of people who can access the bin
+        @SuppressWarnings("unchecked")
+        List<BinPermission> permissions = session.createCriteria(BinPermission.class)
+                                                 .add(Restrictions.eq("bin", bin))
+                                                 .addOrder(Order.asc("user"))
+                                                 .list();
+
         // Create list of people who have access to the bin
         List<String> res = new LinkedList<String>();
-        for (BinPermission binPermission: bin.getPermissions())
+        for (BinPermission binPermission : permissions)
             res.add(binPermission.getUser());
 
         return ImmutableMap.of("users", res);
