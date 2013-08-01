@@ -90,7 +90,7 @@ public class PDFManip {
     Done
 
      */
-    public String queryMetadata(String key) throws IOException {
+    public String queryMetadata(String key) throws Exception {
 
         PdfReader reader = new PdfReader(filePath);
 
@@ -111,7 +111,7 @@ public class PDFManip {
             }
         }
 
-        return "0";
+        throw new Exception();
     }
 
     /*

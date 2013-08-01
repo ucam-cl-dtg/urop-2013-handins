@@ -10,6 +10,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,8 @@ public class Bin {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
+
+    private Date dateCreated;
 
     private String owner;
     private String token;
@@ -45,10 +48,12 @@ public class Bin {
 
     // Constructors
     public Bin() {
-
+        dateCreated = new Date();
     }
 
     public Bin(String owner, String questionSetName) {
+        dateCreated = new Date();
+
         setQuestionSetName(questionSetName);
         setOwner(owner);
         setToken(generateToken());
@@ -150,6 +155,15 @@ public class Bin {
 
     public void setArchived(boolean archived) {
         isArchived = archived;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
     // Actual useful functions

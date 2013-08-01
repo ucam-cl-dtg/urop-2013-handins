@@ -12,7 +12,7 @@ public class MarkedSubmission extends Submission<MarkedAnswer> {
 
     // Constructors
     public MarkedSubmission() {
-
+        super();
     }
 
     public MarkedSubmission(String owner) {

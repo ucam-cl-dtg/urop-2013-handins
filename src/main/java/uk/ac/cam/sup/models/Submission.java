@@ -3,12 +3,12 @@ package uk.ac.cam.sup.models;
 import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.tools.PDFManip;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +21,8 @@ public abstract class Submission<T> {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    private Date dateCreated;
+
     @NotNull
     private String owner;
     @NotNull
@@ -32,10 +34,12 @@ public abstract class Submission<T> {
 
     // Constructors
     public Submission() {
-
+        dateCreated = new Date();
     }
 
     public Submission(String owner) {
+        dateCreated = new Date();
+
         setOwner(owner);
     }
 
@@ -75,6 +79,15 @@ public abstract class Submission<T> {
         this.owner = owner;
     }
 
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
     // Actual useful functions
 
     /*
@@ -107,30 +120,32 @@ public abstract class Submission<T> {
         ProposedQuestion prevQuestion = null;
         Distribution distribution = null;
         for (int i = 1; i <= pages; i++) {
+            ProposedQuestion question;
+            String student;
             try {
-                ProposedQuestion question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
-                String student = pdfManip.queryMetadata("pageOwner" + i);
-
-                if (prevQuestion != null && question.getId() == prevQuestion.getId() && student == prevStudent)
-                    distribution.setEndPage(i);
-                else {
-                    if (distribution != null)
-                        distributionList.add(distribution);
-
-                    prevQuestion = question;
-                    prevStudent = student;
-
-                    distribution = new Distribution();
-
-                    distribution.setSubmission(this);
-                    distribution.setStartPage(i);
-                    distribution.setEndPage(i);
-                    distribution.setQuestion(question);
-                    distribution.setStudent(student);
-                }
+                question = (ProposedQuestion) session.get(ProposedQuestion.class, Long.parseLong(pdfManip.queryMetadata("pageQuestion" + i)));
+                student = pdfManip.queryMetadata("pageOwner" + i);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                continue;
+            }
+
+            if (prevQuestion != null && question.getId() == prevQuestion.getId() && student.equals(prevStudent))
+                distribution.setEndPage(i);
+            else {
+                if (distribution != null)
+                    distributionList.add(distribution);
+
+                prevQuestion = question;
+                prevStudent = student;
+
+                distribution = new Distribution();
+
+                distribution.setSubmission(this);
+                distribution.setStartPage(i);
+                distribution.setEndPage(i);
+                distribution.setQuestion(question);
+                distribution.setStudent(student);
             }
         }
 

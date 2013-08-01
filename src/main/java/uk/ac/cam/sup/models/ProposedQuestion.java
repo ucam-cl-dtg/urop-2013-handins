@@ -5,6 +5,7 @@ package uk.ac.cam.sup.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -16,6 +17,8 @@ public class ProposedQuestion {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    private Date dateCreated;
+
     private String name;
 
     @ManyToOne
@@ -26,7 +29,7 @@ public class ProposedQuestion {
 
     // Constructors
     public ProposedQuestion() {
-
+        dateCreated = new Date();
     }
 
     // Id
@@ -59,5 +62,14 @@ public class ProposedQuestion {
 
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 }

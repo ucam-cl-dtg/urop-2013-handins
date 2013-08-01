@@ -3,6 +3,7 @@ package uk.ac.cam.sup.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "MarkedAnswer")
@@ -12,6 +13,8 @@ public class MarkedAnswer {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
+
+    private Date dateCreated;
 
     private String owner;
     private String filePath;
@@ -25,7 +28,7 @@ public class MarkedAnswer {
 
     // Constructors
     public MarkedAnswer() {
-
+        dateCreated = new Date();
     }
 
     // Id
@@ -76,5 +79,14 @@ public class MarkedAnswer {
 
     public void setAnnotator(String annotator) {
         this.annotator = annotator;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 }

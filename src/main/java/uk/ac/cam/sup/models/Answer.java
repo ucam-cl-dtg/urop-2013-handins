@@ -3,6 +3,7 @@ package uk.ac.cam.sup.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -14,10 +15,12 @@ public class Answer {
     @GenericGenerator(name="increment", strategy="increment")
     private long id;
 
+    private Date dateCreated;
+
     private String owner;
     private String filePath;
 
-    private boolean finalState;
+    private boolean last;
     private boolean annotated;
 
     @ManyToOne
@@ -34,7 +37,7 @@ public class Answer {
 
     // Constructors
     public Answer() {
-
+        dateCreated = new Date();
     }
 
     // Id
@@ -100,12 +103,12 @@ public class Answer {
     }
 
     // FinalState
-    public boolean getFinalState() {
-        return finalState;
+    public boolean isLast() {
+        return last;
     }
 
-    public void setFinalState(boolean finalState) {
-        this.finalState = finalState;
+    public void setLast(boolean last) {
+        this.last = last;
     }
 
     // Annotated
@@ -115,5 +118,14 @@ public class Answer {
 
     public void setAnnotated(boolean annotated) {
         this.annotated = annotated;
+    }
+
+    // DateCreated
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 }

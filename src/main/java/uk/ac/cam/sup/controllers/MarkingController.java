@@ -164,6 +164,7 @@ public class MarkingController {
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", student))
+                                          .add(Restrictions.eq("last", true))
                                           .list();
 
             /*
@@ -225,7 +226,9 @@ public class MarkingController {
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", studentCrsId))
-                                          .add(Restrictions.eq("question", question)).list();
+                                          .add(Restrictions.eq("question", question))
+                                          .add(Restrictions.eq("last", true))
+                                          .list();
 
             /*
             If the answer exists then return it if it's visible to the user.
@@ -281,7 +284,9 @@ public class MarkingController {
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", studentCrsId))
-                                          .add(Restrictions.eq("question", question)).list();
+                                          .add(Restrictions.eq("question", question))
+                                          .add(Restrictions.eq("last", true))
+                                          .list();
 
             /*
             if it exists and it is visible then change the annotation
@@ -360,7 +365,7 @@ public class MarkingController {
             boolean available = false;
             boolean isMarked = true;
             for (Answer answer : answers) {
-                if (bin.canSeeAnswer(user, answer))
+                if (answer.isLast() && bin.canSeeAnswer(user, answer))
                     available = true;
 
                 isMarked &= answer.isAnnotated();
@@ -404,7 +409,7 @@ public class MarkingController {
         // Filter the answers to get the ones which are visible
         List<ImmutableMap<String, ?>> studentList = new LinkedList<ImmutableMap<String, ?>>();
         for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer))
+            if (answer.isLast() && bin.canSeeAnswer(user, answer))
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(),
                                                 "isMarked", answer.isAnnotated()));
 
@@ -446,8 +451,10 @@ public class MarkingController {
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answers.get(0)))
-                answer.setAnnotated(!answer.isAnnotated());
+            if (bin.canSeeAnswer(user, answers.get(0))) {
+                if (answer.isLast())
+                    answer.setAnnotated(!answer.isAnnotated());
+            }
             else return Response.status(401).build();
 
         return Response.ok().build();
@@ -488,8 +495,10 @@ public class MarkingController {
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
-            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answers.get(0)))
-                answer.setAnnotated(!answer.isAnnotated());
+            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answers.get(0))) {
+                if (answer.isLast())
+                    answer.setAnnotated(!answer.isAnnotated());
+            }
             else return Response.status(401).build();
 
         return Response.ok().build();
