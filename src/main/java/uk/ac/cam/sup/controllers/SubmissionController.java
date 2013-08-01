@@ -2,10 +2,13 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
+import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 
@@ -93,8 +96,22 @@ public class SubmissionController {
 
         // Delete all answers from the submission
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {
+
             FilesManip.fileDelete(answer.getFilePath());
             session.delete(answer);
+
+            if (answer.isLast()) {
+                @SuppressWarnings("unchecked")
+                List<Answer> altAnswers = session.createCriteria(Answer.class)
+                                                 .add(Restrictions.eq("bin", answer.getBin()))
+                                                 .add(Restrictions.eq("owner", answer.getOwner()))
+                                                 .add(Restrictions.eq("question", answer.getQuestion()))
+                                                 .addOrder(Order.desc("dateCreated"))
+                                                 .list();
+
+                if (altAnswers.size() > 0)
+                    altAnswers.get(0).setLast(true);
+            }
         }
 
         // Delete the actual submission

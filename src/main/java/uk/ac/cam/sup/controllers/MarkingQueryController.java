@@ -51,7 +51,7 @@ public class MarkingQueryController {
         List<Marking> markingList = new LinkedList<Marking>();
         int actualPage = 1;
         for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answer) &&
+            if (bin.canSeeAnswer(user, answer) && answer.isLast() &&
                     (questionId == null || answer.getQuestion().getId() == questionId) &&
                     (studentCrsId == null || answer.getOwner().equals(studentCrsId)))
             {

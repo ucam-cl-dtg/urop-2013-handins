@@ -59,8 +59,8 @@ public class BinController {
         return ImmutableMap.of("bins", finalBinList);
     }
 
-    @Path("/create")
     @GET
+    @Path("/create")
     public Object viewForCreateBin() {
         return Response.status(200).build();
     }
@@ -106,6 +106,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.canDelete(user, token) || bin.getUnmarkedSubmissions().size() > 0)
             return Response.status(401).build();
 
@@ -142,6 +143,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (! bin.canSeeBin(user))
             return Response.status(401).build();
 
@@ -173,6 +175,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
 
@@ -224,6 +227,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.isOwner(user))
             return Response.status(401).build();
 
@@ -256,6 +260,7 @@ public class BinController {
         // Check the existence of the bin
         if (bin == null)
             return Response.status(404).build();
+
         if (!bin.canAddPermission(user, token))
             return Response.status(401).build();
 
@@ -470,6 +475,8 @@ public class BinController {
 
     /*
     Done
+
+    Checked
      */
     @GET
     @Path("/{binId}/questions")
@@ -508,6 +515,8 @@ public class BinController {
 
     /*
     Done
+
+    Checked
      */
     @DELETE
     @Path("/{binId}/questions/{questionId}")

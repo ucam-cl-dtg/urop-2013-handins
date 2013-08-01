@@ -20,7 +20,7 @@ public class Answer {
     private String owner;
     private String filePath;
 
-    private boolean finalState;
+    private boolean last;
     private boolean annotated;
 
     @ManyToOne
@@ -103,12 +103,12 @@ public class Answer {
     }
 
     // FinalState
-    public boolean getFinalState() {
-        return finalState;
+    public boolean isLast() {
+        return last;
     }
 
-    public void setFinalState(boolean finalState) {
-        this.finalState = finalState;
+    public void setLast(boolean last) {
+        this.last = last;
     }
 
     // Annotated

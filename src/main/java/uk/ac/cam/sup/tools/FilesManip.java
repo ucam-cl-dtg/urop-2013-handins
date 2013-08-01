@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.*;
@@ -78,10 +79,22 @@ public class FilesManip {
             e.printStackTrace();
         }
 
+        for (Object object : session.createCriteria(Answer.class)
+                                     .add(Restrictions.eq("bin", submission.getBin()))
+                                     .add(Restrictions.eq("question", distribution.getQuestion()))
+                                     .add(Restrictions.eq("owner", distribution.getStudent()))
+                                     .list()) {
+
+            Answer answer1 = (Answer) object;
+
+            answer1.setLast(false);
+        }
+
+
         answer.setBin(submission.getBin());
         answer.setFilePath(filePath);
         answer.setQuestion(distribution.getQuestion());
-        answer.setFinalState(false);
+        answer.setLast(true);
         answer.setOwner(distribution.getStudent());
         answer.setUnmarkedSubmission((UnmarkedSubmission) submission);
 
@@ -115,6 +128,7 @@ public class FilesManip {
         markedAnswer.setAnswer((Answer) session.createCriteria(Answer.class)
                                                .add(Restrictions.eq("owner", distribution.getStudent()))
                                                .add(Restrictions.eq("question", distribution.getQuestion()))
+                                               .addOrder(Order.desc("dateCreated"))
                                                .list().get(0));
         markedAnswer.getAnswer().setAnnotated(true);
 
