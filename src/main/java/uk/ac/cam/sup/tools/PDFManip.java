@@ -4,7 +4,6 @@ import com.google.common.io.Files;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.RandomStringUtils;
-import uk.ac.cam.sup.exceptions.MetadataNotFoundException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -112,7 +111,7 @@ public class PDFManip {
             }
         }
 
-        throw new MetadataNotFoundException();
+        throw new Exception();
     }
 
     /*

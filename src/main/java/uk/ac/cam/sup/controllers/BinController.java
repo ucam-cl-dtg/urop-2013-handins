@@ -89,7 +89,9 @@ public class BinController {
     }
 
     /*
-    FixMe: delete everything from the bin
+    Done
+
+    Checked
      */
     @DELETE
     @Path("/{binId}")
@@ -351,7 +353,7 @@ public class BinController {
             return Response.status(401).build();
 
         // Get all submissions from the list
-        @SuppressWarnings("unchecked")
+        // noinspection unchecked
         List<UnmarkedSubmission> allUnmarkedSubmissions = session.createCriteria(UnmarkedSubmission.class)
                                                                  .add(Restrictions.eq("bin", bin))
                                                                  .addOrder(Order.asc("id"))
