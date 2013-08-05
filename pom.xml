@@ -5,33 +5,11 @@
 	<groupId>uk.ac.cam.sup</groupId>
 	<artifactId>handins</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>Handins</name>
 
 	<properties>
 		<jettyVersion>7.2.0.v20101020</jettyVersion>
-        <custom_scripts>
-            <![CDATA[
-                <script type="text/javascript" src="/js/vendor/jquery.form.min.js"></script>
-                <script src="/js/handins/main.js"></script>
-                <script type="text/javascript" src="/js/handins/l10n.js"></script>
-                <script type="text/javascript" src="/js/vendor/pdf.js"></script>
-                <script type="text/javascript" src="/js/handins/viewer.js"></script>
-                <script src="/js/handins/pdf-selector.js"></script>
-			]]>
-        </custom_scripts>
-        <custom_templates>
-            <![CDATA[
-            <script src="/soy/js/1/handins.submission.js"></script>
-            <script src="/soy/js/1/handins.bin.js"></script>
-            <script src="/soy/js/1/handins.marking.js"></script>
-            <script src="/soy/js/1/shared.handins.js"></script>
-            <script src="/soy/js/1/shared.handins.generic.js"></script>
-            <script src="/soy/js/1/main.js"></script>
-
-
-			]]>
-        </custom_templates>
 	</properties>
 
 	<repositories>
@@ -40,12 +18,18 @@
 			<url>http://htmleasy-maven.googlecode.com/svn/trunk/</url>
 		</repository>
 		<repository>
-			<id>codedance on Github</id>
+			<id>codedance</id>
 			<url>https://github.com/codedance/maven-repository/raw/master</url>
 		</repository>
 	</repositories>
 
 	<dependencies>
+    <dependency>
+      <groupId>uk.ac.cam.cl.dtg.teaching</groupId>
+      <artifactId>frontend</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>war</type>
+    </dependency>
         <!-- Jetty -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
@@ -54,7 +38,7 @@
 		</dependency>
 
         <!-- HtmlEasy -->
-		<dependency>
+        <dependency>
 			<groupId>com.googlecode.htmleasy</groupId>
 			<artifactId>htmleasy</artifactId>
 			<version>0.7</version>
@@ -177,6 +161,20 @@
                     <mainClass>uk.ac.cam.tools.PDFManip</mainClass>
                 </configuration>
             </plugin>
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <overlays>
+            <overlay>
+            </overlay>
+            <overlay>
+              <groupId>uk.ac.cam.cl.dtg.teaching</groupId>
+              <artifactId>frontend</artifactId>
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -188,37 +186,6 @@
 				</configuration>
 			</plugin>
 
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <!-- here the phase you need -->
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                                <nonFilteredFileExtensions>
-                                    <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-                                    <nonFilteredFileExtension>eot</nonFilteredFileExtension>
-                                    <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                                    <nonFilteredFileExtension>svg</nonFilteredFileExtension>
-                                </nonFilteredFileExtensions>
-                            <outputDirectory>${basedir}/src/main/webapp/app</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/../frontend</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                                <!-- <resource> <directory>${basedir}/src/config</directory> <filtering>true</filtering>
-                                    </resource> -->
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 		</plugins>
 	</build>
 
