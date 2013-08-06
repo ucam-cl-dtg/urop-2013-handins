@@ -4,7 +4,7 @@ $(document).on("click", ".delete-submission", function() {
 
     if (confirm("Are you sure you want to delete the submission?")) {
         $.ajax({
-            url: deleteLink,
+            url: prepareURL(deleteLink),
             type: 'DELETE',
             success: function(result) {
                 elem.parents('.delete-me').first().fadeOut();
@@ -28,8 +28,9 @@ $(document).on("click", ".upload-work-for-bin", function() {
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
 
 function uploadedSubmission(data) {
+    var fragment = Backbone.history.fragment;
     Backbone.history.fragment = null;
-    router.navigate(window.location.hash, {trigger: true});
+    router.navigate(fragment, {trigger: true});
     showSelectingModal(data.bin, data.unmarkedSubmission.id);
 }
 
@@ -156,7 +157,7 @@ function toggleMarkSubPanel(elem, marked) {
 
 $(document).on("click", ".toggle-mark", function () {
     var $this = $(this),
-        markLink = $this.attr("marking-link"),
+        markLink = prepareURL($this.attr("marking-link")),
         elem = $this.closest('li'),
         isSubPanel = elem.parents('.sublist-container').size() > 0,
         marked = $this.parents('.marked').size() > 0;
@@ -164,7 +165,6 @@ $(document).on("click", ".toggle-mark", function () {
     if (isTogglingMark) {
         return false;
     }
-    console.log("muie", isTogglingMark);
     isTogglingMark = true;
     if (isSubPanel) {
         $.post(markLink, function() { toggleMarkSubPanel(elem, marked);})
@@ -177,7 +177,7 @@ $(document).on("click", ".toggle-mark", function () {
 $(document).on("click", ".delete-user-perm", function() {
     var user = $(this).attr("data-delete");
     $.ajax({
-        url: "/bins/" + getRouteParams()[0] + "/permissions?users[]=" + user,
+        url: prepareURL("/bins/" + getRouteParams()[0] + "/permissions?users[]=" + user),
         method: 'DELETE'
     }).done(function() {
        asyncLoad($('.permissions-container.async-loader'));
@@ -199,7 +199,7 @@ $(document).on("click", ".tabs.magic-tabs .title a", function(evt){
 function setupAutocomplete() {
 
     $('.token-user-input').autocomplete({
-        source: "/hack/users",
+        source: prepareURL("hack/users"),
         minLength: 2,
         focus: function( event, ui) {
             console.log(ui);
