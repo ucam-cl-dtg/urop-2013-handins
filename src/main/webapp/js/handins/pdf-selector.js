@@ -114,18 +114,28 @@ bindThis = function(fn, me) {
         return fn.apply(me, arguments);
     };
 };
+
 var Marker = (function MarkerClosure(){
 
     function Marker(pdfViewer) {
         this.pdfViewer = pdfViewer;
         this.pdfContainer = pdfViewer.find('#viewerContainer');
+        this.selecting = false;
 
         // Bind all events handlers to the marker
+        this.setupBindings();
+    }
+
+    Marker.prototype.setupBindings = function () {
         this.startSelecting = bindThis(this.startSelecting, this);
         this.stopSelecting = bindThis(this.stopSelecting, this);
+
         this.handleMouseMove = bindThis(this.handleMouseMove, this);
         this.handleResizableResize = bindThis(this.handleResizableResize, this);
         this.handleRescale = bindThis(this.handleRescale, this);
+
+        this.handlePositionTopClick = bindThis(this.handlePositionTopClick, this);
+        this.handlePositionBottomClick = bindThis(this.handlePositionBottomClick, this);
     }
 
     Marker.prototype.enableMarking =  function () {
@@ -183,6 +193,7 @@ var Marker = (function MarkerClosure(){
     Marker.prototype.startSelecting =  function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
+        this.selecting = true;
 
         $('.pdf-viewer .page').unbind("click", this.startSelecting);
 
@@ -226,6 +237,8 @@ var Marker = (function MarkerClosure(){
     Marker.prototype.stopSelecting = function(evt) {
         this.pdfContainer.unbind('click', this.stopSelecting);
         this.pdfContainer.unbind('mousemove', this.handleMouseMove);
+
+        this.selecting = false;
     }
 
     Marker.prototype.handleResizableResize =  function (evt, ui) {
@@ -242,6 +255,68 @@ var Marker = (function MarkerClosure(){
 
         console.log(bottom - this.top);
     }
+
+    Marker.prototype.handlePositionTopClick = function (evt) {
+        this.pdfContainer.find('.page').unbind('click', this.handlePositionTopClick);
+
+        console.log("Hello")
+
+    }
+
+    Marker.prototype.handlePositionBottomClick = function (evt) {
+        this.pdfContainer.find('.page').unbind('click', this.handlePositionBottomClick);
+
+        console.log("World");
+
+    }
+
+    Marker.prototype.calculateAbsolutePosition = function (page, dist) {
+        var height = $('#pageContainer' + page).height();
+
+        PDFView.getPage(page).then( function (page) {
+            var trueHeight = page.getViewport(1).height;
+
+            console.log(trueHeight * dist / height);
+        })
+    }
+
+    Marker.prototype.hitTest = function (dist) {
+        var borderSize = this.parse(this.page.css('border-top-width'));
+
+        var resultElem, resultDist;
+
+        this.pdfContainer.find('.page').each(function(index, _elem) {
+            var elem = $(_elem);
+            var size = parseFloat(elem.css('height').replace('px', ''));
+
+            dist -= borderSize;
+
+            if (dist < size && dist > 0) {
+                resultElem = elem;
+                resultDist = dist;
+            }
+            dist -= size;
+        })
+
+        var page = parseInt(resultElem.attr('id').replace('pageContainer', ''))
+
+        return {
+            page: page,
+            dist: resultDist,
+            asbolutePosition: this.calculateAbsolutePosition(page, resultDist)
+        }
+
+    }
+
+    Marker.prototype.getPosition =  function () {
+        var height = this.parse(this.marker.css('height'));
+
+        return {
+            'start': this.hitTest(this.top),
+            'end': this.hitTest(this.top + height)
+        }
+    }
+
 
     return Marker;
 })();
