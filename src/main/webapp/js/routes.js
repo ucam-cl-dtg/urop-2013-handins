@@ -5,6 +5,10 @@ The second term must be either a string representing the template name or
 a function that returns the template name. The function will receive the json returned
 by the request as the first parameter.
 */
+var BASE_PATH="/api/";
+var ROUTER_OPTIONS= {
+    pushState: true
+}
 
 function binInjector(templateName) {
     var bin = null;
@@ -17,7 +21,7 @@ function binInjector(templateName) {
     }
 
     updateBin = function() {
-        $.ajax("/bins/" + getRouteParams()[0], {
+        $.ajax(prepareURL("/bins/" + getRouteParams()[0]), {
             async: false,
             success: function(res) {
                bin = res.bin;
@@ -70,7 +74,7 @@ function submissionSubList(json) {
     _.map(json.elems, function(elem) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submissions/" + elem.id;
-        elem.download = "/submissions/" + elem.id + "/download";
+        elem.download = prepareURL("submissions/" + elem.id + "/download");
     })
 
     return "shared.handins.generic.listPanel";
@@ -84,7 +88,7 @@ function submissionList(json) {
         elem.delete = "/submissions/" + elem.id;
         elem.sublist = "submissions/" + elem.id;
         elem.sublistTemplateFunction = "questionList";
-        elem.download = "/submissions/" + elem.id + "/download";
+        elem.download = prepareURL("submissions/" + elem.id + "/download");
     })
 }
 
@@ -94,6 +98,7 @@ function questionList(json) {
 
     _.map(json.elems, function(elem) {
         elem.name = elem.question;
+        // TODO fix this
         elem.download = elem.link;
     })
 
@@ -112,7 +117,7 @@ markingStudents = combine(binInjector(), function (json) {
 
     _.each(json.students,  function(elem) {
         elem.name = elem.student;
-        elem.download = "/marking/bins/" + json.bin.id + "/students/" + elem.student + "/download";
+        elem.download = prepareURL("/marking/bins/" + json.bin.id + "/students/" + elem.student + "/download");
         elem.sublist = "marking/bins/" + json.bin.id + "/students/" + elem.student;
         elem.sublistTemplateFunction = "markingStudentsQuestion"
         elem.marking = "/marking/bins/" + json.bin.id + "/students/" + elem.student;
@@ -135,7 +140,7 @@ function markingStudentsQuestion(json) {
         elem.id = elem.questionId;
         elem.name = elem.questionName;
 
-        elem.download = "/marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student + "/download";
+        elem.download = prepareURL("marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student + "/download");
         elem.marking = "/marking/bins/" + bin + "/questions/" + elem.id + "/students/" + json.student;
     })
 
@@ -147,7 +152,7 @@ markingQuestions = combine(binInjector(), function(json) {
     _.each(json.questionList,  function(elem) {
         elem.name = elem.questionName;
         elem.id = elem.questionId;
-        elem.download = "/marking/bins/" + json.bin.id + "/questions/" + elem.id + "/download";
+        elem.download = prepareURL("marking/bins/" + json.bin.id + "/questions/" + elem.id + "/download");
         elem.sublist = "marking/bins/" + json.bin.id + "/questions/" + elem.id;
         elem.sublistTemplateFunction = "markingQuestionStudents";
         elem.marking= "/marking/bins/" + json.bin.id + "/questions/" + elem.id;
@@ -166,7 +171,7 @@ function markingQuestionStudents(json) {
 
     _.each(json.elems, function(elem){
         elem.name = elem.owner;
-        elem.download = "/marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner + "/download";
+        elem.download = prepareURL("marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner + "/download");
         elem.marking = "/marking/bins/" + bin + "/questions/" + json.question + "/students/" + elem.owner;
     })
     return 'shared.handins.generic.listPanel';

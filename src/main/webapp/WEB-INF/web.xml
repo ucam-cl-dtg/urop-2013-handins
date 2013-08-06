@@ -9,20 +9,25 @@
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
 	
-  <context-param>
-    <param-name>cssNamespace</param-name>
-    <param-value></param-value>
-  </context-param>
-  
-  <context-param>
-    <param-name>cssFiles</param-name>
-    <param-value></param-value>
-  </context-param>
-  
-  <context-param>
-    <param-name>jsFiles</param-name>
-    <param-value>/js/vendor/jquery.form.min.js,/js/handins/main.js,/js/handins/l10n.js,/js/vendor/pdf.js,/js/handins/viewer.js,/js/handins/pdf-selector.js,/soy/js/1/handins.submission.js,/soy/js/1/handins.bin.js,/soy/js/1/handins.marking.js,/soy/js/1/shared.handins.js,/soy/js/1/shared.handins.generic.js,/soy/js/1/main.js</param-value>
-  </context-param>
+    <context-param>
+        <param-name>cssNamespace</param-name>
+        <param-value></param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>cssFiles</param-name>
+        <param-value></param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>jsFiles</param-name>
+        <param-value>/js/vendor/jquery.form.min.js,/js/handins/main.js,/js/handins/l10n.js,/js/vendor/pdf.js,/js/handins/viewer.js,/js/handins/pdf-selector.js,/soy/js/1/handins.submission.js,/soy/js/1/handins.bin.js,/soy/js/1/handins.marking.js,/soy/js/1/shared.handins.js,/soy/js/1/shared.handins.generic.js,/soy/js/1/main.js</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/api</param-value>
+    </context-param>
 
 	<filter>
 		<filter-name>Hibernate</filter-name>
@@ -63,7 +68,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 
 	<filter-mapping>
 		<filter-name>Htmleasy</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
 
   &frontend;
