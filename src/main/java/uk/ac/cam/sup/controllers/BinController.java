@@ -399,16 +399,18 @@ public class BinController {
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
 
+
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+        unmarkedSubmission.setFilePath("2.pdf");
 
         if (!unmarkedSubmission.getOwner().equals(user))
             return Response.status(401).build();
 
         // Inject the pdf with the metadata needed to split it
-        PDFManip pdfManipInit, pdfManip;
+        PDFManip pdfManip;
         try {
-            pdfManipInit = new PDFManip(unmarkedSubmission.getFilePath());
+            pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
         } catch (Exception e) {
             return Response.status(404).build();
         }
@@ -430,18 +432,21 @@ public class BinController {
             {
                 if (startPage[i] == endPage[i]) {
 
-                    pdfManipInit.takeBox(startPage[i], endLoc[i], startLoc[i], directory + "file" + i + ".pdf");
+                    pdfManip.takeBox(startPage[i], endLoc[i], startLoc[i], directory + "file" + i + ".pdf");
 
                     actualPage++;
                     startPageFinal.add(actualPage);
                     endPageFinal.add(actualPage);
                 }
                 else {
-                    pdfManipInit.takeBox(startPage[i], 0, startLoc[i], directory + "t1.pdf");
-                    pdfManipInit.takePages(startPage[i] + 1, endPage[i] - 1, directory + "t2.pdf");
-                    pdfManipInit.takeBox(endPage[i], endLoc[i], 1f, directory + "t3.pdf");
+                    pdfManip.takeBox(startPage[i], 0, startLoc[i], directory + "t1.pdf");
+                    if (startPage[i] + 1 != endPage[i])
+                        pdfManip.takePages(startPage[i] + 1, endPage[i] - 1, directory + "t2.pdf");
+                    pdfManip.takeBox(endPage[i], endLoc[i], 1f, directory + "t3.pdf");
 
-                    FilesManip.mergePdf(ImmutableList.of("t1.pdf", "t2.pdf", "t3.pdf"), directory + "file" + i + ".pdf");
+                    if (startPage[i] + 1 != endPage[i])
+                        FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t2.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
+                    else FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
 
                     actualPage++;
                     startPageFinal.add(actualPage);
@@ -450,12 +455,10 @@ public class BinController {
                 }
             }
 
-            FilesManip.mergePdf(pathList, "x" + unmarkedSubmission.getFilePath());
-
-            pdfManip = new PDFManip("x" + unmarkedSubmission.getFilePath());
+            FilesManip.mergePdf(pathList, unmarkedSubmission.getFilePath());
         }
         catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(401).build();
         }
 
         // Mark simply
@@ -467,6 +470,7 @@ public class BinController {
 
         return Response.ok().build();
     }
+
     /*
     Done
 
