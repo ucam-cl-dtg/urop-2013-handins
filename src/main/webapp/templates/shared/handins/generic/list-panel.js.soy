@@ -12,13 +12,22 @@
 * @param marking - link
 * @param isMarked - boolean
 * @param linkTo
+* @param dropdown - list
 */
 {template .elementContents}
     <div class="columns large-7 small-7">
     {if $linkTo }
         <a href="#{$linkTo}">{$name}</a>
     {else}
-        {$name}
+        {if $dropdown }
+            <select>
+                {foreach $option in $dropdown}
+                    <option value="{$option}">{$option}</value>
+                {/foreach}
+            </select>
+        {else}
+            {$name}
+        {/if}
     {/if}
     </div>
     <div class="columns large-5 small-5 text-right">

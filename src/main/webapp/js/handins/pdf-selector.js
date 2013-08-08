@@ -7,317 +7,103 @@
 * never gonna say goodbye. Never gonna tell a lie and hurt you.
 */
 
-function addSelectingModal(bin, submission) {
-    var html = shared.handins.selectingModal2({bin: bin, submission: submission}),
-        elem = $(html);
-
-    elem.prependTo($('body')).foundation().foundation("reveal","open");
-    asyncLoad(elem.find(".async-loader"));
-    return elem;
-}
 
 function addSelectingModal2(bin, submission) {
-    var html = shared.handins.selectingModal({bin: bin, submission: submission}),
-        elem = $(html);
+    var html = shared.handins.selectingModal({bin: bin, submission: submission});
+    var elem = $(html);
+    var selecting = false;
 
     elem.prependTo($('body')).foundation().foundation("reveal","open");
-    asyncLoad(elem.find(".async-loader"));
+    elem.find('.pdf-viewer').css('height',elem.height() + "px");
+
+    //asyncLoad(elem.find(".async-loader"));
+    markers = new MarkerCollection();
+    view = new MarkerView({
+        el: elem.find('.questions-container'),
+        collection: markers
+    });
+    view.render();
+
+    elem.find('.select-question').click(function() {
+        if (selecting)
+            return ;
+
+        selecting = true;
+        var marker = new MarkerModel({name: "Works"});
+        marker.marker.enableMarking();
+        markers.add(marker);
+    })
     return elem;
 }
 
-function showSelectingModal(bin, submission) {
-    $('#selectingModal').remove();
-    addSelectingModal(bin, submission);
-    showPdf2(submission);
-    $('#selectingModal form').ajaxForm(function(){
-        $('#selectingModal').foundation("reveal", "close");
-    });
-
-    $('#selectingModal .more-inputs').click(function() {
-        var id = $('#selectingModal select').val();
-        var name = $('#selectingModal select option[value="' + id + '"]').text();
-        var start = $('#selectingModal input[name="start"]').val();
-        var end = $('#selectingModal input[name="end"]').val();
-
-        var elem = $(shared.handins.inputLine({
-            "question": { id: id, name: name},
-            "start": start,
-            "end": end
-        }))
-        elem.appendTo($('.input-line-container'))
-    });
-
-}
 function showSelectingModal2(bin, submission) {
     $('#selectingModal').remove();
     addSelectingModal2(bin, submission);
     showPdf(submission);
-    $('#selectingModal form').ajaxForm(function(){
-        $('#selectingModal').foundation("reveal", "close");
-    });
-
-    $('#selectingModal .more-inputs').click(function() {
-        var id = $('#selectingModal select').val();
-        var name = $('#selectingModal select option[value="' + id + '"]').text();
-        var start = $('#selectingModal input[name="start"]').val();
-        var end = $('#selectingModal input[name="end"]').val();
-
-        var elem = $(shared.handins.inputLine({
-            "question": { id: id, name: name},
-            "start": start,
-            "end": end
-        }))
-        elem.appendTo($('.input-line-container'))
-    });
-
-}
-
-$(document).on("click", ".input-line a", function() {
-    $(this).closest('.input-line').remove();
-})
-
-function showPdf2(submission) {
-    PDFJS.disableWorker = true;
-    PDFJS.getDocument("/submissions/" + submission + "/download").then(function (pdf){
-        var numPages = pdf.numPages;
-
-        for (var i=0; i < numPages; i++) {
-            $('<div class="pdf-page page-' + i + '"><canvas></canvas></div>' ).appendTo($('.pdf-container'));
-
-            pdf.getPage(i).then(function(i){ return function(page) {
-                var scale = 1;
-                var viewport = page.getViewport(scale);
-
-                var canvas = $(".page-" + i +" canvas")[0];
-                var context = canvas.getContext('2d');
-
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                page.render({canvasContext: context, viewport: viewport});
-
-            }}(i))
-
-        }
-
-    })
 }
 
 
 function showPdf(submission) {
     // Function located in viewer.js. That file contains magic, pure voodoo magic.
-    loadPdf("/submissions/" + submission + "/download");
+    loadPdf(prepareURL("/submissions/" + submission + "/download"));
 }
 
-bindThis = function(fn, me) {
-    return function() {
-        return fn.apply(me, arguments);
-    };
-};
-
-var Marker = (function MarkerClosure(){
-
-    function Marker(pdfViewer) {
-        this.pdfViewer = pdfViewer;
-        this.pdfContainer = pdfViewer.find('#viewerContainer');
-        this.selecting = false;
-
-        // Bind all events handlers to the marker
-        this.setupBindings();
-    }
-
-    Marker.prototype.setupBindings = function () {
-        this.startSelecting = bindThis(this.startSelecting, this);
-        this.stopSelecting = bindThis(this.stopSelecting, this);
-
-        this.handleMouseMove = bindThis(this.handleMouseMove, this);
-        this.handleResizableResize = bindThis(this.handleResizableResize, this);
-        this.handleRescale = bindThis(this.handleRescale, this);
-
-        this.handlePositionTopClick = bindThis(this.handlePositionTopClick, this);
-        this.handlePositionBottomClick = bindThis(this.handlePositionBottomClick, this);
-    }
-
-    Marker.prototype.enableMarking =  function () {
-        $('.pdf-viewer .page').click(this.startSelecting);
-    }
-
-    Marker.prototype.calculateDistance = function (elem, evt, scrollParent) {
-        // distance from the top of the page
-        var dist = evt.pageY - elem.offset().top;
-
-        // elem.position().top gives the top of the page in the viewing area
-        // elem.scrollParent().scrollTop() gives the scroll
-        // But really there should be a better way of doing this
-        var top;
-        if (scrollParent === undefined || scrollParent === null)
-            top = elem.position().top + dist + elem.scrollParent().scrollTop();
-        else
-            top = dist + scrollParent.scrollTop();
-
-        return top;
-    }
-
-    Marker.prototype.handleRescale = function(evt) {
-        this.updateSize();
-        this.updatePosition();
-    }
-
-    Marker.prototype.parse = function (value) {
-        return parseFloat(value.replace('px', ''));
-    }
-
-    Marker.prototype.updatePosition = function() {
-        var currentWidth = this.parse(this.page.css("width")),
-            prevWidth = this.pageWidth,
-            scaleFactor = currentWidth / prevWidth;
-        this.top *= scaleFactor;
-        this.marker.css("top", this.top + "px");
-        this.savePageWidth();
-    }
-    Marker.prototype.updateSize = function () {
-        var pageMargin = this.parse(this.page.css("margin-left"));
-        var pageBorder = this.parse(this.page.css("border-left-width"));
-
-        this.marker.css("margin-left", pageMargin + pageBorder + "px");
-
-        // Now lets fix the width
-
-        this.marker.css("width", this.page.css("width"))
-    }
-
-    Marker.prototype.savePageWidth = function () {
-        this.pageWidth = this.parse(this.page.css("width"));
-    }
-
-    Marker.prototype.startSelecting =  function(evt) {
-        evt.preventDefault();
-        evt.stopPropagation();
-        this.selecting = true;
-
-        $('.pdf-viewer .page').unbind("click", this.startSelecting);
-
-        var elem = $(evt.currentTarget);
-        this.page = elem;
-        this.savePageWidth();
-
-        // Setup the marker
-        this.marker = $('<div class="marker"></div>');
-        this.marker.appendTo(this.pdfContainer);
-
-        // Setup zindex so we can see it.
-
-        this.marker.zIndex(this.pdfContainer.find('.page').zIndex() + 1);
 
 
-        this.top = this.calculateDistance(elem, evt);
-
-
-        this.marker.css("top", this.top + "px");
-
-        this.updateSize();
-
-
-        // Set up mouse tracking for resize
-
-        this.pdfContainer.mousemove(this.handleMouseMove);
-
-        // Lets make the marker resizable.
-        this.marker.resizable({
-            handles: "n, s",
-            // Sync this.top when the element is resized upwards.
-            resize: this.handleResizableResize
-
+var MarkerView = Backbone.View.extend({
+    initialize: function() {
+        this.render  = _.bind(this.render, this);
+        this.collection.on('all', this.render);
+    },
+    render: function() {
+        var html = shared.handins.generic.listPanel({
+            elems: this.collection.toJSON()
         });
-        $(window).on("scalechange", this.handleRescale);
+        this.$el.html(html);
+        return this;
+    }
+})
 
-        this.pdfContainer.click(this.stopSelecting);
+
+function showSelectingModal3(bin, submission) {
+    $('#selectingModal').remove();
+    var html = shared.handins.selectingModal({bin: this.bin, submission: this.submission});
+    var elem = $(html);
+
+    elem.prependTo($('body')).foundation().foundation("reveal","open");
+    elem.find('.pdf-viewer').css('height',elem.height() + "px");
+
+    var view = new SelectingView({
+        bin: bin,
+        submission: submission,
+        el: elem
+    });
+}
+
+
+var SelectingView = Backbone.View.extend({
+
+    initialize: function(data) {
+        this.markers = new MarkerCollection();
+        view = new MarkerView({
+            el: this.$el.find('.questions-container'),
+            collection: this.markers
+        });
+        view.render();
+
+        _.bindAll(this, 'newQuestion');
+
+        showPdf(this.options.submission)
+    },
+
+    events: {
+        'click .select-question': 'newQuestion'
+    },
+
+    newQuestion: function() {
+        var marker = new MarkerModel({name: "Works"});
+        marker.marker.enableMarking();
+        this.markers.add(marker);
     }
 
-    Marker.prototype.stopSelecting = function(evt) {
-        this.pdfContainer.unbind('click', this.stopSelecting);
-        this.pdfContainer.unbind('mousemove', this.handleMouseMove);
-
-        this.selecting = false;
-    }
-
-    Marker.prototype.handleResizableResize =  function (evt, ui) {
-        this.top = ui.position.top;
-    }
-
-    Marker.prototype.handleMouseMove = function(evt) {
-        var elem = $(evt.currentTarget);
-
-        bottom = this.calculateDistance(elem, evt, elem);
-
-        if (bottom - this.top > 0)
-            this.marker.css("height", (bottom - this.top) + "px");
-
-        console.log(bottom - this.top);
-    }
-
-    Marker.prototype.handlePositionTopClick = function (evt) {
-        this.pdfContainer.find('.page').unbind('click', this.handlePositionTopClick);
-
-        console.log("Hello")
-
-    }
-
-    Marker.prototype.handlePositionBottomClick = function (evt) {
-        this.pdfContainer.find('.page').unbind('click', this.handlePositionBottomClick);
-
-        console.log("World");
-
-    }
-
-    Marker.prototype.calculateAbsolutePosition = function (page, dist) {
-        var height = $('#pageContainer' + page).height();
-
-        PDFView.getPage(page).then( function (page) {
-            var trueHeight = page.getViewport(1).height;
-
-            console.log(trueHeight * dist / height);
-        })
-    }
-
-    Marker.prototype.hitTest = function (dist) {
-        var borderSize = this.parse(this.page.css('border-top-width'));
-
-        var resultElem, resultDist;
-
-        this.pdfContainer.find('.page').each(function(index, _elem) {
-            var elem = $(_elem);
-            var size = parseFloat(elem.css('height').replace('px', ''));
-
-            dist -= borderSize;
-
-            if (dist < size && dist > 0) {
-                resultElem = elem;
-                resultDist = dist;
-            }
-            dist -= size;
-        })
-
-        var page = parseInt(resultElem.attr('id').replace('pageContainer', ''))
-
-        return {
-            page: page,
-            dist: resultDist,
-            asbolutePosition: this.calculateAbsolutePosition(page, resultDist)
-        }
-
-    }
-
-    Marker.prototype.getPosition =  function () {
-        var height = this.parse(this.marker.css('height'));
-
-        return {
-            'start': this.hitTest(this.top),
-            'end': this.hitTest(this.top + height)
-        }
-    }
-
-
-    return Marker;
-})();
-
+})
