@@ -19,6 +19,11 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
         <param-value></param-value>
     </context-param>
 
+	<context-param>
+		<param-name>dashboardUrl</param-name>
+		<param-value>http://www.cl.cam.ac.uk/research/dtg/berrycider/dashboard/api/dashboard</param-value>
+	</context-param>
+	
     <context-param>
         <param-name>jsFiles</param-name>
         <param-value>/js/vendor/jquery.form.min.js,/js/handins/main.js,/js/handins/l10n.js,/js/vendor/pdf.js,/js/handins/viewer.js,/js/handins/pdf-selector.js,/soy/js/1/handins.submission.js,/soy/js/1/handins.bin.js,/soy/js/1/handins.marking.js,/soy/js/1/shared.handins.js,/soy/js/1/shared.handins.generic.js,/soy/js/1/main.js</param-value>
