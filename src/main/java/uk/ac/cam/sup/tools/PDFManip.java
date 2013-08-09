@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -208,5 +209,38 @@ public class PDFManip {
         } catch (IOException e) {
             return 0;
         }
+    }
+
+    /*
+    Smart splitter / cropper!
+     */
+    public void takeBox(int pageIndex, float bottom, float top, String destinationPath) throws IOException, DocumentException {
+
+        PdfReader reader = new PdfReader(filePath);
+        Rectangle pageSize = reader.getPageSizeWithRotation(pageIndex);
+
+        Document document = new Document();
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(destinationPath));
+
+        writer.setBoxSize("crop", new Rectangle(0, bottom * pageSize.getHeight(), pageSize.getWidth(), top * pageSize.getHeight()));
+
+        document.open();
+
+        PdfContentByte content = writer.getDirectContent();
+        PdfImportedPage page = writer.getImportedPage(reader, pageIndex);
+
+        content.addTemplate(page, 0, 0);
+
+        document.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        PDFManip pdfManip = new PDFManip("2.pdf");
+
+        List <String> lista = new LinkedList<String>();
+        for (int i = 4; i >= 0; lista.add("e" + i + ".pdf"), i--)
+            pdfManip.takeBox(4, 0.2f * i, 0.2f * (i + 1), "e" + i + ".pdf");
+
+        FilesManip.mergePdf(lista, "eh.pdf");
     }
 }

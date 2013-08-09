@@ -219,8 +219,9 @@ moduleScripts['handins'] = {
         'index': [function () {
             $(".upload-marked-work-form form").ajaxForm(function(data) {
                 console.log(data);
+                var fragment = Backbone.history.fragment;
                 Backbone.history.fragment = null;
-                router.navigate(window.location.hash, {trigger: true});
+                router.navigate(fragment, {trigger: true});
             })
         }]
     },

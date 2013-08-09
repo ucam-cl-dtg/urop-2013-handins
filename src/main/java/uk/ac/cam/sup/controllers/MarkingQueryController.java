@@ -1,6 +1,8 @@
 package uk.ac.cam.sup.controllers;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
@@ -45,7 +47,12 @@ public class MarkingQueryController {
             return Response.status(404).build();
 
         // Get all answers from the bin
-        List<Answer> answers = new LinkedList<Answer>(bin.getAnswers());
+        @SuppressWarnings("unchecked")
+        List<Answer> answers = session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("bin", bin))
+                                      .addOrder(Order.asc("question.id"))
+                                      .addOrder(Order.asc("owner"))
+                                      .list();
 
         // Create the marking list for the file
         List<Marking> markingList = new LinkedList<Marking>();

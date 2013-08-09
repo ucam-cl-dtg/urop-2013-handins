@@ -364,12 +364,12 @@ public class MarkingController {
              */
             boolean available = false;
             boolean isMarked = true;
-            for (Answer answer : answers) {
-                if (answer.isLast() && bin.canSeeAnswer(user, answer))
+            for (Answer answer : answers)
+                if (answer.isLast() && bin.canSeeAnswer(user, answer)) {
                     available = true;
 
-                isMarked &= answer.isAnnotated();
-            }
+                    isMarked &= answer.isAnnotated();
+                }
 
             // If there is anything available then add it to the question list
             if (available)

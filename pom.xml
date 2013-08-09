@@ -158,7 +158,7 @@
                     <execution><goals><goal>java</goal></goals></execution>
                 </executions>
                 <configuration>
-                    <mainClass>uk.ac.cam.tools.PDFManip</mainClass>
+                    <mainClass>uk.ac.cam.sup.tools.PDFManip</mainClass>
                 </configuration>
             </plugin>
 			<plugin>

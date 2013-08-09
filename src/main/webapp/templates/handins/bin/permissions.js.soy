@@ -17,7 +17,7 @@
              </div>
         </div>
 
-        <form action="/bins/{$bin.id}/permissions" method="post">
+        <form action="/api/bins/{$bin.id}/permissions" method="post">
             <div class="row">
                 <div class="columns large-9">
                     <input type="text" class="token-user-input" name="users[]"/>
@@ -42,7 +42,7 @@
              </div>
         </div>
 
-        <form action="/bins/{$bin.id}/questions" method="post">
+        <form action="/api/bins/{$bin.id}/questions" method="post">
             <div class="row">
                 <div class="columns large-9">
                     <input type="text" name="questionName"/>

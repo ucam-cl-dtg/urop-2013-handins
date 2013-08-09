@@ -1,5 +1,6 @@
 package uk.ac.cam.sup.controllers;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -379,8 +380,10 @@ public class BinController {
     public Object splitSubmission (@PathParam("binId") long binId,
                                    @PathParam("submissionId") long submissionId,
                                    @FormParam("id[]") long[] questionId,
-                                   @FormParam("start[]") int[] startPage,
-                                   @FormParam("end[]") int[] endPage) {
+                                   @FormParam("startPage[]") int[] startPage,
+                                   @FormParam("endPage[]") int[] endPage,
+                                   @FormParam("startLoc[]") float[] startLoc,
+                                   @FormParam("endLoc[]") float[] endLoc) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -396,6 +399,7 @@ public class BinController {
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
 
+
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -409,14 +413,63 @@ public class BinController {
         } catch (Exception e) {
             return Response.status(404).build();
         }
+
+        // Create directory
+        String directory = "temp/" + user + "/submissions/temp/";
+        File fileDirectory = new File(directory);
+        //noinspection ResultOfMethodCallIgnored
+        fileDirectory.mkdirs();
+
+        // Split questions
+        List<Integer> startPageFinal = new LinkedList<Integer>();
+        List<Integer> endPageFinal = new LinkedList<Integer>();
+        List<String> pathList = new LinkedList<String>();
+
+        int actualPage = 0;
+        try {
+            for (int i = 0; i < questionId.length; pathList.add(directory + "file" + i + ".pdf"), i++)
+            {
+                if (startPage[i] == endPage[i]) {
+
+                    pdfManip.takeBox(startPage[i], endLoc[i], startLoc[i], directory + "file" + i + ".pdf");
+
+                    actualPage++;
+                    startPageFinal.add(actualPage);
+                    endPageFinal.add(actualPage);
+                }
+                else {
+                    pdfManip.takeBox(startPage[i], 0, startLoc[i], directory + "t1.pdf");
+                    if (startPage[i] + 1 != endPage[i])
+                        pdfManip.takePages(startPage[i] + 1, endPage[i] - 1, directory + "t2.pdf");
+                    pdfManip.takeBox(endPage[i], endLoc[i], 1f, directory + "t3.pdf");
+
+                    if (startPage[i] + 1 != endPage[i])
+                        FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t2.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
+                    else FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
+
+                    actualPage++;
+                    startPageFinal.add(actualPage);
+                    actualPage += (new PDFManip(directory + "file" + i + ".pdf")).getPageCount();
+                    endPageFinal.add(actualPage);
+                }
+            }
+
+            FilesManip.mergePdf(pathList, unmarkedSubmission.getFilePath());
+        }
+        catch (Exception e) {
+            return Response.status(401).build();
+        }
+
+        // Mark simply
         for (int i = 0; i < questionId.length; i++)
-            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPage[i], endPage[i]);
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPageFinal.get(i), endPageFinal.get(i));
 
         // Split the resulting pdf
         FilesManip.distributeSubmission(user, unmarkedSubmission);
 
         return Response.ok().build();
     }
+
     /*
     Done
 
