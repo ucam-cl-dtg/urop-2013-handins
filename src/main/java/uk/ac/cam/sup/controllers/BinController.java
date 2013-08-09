@@ -79,8 +79,11 @@ public class BinController {
 
         String user = UserHelper.getCurrentUser(request);
 
+        if (questionSet.trim().isEmpty())
+            return Response.status(401).build();
+
         // Create a new bin
-        Bin bin = new Bin(user, questionSet);
+        Bin bin = new Bin(user, questionSet.trim());
 
         // Save and return bin details
         session.save(bin);
@@ -283,9 +286,12 @@ public class BinController {
             usersWithPermission.add(perm.getUser());
 
         // Add the new users
-        for (String newUser : newUsers)
-            if (!usersWithPermission.contains(newUser))
+        for (String newUser : newUsers) {
+            newUser = newUser.trim();
+
+            if (!newUser.isEmpty() && !usersWithPermission.contains(newUser))
                 session.save(new BinPermission(bin, newUser));
+        }
 
         return Response.ok().build();
     }
@@ -525,12 +531,15 @@ public class BinController {
         if (!bin.isOwner(user))
             return Response.status(401).build();
 
+        if (questionName.trim().isEmpty())
+            return Response.status(401).build();
+
         // New ProposedQuestion to get Id
         ProposedQuestion question = new ProposedQuestion();
         session.save(question);
 
         // Add the question to the database
-        question.setName(questionName);
+        question.setName(questionName.trim());
         question.setBin(bin);
 
         session.update(question);
