@@ -18,7 +18,7 @@
     <div class="columns small-12 large-12">
         <div class="button-bar">
             <ul class="button-group">
-                <li><a href="/marking/bins/{$bin.id}/download" class="medium secondary button">Download all</a></li>
+                <li><a href="/api/marking/bins/{$bin.id}/download" class="medium secondary button">Download all</a></li>
                 <li><a class="medium secondary button upload-marked-work">Upload</a></li>
             </ul>
         </div>
@@ -29,8 +29,8 @@
 	<div class="columns large-8 small-12">
 		<div class="button-bar">
 			<ul class="button-group">
-				<li><a href="#marking/bins/{$bin.id}/students" class="medium secondary button">Student</a></li>
-				<li><a href="#marking/bins/{$bin.id}/questions" class="medium secondary button">Question</a></li>
+				<li><a href="/api/marking/bins/{$bin.id}/students" class="medium secondary button">Student</a></li>
+				<li><a href="/api/marking/bins/{$bin.id}/questions" class="medium secondary button">Question</a></li>
 			</ul>
 			<a class="medium secondary button upload-marked-work">Upload</a>
 		</div>
@@ -43,7 +43,7 @@
 
 <div class="row upload-marked-work-form">
 	<div class="columns large-12">
-		<form action="/marking/bins/{$bin.id}" method="post" enctype="multipart/form-data">
+		<form action="/api/marking/bins/{$bin.id}" method="post" enctype="multipart/form-data">
 			<fieldset>
 				<legend>Upload marked work</legend>
 				<input type="file" name="file"><input type="submit" name="submit" value="Upload">
@@ -60,7 +60,7 @@
                 <section>
             {/if}
                 <p class="title" data-section-title="">
-                    <a href="#marking/bins/{$bin.id}/students">Filter by user</a>
+                    <a href="/marking/bins/{$bin.id}/students" >Filter by user</a>
                 </p>
                 <div class="content" data-section-content="">
                     <div class="async-loader" data-path="marking/bins/{$bin.id}/students" template-function="markingStudents">
@@ -74,7 +74,7 @@
                 <section>
             {/if}
                 <p class="title" data-section-title="">
-                    <a href="#marking/bins/{$bin.id}/questions">Filter by question</a>
+                    <a href="/marking/bins/{$bin.id}/questions">Filter by question</a>
                 </p>
                 <div class="content" data-section-content="">
                     <div class="async-loader" data-path="marking/bins/{$bin.id}/questions" template-function="markingQuestions">
