@@ -402,7 +402,6 @@ public class BinController {
 
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
-        unmarkedSubmission.setFilePath("2.pdf");
 
         if (!unmarkedSubmission.getOwner().equals(user))
             return Response.status(401).build();
