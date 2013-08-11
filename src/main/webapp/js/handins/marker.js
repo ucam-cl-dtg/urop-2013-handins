@@ -4,18 +4,18 @@ bindThis = function(fn, me) {
     };
 };
 
-var Marker = (function MarkerClosure(){
+var Marker = Backbone.Model.extend({
 
-    function Marker(pdfViewer) {
-        this.pdfViewer = pdfViewer;
-        this.pdfContainer = pdfViewer.find('#viewerContainer');
+    initialize: function() {
+        this.pdfViewer = $('.pdf-viewer');
+        this.pdfContainer = this.pdfViewer.find('#viewerContainer');
         this.selecting = false;
 
         // Bind all events handlers to the marker
         this.setupBindings();
-    }
+    },
 
-    Marker.prototype.setupBindings = function () {
+    setupBindings: function () {
         this.startSelecting = bindThis(this.startSelecting, this);
         this.stopSelecting = bindThis(this.stopSelecting, this);
 
@@ -25,13 +25,13 @@ var Marker = (function MarkerClosure(){
 
         this.handlePositionTopClick = bindThis(this.handlePositionTopClick, this);
         this.handlePositionBottomClick = bindThis(this.handlePositionBottomClick, this);
-    }
+    },
 
-    Marker.prototype.enableMarking =  function () {
+    enableMarking: function () {
         $('.pdf-viewer .page').click(this.startSelecting);
-    }
+    },
 
-    Marker.prototype.calculateDistance = function (elem, evt, scrollParent) {
+    calculateDistance: function (elem, evt, scrollParent) {
         // distance from the top of the page
         var dist = evt.pageY - elem.offset().top;
 
@@ -45,26 +45,27 @@ var Marker = (function MarkerClosure(){
             top = dist + scrollParent.scrollTop();
 
         return top;
-    }
+    },
 
-    Marker.prototype.handleRescale = function(evt) {
+    handleRescale: function(evt) {
         this.updateSize();
         this.updatePosition();
-    }
+    },
 
-    Marker.prototype.parse = function (value) {
+    parse: function (value) {
         return parseFloat(value.replace('px', ''));
-    }
+    },
 
-    Marker.prototype.updatePosition = function() {
+    updatePosition: function() {
         var currentWidth = this.parse(this.page.css("width")),
             prevWidth = this.pageWidth,
             scaleFactor = currentWidth / prevWidth;
         this.top *= scaleFactor;
         this.marker.css("top", this.top + "px");
         this.savePageWidth();
-    }
-    Marker.prototype.updateSize = function () {
+    },
+
+    updateSize: function () {
         var pageMargin = this.parse(this.page.css("margin-left"));
         var pageBorder = this.parse(this.page.css("border-left-width"));
 
@@ -73,13 +74,13 @@ var Marker = (function MarkerClosure(){
         // Now lets fix the width
 
         this.marker.css("width", this.page.css("width"))
-    }
+    },
 
-    Marker.prototype.savePageWidth = function () {
+    savePageWidth: function () {
         this.pageWidth = this.parse(this.page.css("width"));
-    }
+    },
 
-    Marker.prototype.startSelecting =  function(evt) {
+    startSelecting: function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
         this.selecting = true;
@@ -121,20 +122,29 @@ var Marker = (function MarkerClosure(){
         $(window).on("scalechange", this.handleRescale);
 
         this.pdfContainer.click(this.stopSelecting);
-    }
+    },
 
-    Marker.prototype.stopSelecting = function(evt) {
+    stopSelecting: function(evt) {
         this.pdfContainer.unbind('click', this.stopSelecting);
         this.pdfContainer.unbind('mousemove', this.handleMouseMove);
 
         this.selecting = false;
-    }
+        this.set('hidden', false);
+    },
 
-    Marker.prototype.handleResizableResize =  function (evt, ui) {
+    remove: function() {
+        this.marker.remove();
+    },
+
+    scrollTo: function() {
+        this.pdfContainer.scrollTop(this.top - 150);
+    },
+
+    handleResizableResize:  function (evt, ui) {
         this.top = ui.position.top;
-    }
+    },
 
-    Marker.prototype.handleMouseMove = function(evt) {
+    handleMouseMove: function(evt) {
         var elem = $(evt.currentTarget);
 
         bottom = this.calculateDistance(elem, evt, elem);
@@ -143,23 +153,23 @@ var Marker = (function MarkerClosure(){
             this.marker.css("height", (bottom - this.top) + "px");
 
         console.log(bottom - this.top);
-    }
+    },
 
-    Marker.prototype.handlePositionTopClick = function (evt) {
+    handlePositionTopClick: function (evt) {
         this.pdfContainer.find('.page').unbind('click', this.handlePositionTopClick);
 
         console.log("Hello")
 
-    }
+    },
 
-    Marker.prototype.handlePositionBottomClick = function (evt) {
+    handlePositionBottomClick: function (evt) {
         this.pdfContainer.find('.page').unbind('click', this.handlePositionBottomClick);
 
         console.log("World");
 
-    }
+    },
 
-    Marker.prototype.calculateAbsolutePosition = function (page, dist) {
+    calculateAbsolutePosition: function (page, dist) {
         var height = $('#pageContainer' + page).height();
 
         PDFView.getPage(page).then( function (page) {
@@ -167,9 +177,9 @@ var Marker = (function MarkerClosure(){
 
             console.log(trueHeight * dist / height);
         })
-    }
+    },
 
-    Marker.prototype.hitTest = function (dist) {
+    hitTest: function (dist) {
         var borderSize = this.parse(this.page.css('border-top-width'));
 
         var resultElem, resultDist;
@@ -195,9 +205,9 @@ var Marker = (function MarkerClosure(){
             absolutePosition: this.calculateAbsolutePosition(page, resultDist)
         }
 
-    }
+    },
 
-    Marker.prototype.getPosition =  function () {
+    getPosition:  function () {
         var height = this.parse(this.marker.css('height'));
 
         return {
@@ -206,24 +216,10 @@ var Marker = (function MarkerClosure(){
         }
     }
 
+})
 
-    return Marker;
-})();
-
-var MarkerModel = Backbone.Model.extend({
-    questions: [
-        "Ana",
-        "are",
-        "mere"
-    ],
-
-    initialize: function() {
-        this.marker = new Marker($('.pdf-viewer'));
-    }
-
-});
 
 var MarkerCollection = Backbone.Collection.extend({
-    model: MarkerModel,
+    model: Marker,
 
 });

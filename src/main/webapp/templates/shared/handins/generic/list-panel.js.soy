@@ -13,6 +13,7 @@
 * @param isMarked - boolean
 * @param linkTo
 * @param dropdown - list
+* @param show - boolean
 */
 {template .elementContents}
     <div class="columns large-7 small-7">
@@ -45,14 +46,17 @@
                 >p</a>
 
             {/if}
+            {if $show }
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array show-element">X</a>
+            {/if}
             {if $download }
                 <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$download}" data-bypass>X</a>
             {/if}
             {if $uploadTo}
                 <a class="icon-button panel-icon-button websymbols-icon icon-button-array upload-work-for-bin" bin="{$uploadTo}">J</a>
             {/if}
-            {if $delete}
-                <a class="icon-button panel-icon-button websymbols-icon delete-submission" delete-link="{$delete}">'</a>
+            {if isNonnull($delete) }
+                <a class="icon-button panel-icon-button websymbols-icon delete-element" delete-link="{$delete}">'</a>
             {/if}
             {if $marking}
                 <a class="icon-button panel-icon-button websymbols-icon toggle-mark" marking-link="{$marking}">
@@ -120,9 +124,11 @@
     {if $subPanel}
         <ul class="sub-panel force-display">
         {foreach $elem in $elems}
-            {call .listElementSubPanel}
-                {param elem: $elem /}
-            {/call}
+            {if not $elem.hidden}
+                {call .listElementSubPanel}
+                    {param elem: $elem /}
+                {/call}
+            {/if}
             {ifempty}
                 <li class="list-sub-panel delete-me">
                     Nothing found.
@@ -133,9 +139,11 @@
         <div class="row">
             <ul class="panels">
                 {foreach $elem in $elems}
-                    {call .listElement data="$elem"}
-                        {param elem: $elem /}
-                    {/call}
+                    {if not $elem.hidden}
+                        {call .listElement data="$elem"}
+                            {param elem: $elem /}
+                        {/call}
+                    {/if}
                 {/foreach}
             </ul>
         </div>
