@@ -13,6 +13,11 @@ var Marker = Backbone.Model.extend({
 
         // Bind all events handlers to the marker
         this.setupBindings();
+        this.on("change:question", function(evt) {
+            this.set("hidden", false);
+            this.set("name", this.get("question").get("name"))
+        })
+
     },
 
     setupBindings: function () {
@@ -129,7 +134,7 @@ var Marker = Backbone.Model.extend({
         this.pdfContainer.unbind('mousemove', this.handleMouseMove);
 
         this.selecting = false;
-        this.set('hidden', false);
+        this.trigger("stopSelecting", this);
     },
 
     remove: function() {
@@ -169,17 +174,19 @@ var Marker = Backbone.Model.extend({
 
     },
 
-    calculateAbsolutePosition: function (page, dist) {
+    calculateAbsolutePosition: function (page, dist, callback) {
         var height = $('#pageContainer' + page).height();
 
         PDFView.getPage(page).then( function (page) {
             var trueHeight = page.getViewport(1).height;
 
-            console.log(trueHeight * dist / height);
+            var result = 1 - (dist / height);
+            console.log(result);
+            callback(result);
         })
     },
 
-    hitTest: function (dist) {
+    hitTest: function (dist, callback) {
         var borderSize = this.parse(this.page.css('border-top-width'));
 
         var resultElem, resultDist;
@@ -199,21 +206,27 @@ var Marker = Backbone.Model.extend({
 
         var page = parseInt(resultElem.attr('id').replace('pageContainer', ''))
 
-        return {
-            page: page,
-            dist: resultDist,
-            absolutePosition: this.calculateAbsolutePosition(page, resultDist)
-        }
+        this.calculateAbsolutePosition(page, resultDist, function(absolutePosition) {
+            callback({
+                page: page,
+                absolutePosition: absolutePosition,
+            })
+        })
 
     },
 
-    getPosition:  function () {
+    getPosition:  function (callback) {
         var height = this.parse(this.marker.css('height'));
+        var _this = this;
 
-        return {
-            'start': this.hitTest(this.top),
-            'end': this.hitTest(this.top + height)
-        }
+        this.hitTest(this.top, function(start) {
+            _this.hitTest(_this.top + height, function(end) {
+                callback({
+                    start: start,
+                    end: end,
+                })
+            })
+        })
     }
 
 })

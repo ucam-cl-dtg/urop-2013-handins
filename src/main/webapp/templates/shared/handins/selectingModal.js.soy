@@ -269,9 +269,18 @@
 * @param questions
 */
 {template .questionSelect}
-<div id="selecting-modal" class="reveal-modal">
-    NANANANANANANA Batman !
+<div class="test-me">
+    <div class="row">
+        <div class="columns large-8">
+            <input type="text" class="question-input" />
+        </div>
+        <div class="columns large-4 button small save-question-selection">
+            Save
+        </div>
+    </div>
+    <div style="display:none;">
     {$questions}
+    </div>
 </div>
 {/template}
 /**

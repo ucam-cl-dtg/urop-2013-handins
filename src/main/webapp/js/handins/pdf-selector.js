@@ -95,13 +95,13 @@ var SelectingView = Backbone.View.extend({
         this.questions = new QuestionCollection([], {
             url: prepareURL('bins/'+ this.options.bin + '/questions')
         })
-        this.questionsSelectinbView = new QuestionSelectorView({
-            collection: this.markers
+        this.questionsSelectingView = new QuestionSelectorView({
+            collection: this.questions
         })
 
         this.questions.fetch();
 
-        _.bindAll(this, 'newQuestion', 'deleteQuestion');
+        _.bindAll(this, 'newQuestion', 'deleteQuestion', 'selectQuestion', 'saveSelection');
 
         showPdf(this.options.submission)
     },
@@ -109,7 +109,57 @@ var SelectingView = Backbone.View.extend({
     events: {
         'click .select-question': 'newQuestion',
         'click .delete-element': 'deleteQuestion',
-        'click .show-element': 'showQuestion'
+        'click .show-element': 'showQuestion',
+        'click .save-selection': 'saveSelection'
+    },
+
+    selectQuestion: function(evt) {
+        this.questionsSelectingView.marker = evt;
+        this.questionsSelectingView.show();
+    },
+
+
+    // For acr31: Tick 8 * // Voodoo magic
+    extractPositions: function(callback) {
+        this.markers.foldl(function(stack, val) {
+           return function (objs) {
+                val.getPosition(function(obj) {
+                    obj.id = val.get("question").get("id");
+                    objs.push(obj);
+                    stack(objs);
+                })
+           };
+        }, callback) ( [] );
+
+    },
+
+    saveSelection: function(evt) {
+        this.extractPositions(function(positions) {
+            var id = [],
+                startPage = [],
+                endPage = [],
+                startLoc = [],
+                endLoc = [];
+            positions = _.each(positions, function (elem) {
+                id.push(elem.id);
+                startPage.push(elem.start.page);
+                endPage.push(elem.end.page);
+                startLoc.push(elem.start.absolutePosition);
+                endLoc.push(elem.end.absolutePosition);
+
+            })
+
+            var data = {
+                id: id,
+                startPage: startPage,
+                endPage: endPage,
+                startLoc: startLoc,
+                endLoc: endLoc,
+            }
+            console.log(data);
+            //$.post(prepareURL("bins/" + this.options.bin + "/submissions/" + this.options.submission), data);
+
+        })
     },
 
     showQuestion: function(evt) {
@@ -171,6 +221,7 @@ var SelectingView = Backbone.View.extend({
             hidden: true,
             show: true
         });
+        marker.on("stopSelecting", this.selectQuestion)
         marker.enableMarking();
         this.markers.add(marker);
         this.counter ++;
@@ -180,24 +231,63 @@ var SelectingView = Backbone.View.extend({
 })
 
 
+
 var QuestionSelectorView = Backbone.View.extend({
     initialize: function() {
-        _.bindAll(this, "render");
+        _.bindAll(this, "render", "selectQuestion", "close");
         this.collection.on('all', this.render);
     },
 
     show: function() {
+        this.selectedQuestionCID = null;
+
         this.$el.appendTo($('body'));
-        this.$el.show();
+
+        this.$el.dialog({
+            modal: true,
+            title: 'Please select the question',
+            minWidth: 400,
+            resizable: false,
+            draggable: false
+        })
     },
 
-    hide: function() {
-        this.$el.remove();
+    close: function() {
+        this.remove();
+        if (this.selectedQuestionCID)  {
+            this.marker.set("question", this.collection.get(this.selectedQuestionCID));
+        }
     },
 
+    events: {
+        'click .save-question-selection': 'close'
+    },
+
+    selectQuestion: function(evt, ui) {
+        this.selectedQuestionCID = ui.item.cid;
+    },
 
     render: function() {
-        this.$el.html(shared.handins.questionSelect(this.collection))
+        this.$el.html(shared.handins.questionSelect({
+            questions: this.collection.toJSON()
+        }))
+
+        var autocompleteSrc = this.collection.map(function(elem) {
+            return {
+                label: elem.get('name'),
+                value: elem.get('name'),
+                cid: elem.cid
+            }
+        })
+
+        this.$el.find('.question-input').autocomplete({
+            source: autocompleteSrc,
+            minLength: 0,
+            delay: 0,
+            select: this.selectQuestion,
+        })
+
+        $('.ui-autocomplete').zIndex(200);
         return this;
     }
 });

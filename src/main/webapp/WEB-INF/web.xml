@@ -38,8 +38,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
                      /soy/js/1/handins.bin.js,
                      /soy/js/1/handins.marking.js,
                      /soy/js/1/shared.handins.js,
-                     /soy/js/1/shared.handins.generic.js,
-                     /soy/js/1/main.js
+                     /soy/js/1/shared.handins.generic.js
         </param-value>
     </context-param>
 
