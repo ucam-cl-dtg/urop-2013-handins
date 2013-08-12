@@ -95,9 +95,6 @@ var SelectingView = Backbone.View.extend({
         this.questions = new QuestionCollection([], {
             url: prepareURL('bins/'+ this.options.bin + '/questions')
         })
-        this.questionsSelectingView = new QuestionSelectorView({
-            collection: this.questions
-        })
 
         this.questions.fetch();
 
@@ -114,6 +111,10 @@ var SelectingView = Backbone.View.extend({
     },
 
     selectQuestion: function(evt) {
+        this.questionsSelectingView = new QuestionSelectorView({
+            collection: this.questions
+        })
+
         this.questionsSelectingView.marker = evt;
         this.questionsSelectingView.show();
     },
@@ -239,8 +240,7 @@ var QuestionSelectorView = Backbone.View.extend({
     },
 
     show: function() {
-        this.selectedQuestionCID = null;
-
+        this.render();
         this.$el.appendTo($('body'));
 
         this.$el.dialog({
