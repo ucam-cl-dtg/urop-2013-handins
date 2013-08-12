@@ -80,7 +80,7 @@ public class BinController {
         String user = UserHelper.getCurrentUser(request);
 
         if (questionSet.trim().isEmpty())
-            return Response.status(401).build();
+            return Response.status(418).build();
 
         // Create a new bin
         Bin bin = new Bin(user, questionSet.trim());
@@ -399,8 +399,9 @@ public class BinController {
         Bin bin = (Bin) session.get(Bin.class, binId);
 
         // Check the existence of the bin
-        if (bin == null)
-            return Response.status(404).build();
+        if (bin != null)
+            return Response.status(402).build();
+        //    return Response.status(404).build();
 
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
@@ -532,7 +533,7 @@ public class BinController {
             return Response.status(401).build();
 
         if (questionName.trim().isEmpty())
-            return Response.status(401).build();
+            return Response.status(418).build();
 
         // New ProposedQuestion to get Id
         ProposedQuestion question = new ProposedQuestion();
