@@ -176,6 +176,51 @@
         </configuration>
       </plugin>
 
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>sass-maven-plugin</artifactId>
+                <version>1.1.0</version>
+
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>update-stylesheets</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <resources>
+                        <resource>
+                            <source>
+                                <directory>${project.basedir}/src/main/scss/</directory>
+                                <includes>
+                                    <include>**</include>
+                                </includes>
+                            </source>
+                            <destination>${project.build.directory}/generated-css/css</destination>
+                        </resource>
+                    </resources>
+                    <sassOptions>
+                        <style>:compressed</style>
+                        <syntax>:scss</syntax>
+                    </sassOptions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.build.directory}/generated-css</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

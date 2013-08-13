@@ -13,7 +13,7 @@
 
     <context-param>
         <param-name>cssFiles</param-name>
-        <param-value></param-value>
+        <param-value>/css/pdf-selector.css</param-value>
     </context-param>
 
 	<context-param>
