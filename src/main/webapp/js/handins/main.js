@@ -31,7 +31,7 @@ function uploadedSubmission(data) {
     var fragment = Backbone.history.fragment;
     Backbone.history.fragment = null;
     router.navigate(fragment, {trigger: true});
-    showSelectingModal(data.bin, data.unmarkedSubmission.id);
+    showSelectingModal3(data.bin, data.unmarkedSubmission.id);
 }
 
 
