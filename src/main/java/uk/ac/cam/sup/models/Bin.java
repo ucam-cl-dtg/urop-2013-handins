@@ -252,7 +252,7 @@ public class Bin {
                                   .add(Restrictions.eq("bin", this))
                                   .list();
 
-        return (!permissions.isEmpty());
+        return this.isOwner(user) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
@@ -266,7 +266,7 @@ public class Bin {
                                                         .add(Restrictions.eq("questionOwner", answer.getOwner()))
                                                         .list();
 
-        return (!permissions.isEmpty());
+        return user.equals(answer.getOwner()) || this.isOwner(user) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {

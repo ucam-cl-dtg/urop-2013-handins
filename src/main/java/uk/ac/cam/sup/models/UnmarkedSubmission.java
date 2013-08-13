@@ -49,6 +49,6 @@ public class UnmarkedSubmission extends Submission<Answer> {
     }
 
     public String getOriginalFilePath() {
-        return this.getFilePath();
+        return super.getFilePath();
     }
 }

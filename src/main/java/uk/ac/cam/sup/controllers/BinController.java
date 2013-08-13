@@ -434,7 +434,7 @@ public class BinController {
 
         // Adding the new File
         String splitName = unmarkedSubmission.getFilePath();
-        FilenameUtils.removeExtension(splitName);
+        splitName = FilenameUtils.removeExtension(splitName);
         unmarkedSubmission.setSplitFilePath(splitName + "a.pdf");
 
         int actualPage = 0;
@@ -467,6 +467,7 @@ public class BinController {
             }
 
             FilesManip.mergePdf(pathList, unmarkedSubmission.getFilePath());
+            pdfManip.setFilePath(unmarkedSubmission.getFilePath());
         }
         catch (Exception e) {
             return Response.status(401).build();
