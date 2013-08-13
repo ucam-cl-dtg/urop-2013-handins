@@ -1,8 +1,8 @@
-$(document).on("click", ".delete-submission", function() {
+$(document).on("click", ".delete-element", function() {
     var elem = $(this),
         deleteLink = elem.attr("delete-link");
 
-    if (confirm("Are you sure you want to delete the submission?")) {
+    if (confirm("Are you sure you want to delete?")) {
         $.ajax({
             url: prepareURL(deleteLink),
             type: 'DELETE',
