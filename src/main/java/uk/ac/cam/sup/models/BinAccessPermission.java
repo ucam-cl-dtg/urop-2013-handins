@@ -16,8 +16,7 @@ public class BinAccessPermission {
 
     private Date dateCreated;
 
-    @Column(name="`user`")
-    private String user;
+    private String userCrsId;
 
     @ManyToOne
     private Bin bin;
@@ -27,11 +26,11 @@ public class BinAccessPermission {
         dateCreated = new Date();
     }
 
-    public BinAccessPermission(Bin bin, String user) {
+    public BinAccessPermission(Bin bin, String userCrsId) {
         dateCreated = new Date();
 
         setBin(bin);
-        setUser(user);
+        setUserCrsId(userCrsId);
     }
 
     // Id
@@ -48,13 +47,13 @@ public class BinAccessPermission {
         this.bin = bin;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // UserCrsId
+    public String getUserCrsId() {
+        return userCrsId;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUserCrsId(String userCrsId) {
+        this.userCrsId = userCrsId;
     }
 
     // DateCreated
