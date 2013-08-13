@@ -135,6 +135,7 @@ var SelectingView = Backbone.View.extend({
     },
 
     saveSelection: function(evt) {
+        var _this = this;
         this.extractPositions(function(positions) {
             var id = [],
                 startPage = [],
@@ -158,7 +159,7 @@ var SelectingView = Backbone.View.extend({
                 endLoc: endLoc,
             }
             console.log(data);
-            $.post(prepareURL("bins/" + this.options.bin + "/submissions/" + this.options.submission), data);
+            $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data);
 
         })
     },
