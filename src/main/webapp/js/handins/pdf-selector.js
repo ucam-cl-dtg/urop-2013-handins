@@ -158,7 +158,7 @@ var SelectingView = Backbone.View.extend({
                 endLoc: endLoc,
             }
             console.log(data);
-            //$.post(prepareURL("bins/" + this.options.bin + "/submissions/" + this.options.submission), data);
+            $.post(prepareURL("bins/" + this.options.bin + "/submissions/" + this.options.submission), data);
 
         })
     },
