@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.Bin;
-import uk.ac.cam.sup.models.BinPermission;
+import uk.ac.cam.sup.models.BinAccessPermission;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class BinControllerTest {
     Session session;
 
     Bin testBin;
-    BinPermission perm1, perm2;
+    BinAccessPermission perm1, perm2;
 
     MockHttpRequest request;
     MockHttpResponse response;
@@ -48,8 +48,8 @@ public class BinControllerTest {
         session = HibernateUtil.getTransaction();
         session.save(testBin);
 
-        session.save(perm1 = new BinPermission(testBin, perm1u));
-        session.save(perm2 = new BinPermission(testBin, perm2u));
+        session.save(perm1 = new BinAccessPermission(testBin, perm1u));
+        session.save(perm2 = new BinAccessPermission(testBin, perm2u));
         session.getTransaction().commit();
 
         session = HibernateUtil.getTransaction();
@@ -64,7 +64,7 @@ public class BinControllerTest {
             session.getTransaction().commit();
 
         session = HibernateUtil.getTransaction();
-        session.createQuery("delete from BinPermission").executeUpdate();
+        session.createQuery("delete from BinAccessPermission").executeUpdate();
         session.createQuery("delete from Bin").executeUpdate();
         session.getTransaction().commit();
     }

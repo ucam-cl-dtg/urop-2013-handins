@@ -152,12 +152,12 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get the list of all students in the bin
-        List<BinPermission> allAccess = new LinkedList<BinPermission>(bin.getPermissions());
+        List<BinAccessPermission> allAccess = new LinkedList<BinAccessPermission>(bin.getAccessPermissions());
 
         // Filter all students
         List<ImmutableMap<String, ?>> studentSubmissions = new LinkedList<ImmutableMap<String, ?>>();
-        for (BinPermission permission : allAccess) {
-            String student = permission.getUser();
+        for (BinAccessPermission permission : allAccess) {
+            String student = permission.getUserCrsId();
 
             // Get all the Answers from the student
             @SuppressWarnings("unchecked")

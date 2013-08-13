@@ -10,6 +10,8 @@ public class UnmarkedSubmission extends Submission<Answer> {
     @OneToMany(mappedBy="unmarkedSubmission")
     private Set<Answer> answers;
 
+    private String splitFilePath;
+
     // Constructors
     public UnmarkedSubmission() {
         super();
@@ -28,9 +30,25 @@ public class UnmarkedSubmission extends Submission<Answer> {
         this.answers = answers;
     }
 
+    // SplitFilePath
+    @Override
+    public String getFilePath() {
+        if (splitFilePath == null)
+            return super.getFilePath();
+        return this.splitFilePath;
+    }
+
+    public void setSplitFilePath(String splitFilePath) {
+        this.splitFilePath = splitFilePath;
+    }
+
     // Actual useful functions
 
     public String getFolder() {
         return "answer";
+    }
+
+    public String getOriginalFilePath() {
+        return this.getFilePath();
     }
 }

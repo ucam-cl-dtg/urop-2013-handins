@@ -96,6 +96,9 @@ public abstract class Submission<T> {
     @Transient
     public abstract String getFolder();
 
+    @Transient
+    public abstract String getOriginalFilePath();
+
     /*
 
      */

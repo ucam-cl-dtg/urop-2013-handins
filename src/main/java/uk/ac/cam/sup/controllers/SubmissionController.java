@@ -118,6 +118,7 @@ public class SubmissionController {
 
         // Delete the actual submission
         FilesManip.fileDelete(unmarkedSubmission.getFilePath());
+        FilesManip.fileDelete(unmarkedSubmission.getOriginalFilePath());
         session.delete(unmarkedSubmission);
 
         return Response.ok().build();
@@ -150,7 +151,7 @@ public class SubmissionController {
             return Response.status(401).build();
 
         // returning the queried file
-        return Response.ok(new File(unmarkedSubmission.getFilePath())).build();
+        return Response.ok(new File(unmarkedSubmission.getOriginalFilePath())).build();
     }
 
     /*

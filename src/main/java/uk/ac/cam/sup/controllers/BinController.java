@@ -2,6 +2,7 @@ package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FilenameUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -45,17 +46,18 @@ public class BinController {
         // Get list of bins
         @SuppressWarnings("unchecked")
         List<Bin> binList = session.createCriteria(Bin.class)
+                                   .createAlias("accessPermissions", "perm")
+                                   .add(Restrictions.eq("perm.userCrsId", user))
                                    .addOrder(Order.desc("id"))
                                    .list();
 
         // Filter all visible bins and return them
         List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
         for (Bin bin : binList)
-            if (bin.canSeeBin(user))
-                finalBinList.add(ImmutableMap.of("id", bin.getId(),
-                                                 "name", bin.getName(),
-                                                 "isArchived", bin.isArchived(),
-                                                 "questions", bin.getQuestionCount()));
+            finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                                             "name", bin.getName(),
+                                             "isArchived", bin.isArchived(),
+                                             "questions", bin.getQuestionCount()));
 
         return ImmutableMap.of("bins", finalBinList);
     }
@@ -121,7 +123,7 @@ public class BinController {
             session.delete(proposedQuestion);
 
         // Delete the permissions of the bin
-        for (BinPermission binPermission : bin.getPermissions())
+        for (BinAccessPermission binPermission : bin.getAccessPermissions())
             session.delete(binPermission);
 
         // Delete the bin
@@ -242,15 +244,15 @@ public class BinController {
 
         // Get the list of people who can access the bin
         @SuppressWarnings("unchecked")
-        List<BinPermission> permissions = session.createCriteria(BinPermission.class)
+        List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
                                                  .add(Restrictions.eq("bin", bin))
-                                                 .addOrder(Order.asc("user"))
+                                                 .addOrder(Order.asc("userCrsId"))
                                                  .list();
 
         // Create list of people who have access to the bin
         List<String> res = new LinkedList<String>();
-        for (BinPermission binPermission : permissions)
-            res.add(binPermission.getUser());
+        for (BinAccessPermission binPermission : permissions)
+            res.add(binPermission.getUserCrsId());
 
         return ImmutableMap.of("users", res);
     }
@@ -262,9 +264,9 @@ public class BinController {
      */
     @POST
     @Path("/{binId}/permissions/")
-    public Response addPermissions(@PathParam("binId") long binId,
-                                   @FormParam("users[]") String[] newUsers,
-                                   @QueryParam("token") String token) {
+    public Response addAccessPermissions(@PathParam("binId") long binId,
+                                         @FormParam("users[]") String[] newUsers,
+                                         @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -282,15 +284,15 @@ public class BinController {
 
         // Get all existing users
         Set<String> usersWithPermission = new TreeSet<String>();
-        for (BinPermission perm: bin.getPermissions())
-            usersWithPermission.add(perm.getUser());
+        for (BinAccessPermission perm: bin.getAccessPermissions())
+            usersWithPermission.add(perm.getUserCrsId());
 
         // Add the new users
         for (String newUser : newUsers) {
             newUser = newUser.trim();
 
             if (!newUser.isEmpty() && !usersWithPermission.contains(newUser))
-                session.save(new BinPermission(bin, newUser));
+                session.save(new BinAccessPermission(bin, newUser));
         }
 
         return Response.ok().build();
@@ -303,9 +305,9 @@ public class BinController {
      */
     @DELETE
     @Path("/{binId}/permissions")
-    public Response deletePermissions(@PathParam("binId") long binId,
-                                      @QueryParam("users[]") String[] users,
-                                      @QueryParam("token") String token) {
+    public Response deleteAccessPermissions(@PathParam("binId") long binId,
+                                            @QueryParam("users[]") String[] users,
+                                            @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -323,13 +325,13 @@ public class BinController {
 
         // Get all BinPermissions
         @SuppressWarnings("unchecked")
-        List<BinPermission> permissions = session.createCriteria(BinPermission.class)
-                                                 .add(Restrictions.in("user", users))
+        List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
+                                                 .add(Restrictions.in("userCrsId", users))
                                                  .add(Restrictions.eq("bin", bin))
                                                  .list();
 
         // Delete all BinPermissions
-        for (BinPermission perm: permissions)
+        for (BinAccessPermission perm: permissions)
             session.delete(perm);
 
         return Response.ok().build();
@@ -399,13 +401,11 @@ public class BinController {
         Bin bin = (Bin) session.get(Bin.class, binId);
 
         // Check the existence of the bin
-        if (bin != null)
-            return Response.status(402).build();
-        //    return Response.status(404).build();
+        if (bin == null)
+            return Response.status(404).build();
 
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
-
 
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
@@ -416,7 +416,7 @@ public class BinController {
         // Inject the pdf with the metadata needed to split it
         PDFManip pdfManip;
         try {
-            pdfManip = new PDFManip(unmarkedSubmission.getFilePath());
+            pdfManip = new PDFManip(unmarkedSubmission.getOriginalFilePath());
         } catch (Exception e) {
             return Response.status(404).build();
         }
@@ -431,6 +431,11 @@ public class BinController {
         List<Integer> startPageFinal = new LinkedList<Integer>();
         List<Integer> endPageFinal = new LinkedList<Integer>();
         List<String> pathList = new LinkedList<String>();
+
+        // Adding the new File
+        String splitName = unmarkedSubmission.getFilePath();
+        FilenameUtils.removeExtension(splitName);
+        unmarkedSubmission.setSplitFilePath(splitName + "a.pdf");
 
         int actualPage = 0;
         try {

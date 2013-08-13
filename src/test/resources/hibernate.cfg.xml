@@ -55,7 +55,7 @@
         <mapping class="uk.ac.cam.sup.models.Answer" />
         <mapping class="uk.ac.cam.sup.models.MarkedAnswer" />
         <mapping class="uk.ac.cam.sup.models.Bin" />
-        <mapping class="uk.ac.cam.sup.models.BinPermission" />
+        <mapping class="uk.ac.cam.sup.models.BinAccessPermission" />
         <mapping class="uk.ac.cam.sup.models.UnmarkedSubmission" />
         <mapping class="uk.ac.cam.sup.models.MarkedSubmission" />
 

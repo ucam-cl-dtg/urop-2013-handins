@@ -33,4 +33,9 @@ public class MarkedSubmission extends Submission<MarkedAnswer> {
     public String getFolder() {
         return "annotated";
     }
+
+    public String getOriginalFilePath() {
+        return getFilePath();
+    }
+
 }

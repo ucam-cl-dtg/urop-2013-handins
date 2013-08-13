@@ -17,7 +17,7 @@ public class BinTest {
     final String perm2u = "sg235";
 
     Bin testBin;
-    BinPermission perm1, perm2;
+    BinAccessPermission perm1, perm2;
     Session session;
     UnmarkedSubmission unmarkedSubmission;
 
@@ -30,8 +30,8 @@ public class BinTest {
         session = HibernateUtil.getTransaction();
         session.save(testBin);
 
-        session.save(perm1 = new BinPermission(testBin, perm1u));
-        session.save(perm2 = new BinPermission(testBin, perm2u));
+        session.save(perm1 = new BinAccessPermission(testBin, perm1u));
+        session.save(perm2 = new BinAccessPermission(testBin, perm2u));
         session.getTransaction().commit();
 
         session = HibernateUtil.getSession();
@@ -46,7 +46,7 @@ public class BinTest {
         session = HibernateUtil.getSession();
 
         session.beginTransaction();
-        session.createQuery("delete from BinPermission").executeUpdate();
+        session.createQuery("delete from BinAccessPermission").executeUpdate();
         session.createQuery("delete from Bin").executeUpdate();
         session.getTransaction().commit();
     }

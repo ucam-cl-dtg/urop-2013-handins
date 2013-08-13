@@ -6,8 +6,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "BinPermission")
-public class BinPermission {
+@Table(name = "BinMarkingPermission")
+public class BinMarkingPermission {
     // Fields
     @Id
     @GeneratedValue(generator="increment")
@@ -16,22 +16,16 @@ public class BinPermission {
 
     private Date dateCreated;
 
-    @Column(name="`user`")
-    private String user;
+    private String userCrsId;
+    private long questionId;
+    private String questionOwner;
 
     @ManyToOne
     private Bin bin;
 
     // Constructors
-    public BinPermission() {
+    public BinMarkingPermission() {
         dateCreated = new Date();
-    }
-
-    public BinPermission(Bin bin, String user) {
-        dateCreated = new Date();
-
-        setBin(bin);
-        setUser(user);
     }
 
     // Id
@@ -48,13 +42,13 @@ public class BinPermission {
         this.bin = bin;
     }
 
-    // User
-    public String getUser() {
-        return user;
+    // UserCrsId
+    public String getUserCrsId() {
+        return userCrsId;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUserCrsId(String userCrsId) {
+        this.userCrsId = userCrsId;
     }
 
     // DateCreated
@@ -64,5 +58,23 @@ public class BinPermission {
 
     public Date getDateCreated() {
         return dateCreated;
+    }
+
+    // QuestionOwner
+    public String getQuestionOwner() {
+        return questionOwner;
+    }
+
+    public void setQuestionOwner(String questionOwner) {
+        this.questionOwner = questionOwner;
+    }
+
+    // Question
+    public long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(long questionId) {
+        this.questionId = questionId;
     }
 }
