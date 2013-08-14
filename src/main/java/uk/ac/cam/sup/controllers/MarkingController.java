@@ -160,7 +160,7 @@ public class MarkingController {
             String student = permission.getUserCrsId();
 
             // Get all the Answers from the student
-            @SuppressWarnings("unchecked")
+                @SuppressWarnings("unchecked")
             List<Answer> answers = session.createCriteria(Answer.class)
                                           .add(Restrictions.eq("bin", bin))
                                           .add(Restrictions.eq("owner", student))
@@ -173,12 +173,12 @@ public class MarkingController {
              */
             boolean available = false;
             boolean isMarked = true;
-            for (Answer answer : answers) {
-                if (bin.canSeeAnswer(user, answer))
+            for (Answer answer : answers)
+                if (answer.isLast() && bin.canSeeAnswer(user, answer)) {
                     available = true;
 
-                isMarked &= answer.isAnnotated();
-            }
+                    isMarked &= answer.isAnnotated();
+                }
 
             // Add if visible
             if (available)
@@ -495,11 +495,8 @@ public class MarkingController {
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
-            if (answer.getOwner().equals(studentCrsId) && bin.canSeeAnswer(user, answers.get(0))) {
-                if (answer.isLast())
+            if (answer.isLast() && bin.canSeeAnswer(user, answer))
                     answer.setAnnotated(!answer.isAnnotated());
-            }
-            else return Response.status(401).build();
 
         return Response.ok().build();
     }
