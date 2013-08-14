@@ -15,7 +15,9 @@ var MarkerOverlay = Backbone.View.extend({
             'handleResizableResize',
             'handleRescale',
             'handlePositionTopClick',
-            'handlePositionBottomClick'
+            'handlePositionBottomClick',
+            'updateHeight',
+            'updateTop'
         );
 
         /*this.model.on("change:question", function(evt) {
@@ -24,7 +26,16 @@ var MarkerOverlay = Backbone.View.extend({
         })*/
 
         this.model.on("change:selecting", this.enableMarking);
+        this.model.on("change:top", this.updateTop);
+        this.model.on("change:height", this.updateHeight);
 
+    },
+    updateHeight: function() {
+        this.$el.height(this.model.get('height'));
+    },
+
+    updateTop: function() {
+        this.$el.css('top', this.model.get('top') + "px");
     },
 
     setupBindings: function () {
@@ -73,8 +84,9 @@ var MarkerOverlay = Backbone.View.extend({
         var currentWidth = this.parse(this.page.css("width")),
             prevWidth = this.pageWidth,
             scaleFactor = currentWidth / prevWidth;
-        this.top *= scaleFactor;
-        this.marker.css("top", this.top + "px");
+        this.model.set('top', this.model.get('top') * scaleFactor);
+        this.model.set('height', this.model.get('height') * scaleFactor);
+        //this.$el.css("top", this.top + "px");
         this.savePageWidth();
     },
 
@@ -82,11 +94,11 @@ var MarkerOverlay = Backbone.View.extend({
         var pageMargin = this.parse(this.page.css("margin-left"));
         var pageBorder = this.parse(this.page.css("border-left-width"));
 
-        this.marker.css("margin-left", pageMargin + pageBorder + "px");
+        this.$el.css("margin-left", pageMargin + pageBorder + "px");
 
         // Now lets fix the width
 
-        this.marker.css("width", this.page.css("width"))
+        this.$el.css("width", this.page.css("width"))
     },
 
     savePageWidth: function () {
@@ -105,7 +117,7 @@ var MarkerOverlay = Backbone.View.extend({
         this.savePageWidth();
 
         // Setup the marker
-        this.$el.replaceWith($('<div class="marker"></div>'));
+        this.$el.addClass("marker");
         this.$el.appendTo(this.pdfContainer);
 
         // Setup zindex so we can see it.
@@ -113,11 +125,10 @@ var MarkerOverlay = Backbone.View.extend({
         this.$el.zIndex(this.pdfContainer.find('.page').zIndex() + 1);
 
 
-        this.top = this.calculateDistance(elem, evt);
-        this.model.set('top', top);
+        this.model.set('top', this.calculateDistance(elem, evt));
 
 
-        this.$el.css("top", this.top + "px");
+        //this.$el.css("top", this.top + "px");
 
         this.updateSize();
 
@@ -156,18 +167,18 @@ var MarkerOverlay = Backbone.View.extend({
     },
 
     handleResizableResize:  function (evt, ui) {
-        this.top = ui.position.top;
-        this.model.set('top', this.top)
+        this.model.set('top', ui.position.top);
     },
 
     handleMouseMove: function(evt) {
         var elem = $(evt.currentTarget);
+        var top = this.model.get('top');
 
         bottom = this.calculateDistance(elem, evt, elem);
 
-        if (bottom - this.top > 0) {
-            this.marker.css("height", (bottom - this.top) + "px");
-            this.model.set("height", bottom - this.top);
+        if (bottom - top > 0) {
+            //this.$el.css("height", (bottom - this.top) + "px");
+            this.model.set("height", bottom - top);
         }
 
        // console.log(bottom - this.top);
@@ -229,11 +240,11 @@ var MarkerOverlay = Backbone.View.extend({
     },
 
     getPosition:  function (callback) {
-        var height = this.parse(this.marker.css('height'));
+        var height = this.parse(this.$el.css('height'));
         var _this = this;
 
-        this.hitTest(this.top, function(start) {
-            _this.hitTest(_this.top + height, function(end) {
+        this.hitTest(this.model.get('top'), function(start) {
+            _this.hitTest(_this.model.get('top') + height, function(end) {
                 callback({
                     start: start,
                     end: end,
