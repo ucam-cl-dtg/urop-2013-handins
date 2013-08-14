@@ -136,6 +136,7 @@ var SelectingView = Backbone.View.extend({
             }
             console.log(data);
             $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data, function() {
+                _this.closeSelection();
             });
 
         })
