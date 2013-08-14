@@ -34,7 +34,11 @@ function showSelectingModal3(bin, submission) {
     var html = shared.handins.selectingModal({bin: this.bin, submission: this.submission});
     var elem = $(html);
 
-    elem.prependTo($('body')).foundation().foundation("reveal","open", {closeOnBackgroundClick: false, closeOnEsc: false});
+    elem.prependTo($('body')).foundation().foundation("reveal","open", {
+            closeOnBackgroundClick: false,
+            closeOnEsc: false
+    });
+
     elem.find('.pdf-viewer').css('height',elem.height() + "px");
 
     view = new SelectingView({
