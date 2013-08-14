@@ -199,8 +199,15 @@ $(document).on("click", ".tabs.magic-tabs .title a", function(evt){
 function setupAutocomplete() {
 
     $('.token-user-input').autocomplete({
-        source: prepareURL("hack/users"),
-        minLength: 2,
+        source: function(req, resp) {
+            $.get(prepareURL("hack/users"), req, function(data){
+                _.map(data, function(elem) {
+                    elem.label = elem.value = elem.crsid;
+                })
+                resp(data);
+            })
+        },
+        minLength: 3,
         focus: function( event, ui) {
             console.log(ui);
 
