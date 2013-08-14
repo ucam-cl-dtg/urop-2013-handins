@@ -3,10 +3,8 @@ var MarkerOverlay = Backbone.View.extend({
     initialize: function() {
         this.pdfViewer = $('.pdf-viewer');
         this.pdfContainer = this.pdfViewer.find('#viewerContainer');
-        //this.selecting = false;
 
         // Bind all events handlers to the marker
-        //this.setupBindings();
         _.bindAll(this,
             'enableMarking',
             'startSelecting',
@@ -38,18 +36,6 @@ var MarkerOverlay = Backbone.View.extend({
         this.$el.css('top', this.model.get('top') + "px");
     },
 
-    setupBindings: function () {
-        this.startSelecting = bindThis(this.startSelecting, this);
-        this.stopSelecting = bindThis(this.stopSelecting, this);
-
-        this.handleMouseMove = bindThis(this.handleMouseMove, this);
-        this.handleResizableResize = bindThis(this.handleResizableResize, this);
-        this.handleRescale = bindThis(this.handleRescale, this);
-
-        this.handlePositionTopClick = bindThis(this.handlePositionTopClick, this);
-        this.handlePositionBottomClick = bindThis(this.handlePositionBottomClick, this);
-    },
-
     enableMarking: function (marker, selecting) {
         if (selecting)
             $('.pdf-viewer .page').click(this.startSelecting);
@@ -71,6 +57,7 @@ var MarkerOverlay = Backbone.View.extend({
         return top;
     },
 
+    // TODO
     handleRescale: function(evt) {
         this.updateSize();
         this.updatePosition();
@@ -80,6 +67,7 @@ var MarkerOverlay = Backbone.View.extend({
         return parseFloat(value.replace('px', ''));
     },
 
+    //TODO
     updatePosition: function() {
         var currentWidth = this.parse(this.page.css("width")),
             prevWidth = this.pageWidth,
@@ -103,7 +91,13 @@ var MarkerOverlay = Backbone.View.extend({
 
     savePageWidth: function () {
         this.pageWidth = this.parse(this.page.css("width"));
+        this.model.set('width', this.pageWidth)
     },
+
+    updatePageWidth: function () {
+        this.pageWidth = this.parse(this.page.css("width"));
+        this.model.set('width', this.pageWidth)
+    }
 
     startSelecting: function(evt) {
         evt.preventDefault();
