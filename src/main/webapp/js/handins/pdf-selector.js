@@ -8,41 +8,6 @@
 */
 
 
-function addSelectingModal2(bin, submission) {
-    var html = shared.handins.selectingModal({bin: bin, submission: submission});
-    var elem = $(html);
-    var selecting = false;
-
-    elem.prependTo($('body')).foundation().foundation("reveal","open");
-    elem.find('.pdf-viewer').css('height',elem.height() + "px");
-
-    //asyncLoad(elem.find(".async-loader"));
-    markers = new MarkerCollection();
-    view = new MarkerView({
-        el: elem.find('.questions-container'),
-        collection: markers
-    });
-    view.render();
-
-    elem.find('.select-question').click(function() {
-        if (selecting)
-            return ;
-
-        selecting = true;
-        var marker = new MarkerModel({name: "Works"});
-        marker.marker.enableMarking();
-        markers.add(marker);
-    })
-    return elem;
-}
-
-function showSelectingModal2(bin, submission) {
-    $('#selectingModal').remove();
-    addSelectingModal2(bin, submission);
-    showPdf(submission);
-}
-
-
 function showPdf(submission) {
     // Function located in viewer.js. That file contains magic, pure voodoo magic.
     loadPdf(prepareURL("/submissions/" + submission + "/download"));
@@ -64,13 +29,12 @@ var MarkerView = Backbone.View.extend({
     }
 })
 
-
 function showSelectingModal3(bin, submission) {
     $('#selectingModal').remove();
     var html = shared.handins.selectingModal({bin: this.bin, submission: this.submission});
     var elem = $(html);
 
-    elem.prependTo($('body')).foundation().foundation("reveal","open");
+    elem.prependTo($('body')).foundation().foundation("reveal","open", {closeOnBackgroundClick: false, closeOnEsc: false});
     elem.find('.pdf-viewer').css('height',elem.height() + "px");
 
     view = new SelectingView({
@@ -84,6 +48,7 @@ function showSelectingModal3(bin, submission) {
 var SelectingView = Backbone.View.extend({
 
     initialize: function(data) {
+        this.selecting = false;
         this.markers = new MarkerCollection();
         this.questionsView = new MarkerView({
             el: this.$el.find('.questions-container'),
@@ -98,7 +63,7 @@ var SelectingView = Backbone.View.extend({
 
         this.questions.fetch();
 
-        _.bindAll(this, 'newQuestion', 'deleteQuestion', 'selectQuestion', 'saveSelection');
+        _.bindAll(this, 'newQuestion', 'deleteQuestion', 'selectQuestion', 'saveSelection', 'closeSelection');
 
         showPdf(this.options.submission)
     },
@@ -107,7 +72,8 @@ var SelectingView = Backbone.View.extend({
         'click .select-question': 'newQuestion',
         'click .delete-element': 'deleteQuestion',
         'click .show-element': 'showQuestion',
-        'click .save-selection': 'saveSelection'
+        'click .save-selection': 'saveSelection',
+        'click .close-selection': 'closeSelection'
     },
 
     selectQuestion: function(evt) {
@@ -115,8 +81,10 @@ var SelectingView = Backbone.View.extend({
             collection: this.questions
         })
 
+        this.selecting = false;
         this.questionsSelectingView.marker = evt;
         this.questionsSelectingView.show();
+
     },
 
 
@@ -132,6 +100,10 @@ var SelectingView = Backbone.View.extend({
            };
         }, callback) ( [] );
 
+    },
+
+    closeSelection: function() {
+        this.$el.foundation("reveal", "close");
     },
 
     saveSelection: function(evt) {
@@ -159,7 +131,8 @@ var SelectingView = Backbone.View.extend({
                 endLoc: endLoc,
             }
             console.log(data);
-            $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data);
+            $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data, function() {
+            });
 
         })
     },
@@ -214,11 +187,12 @@ var SelectingView = Backbone.View.extend({
 
     },
 
-    counter: 0,
 
     newQuestion: function() {
+        if (this.selecting)
+            return false;
+
         var marker = new Marker({
-            name: "Works " + this.counter,
             delete: "",
             hidden: true,
             show: true
@@ -226,7 +200,7 @@ var SelectingView = Backbone.View.extend({
         marker.on("stopSelecting", this.selectQuestion)
         marker.enableMarking();
         this.markers.add(marker);
-        this.counter ++;
+        this.selecting = true;
         //this.mouseEffect();
     }
 
@@ -266,6 +240,7 @@ var QuestionSelectorView = Backbone.View.extend({
 
     selectQuestion: function(evt, ui) {
         this.selectedQuestionCID = ui.item.cid;
+        $(evt.target).parent().next('input').focus();
     },
 
     render: function() {
