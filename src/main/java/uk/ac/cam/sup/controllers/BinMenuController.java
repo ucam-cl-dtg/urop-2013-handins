@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Path("/bins")
 @Produces("application/json")
 public class BinMenuController {
 
@@ -37,7 +38,6 @@ public class BinMenuController {
     Checked
      */
     @GET
-    @Path("/bins")
     public Object viewBinList() {
 
         // Set Hibernate and get user

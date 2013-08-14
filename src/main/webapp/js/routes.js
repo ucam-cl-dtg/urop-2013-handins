@@ -193,7 +193,7 @@ $(document).ready(function() {
         "bins/create": "handins.bin.create",
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
-        "marking": markingList,
+        "bins/marking": markingList,
         "test": "main.index2"
 
     })
