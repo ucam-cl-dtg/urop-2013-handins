@@ -12,10 +12,10 @@ var MarkerOverlay = Backbone.View.extend({
             'handleMouseMove',
             'handleResizableResize',
             'handleRescale',
-            'handlePositionTopClick',
-            'handlePositionBottomClick',
             'updateHeight',
-            'updateTop'
+            'updateTop',
+            'updateWidth',
+            'updateScale'
         );
 
         /*this.model.on("change:question", function(evt) {
@@ -26,7 +26,22 @@ var MarkerOverlay = Backbone.View.extend({
         this.model.on("change:selecting", this.enableMarking);
         this.model.on("change:top", this.updateTop);
         this.model.on("change:height", this.updateHeight);
+        this.model.on("change:width", this.updateWidth);
+        this.model.on("change:scale", this.updateScale);
 
+    },
+
+    updateScale: function() {
+        var prevScale = this.model.previous('scale'),
+            curScale = this.model.get('scale');
+
+        if (prevScale === undefined || prevScale === null)
+            return ; // First time the scale is set we don't do anything
+
+        var scaleFactor = curScale / prevScale;
+        this.model.set('top', this.model.get('top') * scaleFactor);
+        this.model.set('height', this.model.get('height') * scaleFactor);
+        this.model.set('width', this.model.get('width') * scaleFactor);
     },
     updateHeight: function() {
         this.$el.height(this.model.get('height'));
@@ -34,6 +49,17 @@ var MarkerOverlay = Backbone.View.extend({
 
     updateTop: function() {
         this.$el.css('top', this.model.get('top') + "px");
+    },
+
+    updateWidth: function() {
+        var pageMargin = this.parse(this.page.css("margin-left"));
+        var pageBorder = this.parse(this.page.css("border-left-width"));
+
+        this.$el.css("margin-left", pageMargin + pageBorder + "px");
+
+        // Now lets fix the width
+
+        this.$el.css("width", this.model.get('width') + 'px');
     },
 
     enableMarking: function (marker, selecting) {
@@ -57,47 +83,14 @@ var MarkerOverlay = Backbone.View.extend({
         return top;
     },
 
-    // TODO
     handleRescale: function(evt) {
-        this.updateSize();
-        this.updatePosition();
+        this.model.set('scale', PDFView.currentScale);
     },
 
     parse: function (value) {
         return parseFloat(value.replace('px', ''));
     },
 
-    //TODO
-    updatePosition: function() {
-        var currentWidth = this.parse(this.page.css("width")),
-            prevWidth = this.pageWidth,
-            scaleFactor = currentWidth / prevWidth;
-        this.model.set('top', this.model.get('top') * scaleFactor);
-        this.model.set('height', this.model.get('height') * scaleFactor);
-        //this.$el.css("top", this.top + "px");
-        this.savePageWidth();
-    },
-
-    updateSize: function () {
-        var pageMargin = this.parse(this.page.css("margin-left"));
-        var pageBorder = this.parse(this.page.css("border-left-width"));
-
-        this.$el.css("margin-left", pageMargin + pageBorder + "px");
-
-        // Now lets fix the width
-
-        this.$el.css("width", this.page.css("width"))
-    },
-
-    savePageWidth: function () {
-        this.pageWidth = this.parse(this.page.css("width"));
-        this.model.set('width', this.pageWidth)
-    },
-
-    updatePageWidth: function () {
-        this.pageWidth = this.parse(this.page.css("width"));
-        this.model.set('width', this.pageWidth)
-    }
 
     startSelecting: function(evt) {
         evt.preventDefault();
@@ -108,7 +101,6 @@ var MarkerOverlay = Backbone.View.extend({
 
         var elem = $(evt.currentTarget);
         this.page = elem;
-        this.savePageWidth();
 
         // Setup the marker
         this.$el.addClass("marker");
@@ -120,11 +112,8 @@ var MarkerOverlay = Backbone.View.extend({
 
 
         this.model.set('top', this.calculateDistance(elem, evt));
-
-
-        //this.$el.css("top", this.top + "px");
-
-        this.updateSize();
+        this.model.set('width', this.parse(this.page.css("width")));
+        this.model.set('scale', PDFView.currentScale);
 
 
         // Set up mouse tracking for resize
@@ -135,7 +124,8 @@ var MarkerOverlay = Backbone.View.extend({
         this.$el.resizable({
             handles: "n, s",
             // Sync this.top when the element is resized upwards.
-            resize: this.handleResizableResize
+            resize: this.handleResizableResize,
+            containment: this.pdfContainer
 
         });
         $(window).on("scalechange", this.handleRescale);
@@ -147,7 +137,6 @@ var MarkerOverlay = Backbone.View.extend({
         this.pdfContainer.unbind('click', this.stopSelecting);
         this.pdfContainer.unbind('mousemove', this.handleMouseMove);
 
-        //this.selecting = false;
         //TODO
         this.trigger("stopSelecting", this);
     },
@@ -171,26 +160,11 @@ var MarkerOverlay = Backbone.View.extend({
         bottom = this.calculateDistance(elem, evt, elem);
 
         if (bottom - top > 0) {
-            //this.$el.css("height", (bottom - this.top) + "px");
             this.model.set("height", bottom - top);
         }
 
-       // console.log(bottom - this.top);
     },
 
-    handlePositionTopClick: function (evt) {
-        this.pdfContainer.find('.page').unbind('click', this.handlePositionTopClick);
-
-        console.log("Hello")
-
-    },
-
-    handlePositionBottomClick: function (evt) {
-        this.pdfContainer.find('.page').unbind('click', this.handlePositionBottomClick);
-
-        console.log("World");
-
-    },
 
     calculateAbsolutePosition: function (page, dist, callback) {
         var height = $('#pageContainer' + page).height();
