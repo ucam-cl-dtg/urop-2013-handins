@@ -356,7 +356,13 @@ public class MarkingController {
         List<ImmutableMap<String, ?>> questionList = new LinkedList<ImmutableMap<String, ?>>();
         for (ProposedQuestion question : questions) {
 
-            List <Answer> answers = new LinkedList<Answer>(question.getAnswers());
+            // Get the answers
+            @SuppressWarnings("unchecked")
+            List<Answer> answers = session.createCriteria(Answer.class)
+                                          .add(Restrictions.eq("bin", bin))
+                                          .add(Restrictions.eq("question.id", question.getId()))
+                                          .add(Restrictions.eq("last", true))
+                                          .list();
 
             /*
             Check if the question has an answer visible to the user
@@ -365,7 +371,7 @@ public class MarkingController {
             boolean available = false;
             boolean isMarked = true;
             for (Answer answer : answers)
-                if (answer.isLast() && bin.canSeeAnswer(user, answer)) {
+                if (bin.canSeeAnswer(user, answer)) {
                     available = true;
 
                     isMarked &= answer.isAnnotated();
@@ -403,13 +409,18 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
 
-        // Get the list of answers to the specific
-        List<Answer> answers = new LinkedList<Answer>(((ProposedQuestion) session.get(ProposedQuestion.class, questionId)).getAnswers());
+        // Get the answers
+        @SuppressWarnings("unchecked")
+        List<Answer> answers = session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("bin", bin))
+                                      .add(Restrictions.eq("question.id", questionId))
+                                      .add(Restrictions.eq("last", true))
+                                      .list();
 
         // Filter the answers to get the ones which are visible
         List<ImmutableMap<String, ?>> studentList = new LinkedList<ImmutableMap<String, ?>>();
         for (Answer answer : answers)
-            if (answer.isLast() && bin.canSeeAnswer(user, answer))
+            if (bin.canSeeAnswer(user, answer))
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(),
                                                 "isMarked", answer.isAnnotated()));
 
@@ -439,10 +450,13 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
 
-        ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
-
         // Get the answers
-        List<Answer> answers = new LinkedList<Answer>(proposedQuestion.getAnswers());
+        @SuppressWarnings("unchecked")
+        List<Answer> answers = session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("bin", bin))
+                                      .add(Restrictions.eq("question.id", questionId))
+                                      .add(Restrictions.eq("last", true))
+                                      .list();
 
         /*
         And now change the answers
@@ -451,11 +465,8 @@ public class MarkingController {
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
-            if (bin.canSeeAnswer(user, answers.get(0))) {
-                if (answer.isLast())
-                    answer.setAnnotated(!answer.isAnnotated());
-            }
-            else return Response.status(401).build();
+            if (bin.canSeeAnswer(user, answer))
+                answer.setAnnotated(!answer.isAnnotated());
 
         return Response.ok().build();
     }
@@ -483,10 +494,14 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
 
-        ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
-
         // Get the answers
-        List<Answer> answers = new LinkedList<Answer>(proposedQuestion.getAnswers());
+        @SuppressWarnings("unchecked")
+        List<Answer> answers = session.createCriteria(Answer.class)
+                                      .add(Restrictions.eq("bin", bin))
+                                      .add(Restrictions.eq("question.id", questionId))
+                                      .add(Restrictions.eq("owner", studentCrsId))
+                                      .add(Restrictions.eq("last", true))
+                                      .list();
 
         /*
         And now change the answers
@@ -495,7 +510,7 @@ public class MarkingController {
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
-            if (answer.isLast() && bin.canSeeAnswer(user, answer))
+            if (bin.canSeeAnswer(user, answer))
                     answer.setAnnotated(!answer.isAnnotated());
 
         return Response.ok().build();

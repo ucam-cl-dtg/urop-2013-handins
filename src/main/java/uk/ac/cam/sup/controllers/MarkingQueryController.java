@@ -77,6 +77,8 @@ public class MarkingQueryController {
                 marking.setQuestion(answer.getQuestion());
 
                 markingList.add(marking);
+
+                answer.setDownloaded(true);
             }
 
         return FilesManip.resultingFile(markingList);

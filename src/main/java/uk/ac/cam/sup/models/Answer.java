@@ -21,6 +21,7 @@ public class Answer {
     private String filePath;
 
     private boolean last;
+    private boolean downloaded;
     private boolean annotated;
 
     @ManyToOne
@@ -127,5 +128,14 @@ public class Answer {
 
     public Date getDateCreated() {
         return dateCreated;
+    }
+
+    // Downloaded
+    public boolean isDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
     }
 }

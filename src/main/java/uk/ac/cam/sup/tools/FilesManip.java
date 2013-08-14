@@ -72,9 +72,7 @@ public class FilesManip {
         String filePath = directory + answer.getId() + ".pdf";
         PDFManip pdfManip;
         try {
-            pdfManip = new PDFManip(filePath);
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
-            pdfManip.addHeader(distribution.getStudent() + " " + distribution.getQuestion());
         } catch (Exception e) {
             e.printStackTrace();
         }

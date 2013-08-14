@@ -90,7 +90,7 @@ public class SubmissionController {
         // See if there are annotated answers
         boolean canDelete = true;
         for (Answer answer : unmarkedSubmission.getAllAnswers())
-            if (answer.isAnnotated())
+            if (answer.isDownloaded())
                 canDelete = false;
 
         if (!canDelete)

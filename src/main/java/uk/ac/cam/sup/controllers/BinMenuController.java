@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 @Path("/marking")
-public class MarkingListings {
+public class BinMenuController {
 
     @SuppressWarnings({"UnusedDeclaration"})
     @Context

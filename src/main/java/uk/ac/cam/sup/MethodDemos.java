@@ -17,8 +17,10 @@ public class MethodDemos extends Application {
         myServices.add(SubmissionController.class);
         myServices.add(MarkingController.class);
         myServices.add(MarkingQueryController.class);
-        myServices.add(MarkingListings.class);
+        myServices.add(BinMenuController.class);
         myServices.add(AnnotatedAnswersController.class);
+        myServices.add(BinEditor.class);
+        myServices.add(BinMenuController.class);
 
         myServices.add(HackController.class);
 

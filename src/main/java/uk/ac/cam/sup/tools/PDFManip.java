@@ -43,7 +43,7 @@ public class PDFManip {
     /*
     FixMe: This function should be rewritten because it behaves badly in general
      */
-    public void addHeader(String content) throws Exception {
+   /* public void addHeader(String content) throws Exception {
 
         String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -63,7 +63,6 @@ public class PDFManip {
 
     /*
     Don't mind this... trust me
-     */
     private static PdfPTable getHeaderTable(int x, int y, String content) {
         PdfPTable table = new PdfPTable(2);
         table.setTotalWidth(530);
@@ -75,7 +74,8 @@ public class PDFManip {
         table.addCell("" + x + "/" + y);
 
         return table;
-    }
+    }       */
+
     /*
     Metadata table:
         Submission:
