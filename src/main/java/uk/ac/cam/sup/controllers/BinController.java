@@ -263,6 +263,30 @@ public class BinController {
         if (!unmarkedSubmission.getOwner().equals(user))
             return Response.status(401).build();
 
+        for (Answer answer : unmarkedSubmission.getAllAnswers())
+            if (answer.isDownloaded())
+                return Response.status(401).build();
+
+        // Delete all answers from the submission
+        for (Answer answer : unmarkedSubmission.getAllAnswers()) {
+
+            FilesManip.fileDelete(answer.getFilePath());
+            session.delete(answer);
+
+            if (answer.isLast()) {
+                @SuppressWarnings("unchecked")
+                List<Answer> altAnswers = session.createCriteria(Answer.class)
+                                                 .add(Restrictions.eq("bin", answer.getBin()))
+                                                 .add(Restrictions.eq("owner", answer.getOwner()))
+                                                 .add(Restrictions.eq("question", answer.getQuestion()))
+                                                 .addOrder(Order.desc("dateCreated"))
+                                                 .list();
+
+                if (altAnswers.size() > 0)
+                    altAnswers.get(0).setLast(true);
+            }
+        }
+
         // Inject the pdf with the metadata needed to split it
         PDFManip pdfManip;
         try {
