@@ -27,15 +27,19 @@
     </context-param>
     <context-param>
         <param-name>jsFiles</param-name>
-        <param-value>/js/vendor/jquery.form.min.js,
-                     /js/handins/main.js,
+        <param-value>
                      /js/handins/l10n.js,
                      /js/vendor/pdf.js,
                      /js/handins/viewer.js,
                      /js/handins/models/marker.js,
+                     /js/handins/models/questions.js,
+                     /js/handins/views/marker-question.js,
                      /js/handins/views/marker-overlay.js,
+                     /js/handins/views/marker-select-question.js,
+                     /js/handins/views/pdf-selecting.js,
                      /js/handins/pdf-selector.js,
                      /js/handins/legacy-selector.js,
+                     /js/handins/main.js,
                      /soy/js/1/handins.submission.js,
                      /soy/js/1/handins.bin.js,
                      /soy/js/1/handins.marking.js,

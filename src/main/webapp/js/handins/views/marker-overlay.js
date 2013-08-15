@@ -15,7 +15,9 @@ var MarkerOverlay = Backbone.View.extend({
             'updateHeight',
             'updateTop',
             'updateWidth',
-            'updateScale'
+            'updateScale',
+            'scrollTo',
+            'remove'
         );
 
         /*this.model.on("change:question", function(evt) {
@@ -28,6 +30,9 @@ var MarkerOverlay = Backbone.View.extend({
         this.model.on("change:height", this.updateHeight);
         this.model.on("change:width", this.updateWidth);
         this.model.on("change:scale", this.updateScale);
+
+        this.model.on("scrollTo", this.scrollTo);
+        this.model.on("destroy", this.remove);
 
     },
 
@@ -137,12 +142,7 @@ var MarkerOverlay = Backbone.View.extend({
         this.pdfContainer.unbind('click', this.stopSelecting);
         this.pdfContainer.unbind('mousemove', this.handleMouseMove);
 
-        //TODO
-        this.trigger("stopSelecting", this);
-    },
-
-    remove: function() {
-        this.$el.remove();
+        this.model.trigger("selected", this.model);
     },
 
     scrollTo: function() {
