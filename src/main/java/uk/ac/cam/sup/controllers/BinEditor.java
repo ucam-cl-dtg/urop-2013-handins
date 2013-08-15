@@ -7,6 +7,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
+import uk.ac.cam.sup.models.BinMarkingPermission;
 import uk.ac.cam.sup.models.ProposedQuestion;
 
 import javax.servlet.http.HttpServletRequest;
@@ -170,6 +171,102 @@ public class BinEditor {
         // Delete all BinPermissions
         for (BinAccessPermission perm: permissions)
             session.delete(perm);
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+
+    Checked
+     */
+    @POST
+    @Path("/mpermissions/")
+    public Response addBinMarkingPermissions(@PathParam("binId") long binId,
+                                             @FormParam("markingUsers[]") String[] markingUsers,
+                                             @FormParam("questionIds[]") long[] questionIds,
+                                             @FormParam("questionOwners[]") String[] questionOwners,
+                                             @QueryParam("token") String token) {
+
+        // Set Hibernate and get user and bin
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.canAddPermission(user, token))
+            return Response.status(401).build();
+
+        for (String markingUser : markingUsers)
+            for (long questionId : questionIds)
+                for (String questionOwner : questionOwners) {
+
+                    // Check if marking permissions already exists and skip if it does
+                    if (session.createCriteria(BinMarkingPermission.class)
+                               .add(Restrictions.eq("bin", bin))
+                               .add(Restrictions.eq("userCrsId", markingUser))
+                               .add(Restrictions.eq("questionId", questionId))
+                               .add(Restrictions.eq("questionOwner", questionOwner))
+                               .list().size() > 0)
+                        continue;
+
+                    // Add the new user permission
+                    session.save(new BinMarkingPermission(bin, markingUser, questionId, questionOwner));
+                }
+
+        return Response.ok().build();
+    }
+
+    /*
+    Done
+
+    Checked
+     */
+    @DELETE
+    @Path("/mpermissions")
+    public Response deleteBinMarkingPermissions(@PathParam("binId") long binId,
+                                                @QueryParam("markingUsers[]") String[] markingUsers,
+                                                @QueryParam("questionIds[]") long[] questionIds,
+                                                @QueryParam("questionOwners[]") String[] questionOwners,
+                                                @QueryParam("token") String token) {
+
+        // Set Hibernate and get user and bin
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        Bin bin = (Bin) session.get(Bin.class, binId);
+
+        // Check the existence of the bin
+        if (bin == null)
+            return Response.status(404).build();
+
+        if (!bin.canDeletePermission(user, token))
+            return Response.status(401).build();
+
+        for (String markingUser : markingUsers)
+            for (long questionId : questionIds)
+                for (String questionOwner : questionOwners) {
+
+                    // Check if marking permissions already exists and skip if it does
+                    List permissions = session.createCriteria(BinMarkingPermission.class)
+                                              .add(Restrictions.eq("bin", bin))
+                                              .add(Restrictions.eq("userCrsId", markingUser))
+                                              .add(Restrictions.eq("questionId", questionId))
+                                              .add(Restrictions.eq("questionOwner", questionOwner))
+                                              .list();
+
+                    if (permissions.size() == 0)
+                        continue;
+
+                    // Add the new user permission
+                    session.delete(permissions.get(0));
+                }
 
         return Response.ok().build();
     }

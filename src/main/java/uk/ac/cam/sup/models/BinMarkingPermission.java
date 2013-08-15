@@ -28,6 +28,16 @@ public class BinMarkingPermission {
         dateCreated = new Date();
     }
 
+    public BinMarkingPermission(Bin bin, String userCrsId, long questionId, String questionOwner) {
+        dateCreated = new Date();
+
+        setBin(bin);
+
+        setUserCrsId(userCrsId);
+        setQuestionId(questionId);
+        setQuestionOwner(questionOwner);
+    }
+
     // Id
     public long getId() {
         return id;
