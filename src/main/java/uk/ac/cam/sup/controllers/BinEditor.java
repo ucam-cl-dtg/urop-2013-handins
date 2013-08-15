@@ -108,7 +108,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/{binId}/permissions/")
+    @Path("/{binId}/permissions")
     public Response addBinAccessPermissions(@PathParam("binId") long binId,
                                             @FormParam("users[]") String[] newUsers,
                                             @QueryParam("token") String token) {
@@ -188,7 +188,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/{binId}/mpermissions/")
+    @Path("/{binId}/marking-permissions")
     public Response addBinMarkingPermissions(@PathParam("binId") long binId,
                                              @FormParam("markingUsers[]") String[] markingUsers,
                                              @FormParam("questionIds[]") long[] questionIds,
@@ -235,7 +235,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/{binId}/mpermissions")
+    @Path("/{binId}/marking-permissions")
     public Response deleteBinMarkingPermissions(@PathParam("binId") long binId,
                                                 @QueryParam("markingUsers[]") String[] markingUsers,
                                                 @QueryParam("questionIds[]") long[] questionIds,
