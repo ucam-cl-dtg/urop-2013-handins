@@ -34,6 +34,13 @@ var MarkerOverlay = Backbone.View.extend({
         this.model.on("scrollTo", this.scrollTo);
         this.model.on("destroy", this.remove);
 
+
+        this.model.overlay = this;
+    },
+
+    remove: function() {
+        this.model.overlay = null;
+        Backbone.View.prototype.remove.apply(this);
     },
 
     updateScale: function() {
@@ -166,19 +173,13 @@ var MarkerOverlay = Backbone.View.extend({
     },
 
 
-    calculateAbsolutePosition: function (page, dist, callback) {
+    calculateAbsolutePosition: function (page, dist) {
         var height = $('#pageContainer' + page).height();
-
-        PDFView.getPage(page).then( function (page) {
-            var trueHeight = page.getViewport(1).height;
-
-            var result = 1 - (dist / height);
-            console.log(result);
-            callback(result);
-        })
+        var result = 1 - (dist / height);
+        return result;
     },
 
-    hitTest: function (dist, callback) {
+    hitTest: function (dist) {
         var borderSize = this.parse(this.page.css('border-top-width'));
 
         var resultElem, resultDist;
@@ -198,27 +199,24 @@ var MarkerOverlay = Backbone.View.extend({
 
         var page = parseInt(resultElem.attr('id').replace('pageContainer', ''))
 
-        this.calculateAbsolutePosition(page, resultDist, function(absolutePosition) {
-            callback({
-                page: page,
-                absolutePosition: absolutePosition,
-            })
-        })
+        var absolutePosition = this.calculateAbsolutePosition(page, resultDist);
 
+        return {
+            page: page,
+            absolutePosition: absolutePosition
+        }
     },
 
-    getPosition:  function (callback) {
+    getPosition:  function () {
         var height = this.parse(this.$el.css('height'));
         var _this = this;
 
-        this.hitTest(this.model.get('top'), function(start) {
-            _this.hitTest(_this.model.get('top') + height, function(end) {
-                callback({
-                    start: start,
-                    end: end,
-                })
-            })
-        })
+        var start = this.hitTest(this.model.get('top'))
+        var end = this.hitTest(this.model.get('top') + height);
+        return {
+            start: start,
+            end: end,
+        }
     }
 
 })

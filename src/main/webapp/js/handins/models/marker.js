@@ -14,6 +14,10 @@ var Marker = Backbone.Model.extend({
     updateName: function() {
         this.set('name', this.get('question').get('name'));
         this.set('hidden', false);
+    },
+
+    getPosition: function() {
+        return this.overlay.getPosition();
     }
 
 

@@ -74,34 +74,34 @@ var SelectingView = Backbone.View.extend({
     },
 
     saveSelection: function(evt) {
-        var _this = this;
-        this.extractPositions(function(positions) {
-            var id = [],
-                startPage = [],
-                endPage = [],
-                startLoc = [],
-                endLoc = [];
-            positions = _.each(positions, function (elem) {
-                id.push(elem.id);
-                startPage.push(elem.start.page);
-                endPage.push(elem.end.page);
-                startLoc.push(elem.start.absolutePosition);
-                endLoc.push(elem.end.absolutePosition);
-
-            })
-
-            var data = {
-                id: id,
-                startPage: startPage,
-                endPage: endPage,
-                startLoc: startLoc,
-                endLoc: endLoc,
-            }
-            console.log(data);
-            $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data, function() {
-            });
+        var id = [],
+            startPage = [],
+            endPage = [],
+            startLoc = [],
+            endLoc = [],
+            _this = this;
+        var positions = this.markers.map(function(marker) { return marker.getPosition() });
+        positions = _.each(positions, function (elem) {
+            id.push(elem.id);
+            startPage.push(elem.start.page);
+            endPage.push(elem.end.page);
+            startLoc.push(elem.start.absolutePosition);
+            endLoc.push(elem.end.absolutePosition);
 
         })
+
+        var data = {
+            id: id,
+            startPage: startPage,
+            endPage: endPage,
+            startLoc: startLoc,
+            endLoc: endLoc,
+        }
+
+        console.log(data);
+        $.post(prepareURL("bins/" + _this.options.bin + "/submissions/" + _this.options.submission), data, function() {
+           _this.closeSelection();
+        });
     },
 
     showQuestion: function(evt) {
