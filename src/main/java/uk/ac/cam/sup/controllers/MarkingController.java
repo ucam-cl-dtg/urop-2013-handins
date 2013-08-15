@@ -254,7 +254,7 @@ public class MarkingController {
 
     Checked
      */
-    @POST
+    @PUT
     @Path("students/{studentCrsId}")
     @Produces("application/json")
     public Object annotateStudent(@PathParam("binId") long binId,
@@ -314,7 +314,7 @@ public class MarkingController {
 
     Checked
      */
-    @POST
+    @PUT
     @Path("students/{studentCrsId}/questions/{questionId}")
     @Produces("application/json")
     public Object annotateStudentQuestion(@PathParam("binId") long binId,
@@ -433,7 +433,7 @@ public class MarkingController {
 
     Checked
      */
-    @POST
+    @PUT
     @Path("questions/{questionId}")
     @Produces("application/json")
     public Object annotateQuestion(@PathParam("binId") long binId,
@@ -476,7 +476,7 @@ public class MarkingController {
 
     Checked
      */
-    @POST
+    @PUT
     @Path("questions/{questionId}/students/{studentCrsId}")
     @Produces("application/json")
     public Object annotateQuestionStudent(@PathParam("binId") long binId,

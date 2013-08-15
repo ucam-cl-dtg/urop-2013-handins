@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Path("/bins/{binId}")
+@Path("/bins")
 @Produces("application/json")
 public class BinEditor {
 
@@ -33,6 +33,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
+    @Path("/{binId}")
     public Response deleteBin(@PathParam("binId") long binId,
                               @QueryParam("token") String token) {
 
@@ -69,9 +70,11 @@ public class BinEditor {
 
     Checked
      */
-    @POST
-    @Path("/change")
-    public Object changeBinArchive(@PathParam("binId") long binId) {
+    @PUT
+    @Path("/{binId}/change")
+    public Object changeBin(@PathParam("binId") long binId,
+                            @FormParam("archiveSwitch") boolean archiveSwitch,
+                            @FormParam("newName") String newName) {
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -88,7 +91,11 @@ public class BinEditor {
             return Response.status(401).build();
 
         // Change the archive
-        bin.setArchived(!bin.isArchived());
+        bin.setArchived(bin.isArchived() ^ archiveSwitch);
+
+        // Change name
+        if (newName != null)
+            bin.setQuestionSetName(newName);
 
         session.update(bin);
 
