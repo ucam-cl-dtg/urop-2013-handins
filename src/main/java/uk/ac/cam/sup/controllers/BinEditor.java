@@ -108,7 +108,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/permissions/")
+    @Path("/{binId}/permissions/")
     public Response addBinAccessPermissions(@PathParam("binId") long binId,
                                             @FormParam("users[]") String[] newUsers,
                                             @QueryParam("token") String token) {
@@ -149,7 +149,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/permissions")
+    @Path("/{binId}/permissions")
     public Response deleteBinAccessPermissions(@PathParam("binId") long binId,
                                                @QueryParam("users[]") String[] users,
                                                @QueryParam("token") String token) {
@@ -188,7 +188,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/mpermissions/")
+    @Path("/{binId}/mpermissions/")
     public Response addBinMarkingPermissions(@PathParam("binId") long binId,
                                              @FormParam("markingUsers[]") String[] markingUsers,
                                              @FormParam("questionIds[]") long[] questionIds,
@@ -235,7 +235,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/mpermissions")
+    @Path("/{binId}/mpermissions")
     public Response deleteBinMarkingPermissions(@PathParam("binId") long binId,
                                                 @QueryParam("markingUsers[]") String[] markingUsers,
                                                 @QueryParam("questionIds[]") long[] questionIds,
@@ -284,7 +284,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/questions")
+    @Path("/{binId}/questions")
     public Object addBinQuestions(@PathParam("binId") long binId,
                                   @FormParam("questionNames[]") String[] newQuestionNames) {
 
@@ -332,7 +332,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/questions")
+    @Path("/{binId}/questions")
     public Object deleteBinQuestions(@PathParam("binId") long binId,
                                      @QueryParam("questionId[]") long[] questionIds) {
 
