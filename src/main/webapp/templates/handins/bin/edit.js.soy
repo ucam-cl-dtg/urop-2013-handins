@@ -1,0 +1,96 @@
+{namespace handins.bin}
+
+/**
+* @param bin
+*/
+{template .edit}
+<div class="row">
+    <div class="columns large-12 small-12">
+        <div class="section-container tabs" data-section="tabs">
+                <section>
+                <p class="title" data-section-title="">
+                    <a>General Information</a>
+                </p>
+                <div class="content" data-section-content="">
+                    Hello
+                </div>
+            </section>
+            <section class="active">
+                <p class="title" data-section-title="">
+                    <a>Access Permissions</a>
+                </p>
+                <div class="content" data-section-content="">
+                    World
+                </div>
+            </section>
+            <section>
+                <p class="title" data-section-title="">
+                    <a>Questions</a>
+                </p>
+                <div class="content" data-section-content="">
+                    with beer
+                </div>
+            </section>
+            <section>
+                <p class="title" data-section-title="">
+                    <a>Marking Permissions</a>
+                </p>
+                <div class="content" data-section-content="">
+                    and cookies
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="update-permissions">
+        <div class="row">
+            <div class="large-12">
+            <fieldset>
+                <legend>Users with permission</legend>
+                <div class="permissions-container async-loader" data-path="bins/{$bin.id}/permissions" template-name="handins.bin.editPermissions">
+
+                </div>
+             </fieldset>
+             </div>
+        </div>
+
+        <form action="/api/bins/{$bin.id}/permissions" method="post">
+            <div class="row">
+                <div class="columns large-9">
+                    <input type="text" class="token-user-input" name="users[]"/>
+                </div>
+                <div class="columns large-3">
+                    <input type="submit" value="Add user" class="button"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="update-problems">
+        <div class="row">
+            <div class="large-12">
+            <fieldset>
+                <legend>Problems in the bin</legend>
+                <div class="problems-container async-loader" data-path="bins/{$bin.id}/questions" template-name="handins.bin.showQuestions">
+
+                </div>
+             </fieldset>
+             </div>
+        </div>
+
+        <form action="/api/bins/{$bin.id}/questions" method="post">
+            <div class="row">
+                <div class="columns large-9">
+                    <input type="text" name="questionNames[]"/>
+                </div>
+                <div class="columns large-3">
+                    <input type="submit" value="Add Question" class="button"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{/template}

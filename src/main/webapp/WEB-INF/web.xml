@@ -33,6 +33,7 @@
                      /js/handins/viewer.js,
                      /js/handins/models/marker.js,
                      /js/handins/models/questions.js,
+                     /js/handins/models/bin.js,
                      /js/handins/views/marker-question.js,
                      /js/handins/views/marker-overlay.js,
                      /js/handins/views/marker-select-question.js,

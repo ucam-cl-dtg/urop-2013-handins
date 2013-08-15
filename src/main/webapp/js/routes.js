@@ -189,7 +189,7 @@ $(document).ready(function() {
     router = Router({
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins": binList,
-        "bins/:binId": "handins.bin.permissions",
+        "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
