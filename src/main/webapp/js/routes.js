@@ -185,6 +185,16 @@ function marking(students) {
 }
 
 
+function view(view, template) {
+    return function(json) {
+        pageView = new view({
+            el: $('.main'),
+            data: json
+        });
+        return template;
+    }
+}
+
 $(document).ready(function() {
     router = Router({
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),

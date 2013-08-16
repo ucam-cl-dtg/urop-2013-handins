@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Path("/bins")
+@Path("/bins/{binId}")
 @Produces("application/json")
 public class BinEditor {
 
@@ -33,7 +33,6 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/{binId}")
     public Response deleteBin(@PathParam("binId") long binId,
                               @QueryParam("token") String token) {
 
@@ -70,11 +69,9 @@ public class BinEditor {
 
     Checked
      */
-    @PUT
-    @Path("/{binId}/change")
-    public Object changeBin(@PathParam("binId") long binId,
-                            @FormParam("archiveSwitch") boolean archiveSwitch,
-                            @FormParam("newName") String newName) {
+    @POST
+    @Path("/change")
+    public Object changeBinArchive(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -91,11 +88,7 @@ public class BinEditor {
             return Response.status(401).build();
 
         // Change the archive
-        bin.setArchived(bin.isArchived() ^ archiveSwitch);
-
-        // Change name
-        if (newName != null)
-            bin.setQuestionSetName(newName);
+        bin.setArchived(!bin.isArchived());
 
         session.update(bin);
 
@@ -108,7 +101,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/{binId}/permissions")
+    @Path("/permissions")
     public Response addBinAccessPermissions(@PathParam("binId") long binId,
                                             @FormParam("users[]") String[] newUsers,
                                             @QueryParam("token") String token) {
@@ -149,7 +142,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/{binId}/permissions")
+    @Path("/permissions")
     public Response deleteBinAccessPermissions(@PathParam("binId") long binId,
                                                @QueryParam("users[]") String[] users,
                                                @QueryParam("token") String token) {
@@ -188,7 +181,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/{binId}/marking-permissions")
+    @Path("/marking-permissions")
     public Response addBinMarkingPermissions(@PathParam("binId") long binId,
                                              @FormParam("markingUsers[]") String[] markingUsers,
                                              @FormParam("questionIds[]") long[] questionIds,
@@ -235,7 +228,7 @@ public class BinEditor {
     Checked
      */
     @DELETE
-    @Path("/{binId}/marking-permissions")
+    @Path("/marking-permissions")
     public Response deleteBinMarkingPermissions(@PathParam("binId") long binId,
                                                 @QueryParam("markingUsers[]") String[] markingUsers,
                                                 @QueryParam("questionIds[]") long[] questionIds,
@@ -284,7 +277,7 @@ public class BinEditor {
     Checked
      */
     @POST
-    @Path("/{binId}/questions")
+    @Path("/questions")
     public Object addBinQuestions(@PathParam("binId") long binId,
                                   @FormParam("questionNames[]") String[] newQuestionNames) {
 
@@ -326,13 +319,21 @@ public class BinEditor {
         return Response.ok().build();
     }
 
+
+    @DELETE
+    @Path("/questions/{questionId}")
+    public Object deleteBinQuestion(@PathParam("binId") long binId,
+                                    @PathParam("questionId") long questionId) {
+        long[] questions = {questionId};
+        return deleteBinQuestions(binId, questions);
+    }
     /*
     Done
 
     Checked
      */
     @DELETE
-    @Path("/{binId}/questions")
+    @Path("/questions")
     public Object deleteBinQuestions(@PathParam("binId") long binId,
                                      @QueryParam("questionId[]") long[] questionIds) {
 
