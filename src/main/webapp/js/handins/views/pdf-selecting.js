@@ -80,9 +80,14 @@ var SelectingView = Backbone.View.extend({
             startLoc = [],
             endLoc = [],
             _this = this;
-        var positions = this.markers.map(function(marker) { return marker.getPosition() });
+        var positions = this.markers.map(function(marker) {
+            var data = marker.getPosition();
+            data.questionId = marker.get("question").get("id");
+
+            return data;
+        });
         positions = _.each(positions, function (elem) {
-            id.push(elem.id);
+            id.push(elem.questionId);
             startPage.push(elem.start.page);
             endPage.push(elem.end.page);
             startLoc.push(elem.start.absolutePosition);

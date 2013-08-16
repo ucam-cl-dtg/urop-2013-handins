@@ -3,7 +3,11 @@ package uk.ac.cam.sup.controllers;
 import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.resteasy.annotations.Form;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.forms.BinForm;
+import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
@@ -69,9 +73,10 @@ public class BinEditor {
 
     Checked
      */
-    @POST
-    @Path("/change")
-    public Object changeBinArchive(@PathParam("binId") long binId) {
+    @PUT
+    @Path("/{binId}/change")
+    public Object changeBin(@PathParam("binId") long binId,
+                            @Form BinForm binForm) {
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -87,9 +92,8 @@ public class BinEditor {
         if (!bin.isOwner(user))
             return Response.status(401).build();
 
-        // Change the archive
-        bin.setArchived(!bin.isArchived());
-
+        // Update the bin accordingly
+        binForm.save(bin);
         session.update(bin);
 
         return Response.ok().build();
