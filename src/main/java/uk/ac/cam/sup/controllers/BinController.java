@@ -6,9 +6,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
+import uk.ac.cam.sup.forms.SplittingForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.tools.FilesManip;
@@ -237,11 +239,7 @@ public class BinController {
     @Path("/{binId}/submissions/{submissionId}")
     public Object splitSubmission (@PathParam("binId") long binId,
                                    @PathParam("submissionId") long submissionId,
-                                   @FormParam("id[]") long[] questionId,
-                                   @FormParam("startPage[]") int[] startPage,
-                                   @FormParam("endPage[]") int[] endPage,
-                                   @FormParam("startLoc[]") float[] startLoc,
-                                   @FormParam("endLoc[]") float[] endLoc) {
+                                   @Form SplittingForm split) {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -313,23 +311,23 @@ public class BinController {
 
         int actualPage = 0;
         try {
-            for (int i = 0; i < questionId.length; pathList.add(directory + "file" + i + ".pdf"), i++)
+            for (int i = 0; i < split.elements(); pathList.add(directory + "file" + i + ".pdf"), i++)
             {
-                if (startPage[i] == endPage[i]) {
+                if (split.getStartPage(i) == split.getEndPage(i)) {
 
-                    pdfManip.takeBox(startPage[i], endLoc[i], startLoc[i], directory + "file" + i + ".pdf");
+                    pdfManip.takeBox(split.getStartPage(i), split.getEndLoc(i), split.getStartLoc(i), directory + "file" + i + ".pdf");
 
                     actualPage++;
                     startPageFinal.add(actualPage);
                     endPageFinal.add(actualPage);
                 }
                 else {
-                    pdfManip.takeBox(startPage[i], 0, startLoc[i], directory + "t1.pdf");
-                    if (startPage[i] + 1 != endPage[i])
-                        pdfManip.takePages(startPage[i] + 1, endPage[i] - 1, directory + "t2.pdf");
-                    pdfManip.takeBox(endPage[i], endLoc[i], 1f, directory + "t3.pdf");
+                    pdfManip.takeBox(split.getStartPage(i), 0, split.getStartLoc(i), directory + "t1.pdf");
+                    if (split.getStartPage(i) + 1 != split.getEndPage(i))
+                        pdfManip.takePages(split.getStartPage(i) + 1, split.getEndPage(i) - 1, directory + "t2.pdf");
+                    pdfManip.takeBox(split.getEndPage(i), split.getEndLoc(i), 1f, directory + "t3.pdf");
 
-                    if (startPage[i] + 1 != endPage[i])
+                    if (split.getStartPage(i) + 1 != split.getEndPage(i))
                         FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t2.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
                     else FilesManip.mergePdf(ImmutableList.of(directory + "t1.pdf", directory + "t3.pdf"), directory + "file" + i + ".pdf");
 
@@ -348,8 +346,8 @@ public class BinController {
         }
 
         // Mark simply
-        for (int i = 0; i < questionId.length; i++)
-            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, questionId[i]), startPageFinal.get(i), endPageFinal.get(i));
+        for (int i = 0; i < split.elements(); i++)
+            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, split.getQuestionId(i)), startPageFinal.get(i), endPageFinal.get(i));
 
         // Split the resulting pdf
         FilesManip.distributeSubmission(user, unmarkedSubmission);
