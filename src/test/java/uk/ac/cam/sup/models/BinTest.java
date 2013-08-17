@@ -65,8 +65,9 @@ public class BinTest {
 
     @Test
     public void testCanSeeAll() throws Exception {
-        Assert.assertTrue(testBin.canSeeAll(testOwner));
-        Assert.assertFalse(testBin.canSeeAll(randomUser));
+    	Assert.fail("This test doesn't compile");
+//        Assert.assertTrue(testBin.canSeeAll(testOwner));
+//        Assert.assertFalse(testBin.canSeeAll(randomUser));
     }
 
     @Test
