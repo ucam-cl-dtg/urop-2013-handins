@@ -11,6 +11,51 @@
         </div>
     </div>
 {/template}
+
+/**
+@param bin
+*/
+{template .editGeneral}
+
+<div class="row">
+    <div class="columns">
+        <h3> Bin name </h3>
+    </div>
+</div>
+<div class="row">
+    <div class="columns large-8">
+        <input type="text" class="bin-name" value="{$bin.name}">
+    </div>
+</div>
+
+<div class="row" style="margin-bottom: 20px">
+    <div class="columns">
+        <h5 style="display:inline-block"> Archived </h5>
+        <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
+            <input id="z" name="switch-z" type="radio" checked>
+            <label for="z" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
+
+            <input id="z1" name="switch-z" type="radio" >
+            <label for="z1" onclick="" style="padding-left: 0px;">Yes</label>
+
+            <span></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="columns large-3">
+        <div class="button expand save-bin">
+            Save
+        </div>
+    </div>
+    <div class="columns large-3">
+        <div class="large-offset-1 expand button alert delete-bin">
+            Delete
+        </div>
+    </div>
+<div>
+{/template}
 /**
 * @param bin
 */
@@ -18,12 +63,11 @@
 <div class="row">
     <div class="columns large-12 small-12">
         <div class="section-container tabs" data-section="tabs">
-                <section>
+                <section class="active general-bin">
                 <p class="title" data-section-title="">
                     <a>General Information</a>
                 </p>
                 <div class="content" data-section-content="">
-                    Hello
                 </div>
             </section>
             <section class="access-permissions">
@@ -34,7 +78,7 @@
                     World
                 </div>
             </section>
-            <section class="active questions">
+            <section class="questions">
                 <p class="title" data-section-title="">
                     <a>Questions</a>
                 </p>
@@ -53,6 +97,7 @@
         </div>
     </div>
 </div>
+<!--
 <div class="container">
     <div class="update-permissions">
         <div class="row">
@@ -103,5 +148,5 @@
 
         </form>
     </div>
-</div>
+</div> -->
 {/template}

@@ -47,6 +47,11 @@ var Bin = Backbone.Model.extend({
     },
     url: function() {
         return prepareURL("bins/" + this.get('id'));
+    },
+    parse: function(response) {
+        if (response.bin)
+            return response.bin;
+        return response;
     }
 });
 
@@ -231,6 +236,40 @@ var EditAccessPermissionsView = Backbone.View.extend({
     }
 })
 
+var EditGeneralBinView = Backbone.View.extend({
+    initialize: function(options) {
+        _.bindAll(this, "render", "saveBin", "deleteBin");
+        this.render();
+
+        this.model.on('change', this.render);
+    },
+
+    render: function() {
+        var html = handins.bin.editGeneral({
+            bin: this.model.toJSON()
+        });
+        this.$el.html(html);
+    },
+
+    events: {
+        'click .save-bin': 'saveBin',
+        'click .delete-bin': 'deleteBin'
+    },
+
+    saveBin: function() {
+        this.model.set("name", this.$('.bin-name').val());
+        //this.bin.set("archived", this.$('.bin-name').val())
+
+        this.model.save();
+    },
+
+    deleteBin: function() {
+        if (confirm("Are you sure you want to delete this Bin?"))
+            this.model.destroy();
+    }
+
+})
+
 
 
 var BinEditView = Backbone.View.extend({
@@ -238,6 +277,7 @@ var BinEditView = Backbone.View.extend({
         this.bin = new Bin({
             id: getRouteParams()
         });
+        this.bin.fetch();
 
         this.editQuestionsView = new EditQuestionsView({
             el: this.$('section.questions .content'),
@@ -248,6 +288,11 @@ var BinEditView = Backbone.View.extend({
             el: this.$('section.access-permissions .content'),
             bin: this.bin
         });
+
+        this.editGeneralBinView = new EditGeneralBinView({
+            el: this.$('section.general-bin .content'),
+            model: this.bin
+        })
 
     },
 
