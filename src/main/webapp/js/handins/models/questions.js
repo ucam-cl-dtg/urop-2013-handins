@@ -1,4 +1,4 @@
-var Question = Backbone.Model.extend({
+var Question = Backbone.CustomModel.extend({
 
 })
 
@@ -16,5 +16,6 @@ var QuestionCollection = Backbone.Collection.extend({
 
     parse: function(response) {
         return response.questions;
-    }
+    },
+
 })

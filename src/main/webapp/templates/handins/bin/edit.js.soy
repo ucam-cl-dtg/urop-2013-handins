@@ -1,5 +1,16 @@
 {namespace handins.bin}
-
+/**
+*/
+{template .addElement}
+    <div class="row">
+        <div class="columns large-9">
+            <input type="text" class="element-input" />
+        </div>
+        <div class="columns large-3">
+            <input type="submit" value="Add user" class="add-element button"/>
+        </div>
+    </div>
+{/template}
 /**
 * @param bin
 */
@@ -15,7 +26,7 @@
                     Hello
                 </div>
             </section>
-            <section>
+            <section class="access-permissions">
                 <p class="title" data-section-title="">
                     <a>Access Permissions</a>
                 </p>

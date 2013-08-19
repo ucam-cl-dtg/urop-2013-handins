@@ -1,6 +1,8 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
@@ -284,7 +286,11 @@ public class BinEditor {
     @POST
     @Path("/{binId}/questions")
     public Object addBinQuestions(@PathParam("binId") long binId,
-                                  @FormParam("questionNames[]") String[] newQuestionNames) {
+                                  @FormParam("name[]") String[] newQuestionNames,
+                                  @FormParam("name") String questionName) {
+
+        if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0))
+            newQuestionNames = new String[] {questionName};
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
