@@ -77,7 +77,7 @@ public class BinEditor {
     Checked
      */
     @PUT
-    @Path("/{binId}/change")
+    @Path("/{binId}")
     public Object changeBin(@PathParam("binId") long binId,
                             @Form BinForm binForm) {
 

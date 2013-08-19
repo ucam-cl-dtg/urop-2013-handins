@@ -32,11 +32,11 @@
     <div class="columns">
         <h5 style="display:inline-block"> Archived </h5>
         <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
-            <input id="z" name="switch-z" type="radio" checked>
-            <label for="z" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
+            <input id="not-archived" name="switch-archived" type="radio" {if not $bin.archived} checked {/if}>
+            <label for="not-archived" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
 
-            <input id="z1" name="switch-z" type="radio" >
-            <label for="z1" onclick="" style="padding-left: 0px;">Yes</label>
+            <input id="archived" name="switch-archived" type="radio" {if $bin.archived} checked{/if} >
+            <label for="archived" onclick="" style="padding-left: 0px;">Yes</label>
 
             <span></span>
         </div>

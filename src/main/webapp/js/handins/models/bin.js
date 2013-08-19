@@ -1,6 +1,7 @@
 Backbone.CustomModel = Backbone.Model.extend({
     sync: function(method, model, options) {
-        options.data = model.attributes;
+        if (method == 'create' || method == 'update')
+            options.data = model.attributes;
         return Backbone.Model.prototype.sync.call(this, method, model, options);
     }
 
@@ -33,17 +34,17 @@ var  AccessPermissionCollection = Backbone.Collection.extend({
     }
 })
 
-var Bin = Backbone.Model.extend({
+var Bin = Backbone.CustomModel.extend({
     initialize: function() {
-        this.set("questions", new QuestionCollection({
+        this.questions = new QuestionCollection({
             bin: this,
-        }));
-        this.set("accessPermissions", new AccessPermissionCollection({
+        });
+        this.accessPermissions = new AccessPermissionCollection({
             bin: this,
-        }));
+        });
 
-        this.get('accessPermissions').fetch();
-        this.get('questions').fetch();
+        this.accessPermissions.fetch();
+        this.questions.fetch();
     },
     url: function() {
         return prepareURL("bins/" + this.get('id'));
@@ -164,7 +165,7 @@ var EditQuestionsView = Backbone.View.extend({
         this.render();
 
         this.questionsView = new GeneralListView({
-            collection: this.bin.get("questions"),
+            collection: this.bin.questions,
             el: this.$('.question-container'),
             options: {
                 'delete': ''
@@ -178,7 +179,7 @@ var EditQuestionsView = Backbone.View.extend({
     },
 
     addQuestion: function(name) {
-        this.bin.get('questions').create({
+        this.bin.questions.create({
             name: name
         })
     },
@@ -196,7 +197,7 @@ var EditAccessPermissionsView = Backbone.View.extend({
         this.render();
 
         this.questionsView = new GeneralListView({
-            collection: this.bin.get("accessPermissions"),
+            collection: this.bin.accessPermissions,
             el: this.$('.access-permissions-container'),
             options: {
                 'delete': ''
@@ -224,7 +225,7 @@ var EditAccessPermissionsView = Backbone.View.extend({
     },
 
     addPermission: function(user) {
-        this.bin.get('accessPermissions').create({
+        this.bin.accessPermissions.create({
             user: user.crsid,
             name: user.name
         })
@@ -257,8 +258,11 @@ var EditGeneralBinView = Backbone.View.extend({
     },
 
     saveBin: function() {
-        this.model.set("name", this.$('.bin-name').val());
-        //this.bin.set("archived", this.$('.bin-name').val())
+        var name = this.$('.bin-name').val();
+        var archived = this.$('input:checked').attr('id') == 'archived';
+        this.model.set("questionSetName", name, {silent: true}) ;
+        this.model.set("name", name, {silent: true});
+        this.model.set("archived", archived, {silent: true});
 
         this.model.save();
     },
