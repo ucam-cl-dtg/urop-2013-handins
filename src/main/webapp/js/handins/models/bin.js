@@ -130,7 +130,7 @@ var GeneralListElemView = Backbone.View.extend({
     },
 
     events: {
-        'click .delete-me': 'deleteElem'
+        'click .delete-element': 'deleteElem'
     },
 
     deleteElem: function(evt) {
@@ -209,6 +209,9 @@ var EditAccessPermissionsView = Backbone.View.extend({
                     });
                 },
                 minLength: 3,
+                render: function( ul, item ) {
+                    return $( "<li>" + "<a><div style='display: inline-block; padding-left: 10px;'><div class='full_name'>" + item.name + " (" + item.crsid + ")</div><div class='email'>" + item.crsid + "@cam.ac.uk</div></div></a></li>" ).appendTo(ul);
+                }
             }
         }).render();
 
@@ -258,13 +261,14 @@ var GeneralAddView = Backbone.View.extend({
     initialize: function(options) {
         _.bindAll(this, 'selectElement', 'addElement');
 
-        if (options.autocomplete)
+        if (options.autocomplete) {
             this.autocomplete = _.defaults(options.autocomplete, {
                 source: ['ana', 'are' ,'mere'],
                 delay: 0,
                 minLenght: 0,
                 select: this.selectElement
             })
+        }
 
     },
 
@@ -284,7 +288,10 @@ var GeneralAddView = Backbone.View.extend({
     setupAutocomplete: function(){
         if (this.autocomplete == undefined)
             return ;
-        this.$('.element-input').autocomplete(this.autocomplete);
+        var auto = this.$('.element-input').autocomplete(this.autocomplete);
+
+        if (this.autocomplete.render)
+            auto.data( "ui-autocomplete" )._renderItem = this.autocomplete.render ;
     },
 
     setupNormalInput: function() {
