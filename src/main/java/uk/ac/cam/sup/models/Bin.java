@@ -1,26 +1,33 @@
 package uk.ac.cam.sup.models;
 
-import com.sun.istack.NotNull;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.hibernate.Session;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.helpers.UserHelper;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.Session;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.criterion.Restrictions;
+
+import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.helpers.UserHelper;
+
+import com.sun.istack.NotNull;
 
 @Entity
 @Table(name = "Bin")
 public class Bin {
     // Fields
     @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
     private long id;
 
     private Date dateCreated;
@@ -31,13 +38,13 @@ public class Bin {
 
     private boolean isArchived;
 
-    @OneToMany(mappedBy="bin")
+    @OneToMany(mappedBy = "bin")
     private Set<BinAccessPermission> accessPermissions;
 
-    @OneToMany(mappedBy="bin")
+    @OneToMany(mappedBy = "bin")
     private Set<BinMarkingPermission> markingPermissions;
 
-    @OneToMany(mappedBy="bin")
+    @OneToMany(mappedBy = "bin")
     private Set<UnmarkedSubmission> unmarkedSubmissions;
 
     @OneToMany(mappedBy = "bin")
@@ -68,20 +75,21 @@ public class Bin {
     }
 
     // AccessPermissions
-    public Set<BinAccessPermission> getAccessPermissions(){
+    public Set<BinAccessPermission> getAccessPermissions() {
         return accessPermissions;
     }
 
-    public void setPermissions(Set accessPermissions) {
+    public void setPermissions(Set<BinAccessPermission> accessPermissions) {
         this.accessPermissions = accessPermissions;
     }
 
     // Submissions
-    public Set<UnmarkedSubmission> getUnmarkedSubmissions(){
+    public Set<UnmarkedSubmission> getUnmarkedSubmissions() {
         return unmarkedSubmissions;
     }
 
-    public void setUnmarkedSubmissions(Set unmarkedSubmissions) {
+    public void setUnmarkedSubmissions(
+            Set<UnmarkedSubmission> unmarkedSubmissions) {
         this.unmarkedSubmissions = unmarkedSubmissions;
     }
 
@@ -120,7 +128,7 @@ public class Bin {
         return answers;
     }
 
-    public void setAnswers(Set answers) {
+    public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
     }
 
@@ -134,7 +142,7 @@ public class Bin {
         return markedSubmissions;
     }
 
-    public void setMarkedSubmissions(Set markedSubmissions) {
+    public void setMarkedSubmissions(Set<MarkedSubmission> markedSubmissions) {
         this.markedSubmissions = markedSubmissions;
     }
 
@@ -174,7 +182,8 @@ public class Bin {
         return markingPermissions;
     }
 
-    public void setMarkingPermissions(Set<BinMarkingPermission> markingPermissions) {
+    public void setMarkingPermissions(
+            Set<BinMarkingPermission> markingPermissions) {
         this.markingPermissions = markingPermissions;
     }
 
@@ -189,52 +198,57 @@ public class Bin {
     }
 
     public boolean canDelete(String user, String token) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user) || isOwner(user);
+        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
+                || isOwner(user);
     }
 
     /*
-    Only users with permissions can upload files.
-    */
+     * Only users with permissions can upload files.
+     */
     public boolean canAddSubmission(String user) {
         Session session = HibernateUtil.getSession();
 
-        List permissions = session.createCriteria(BinAccessPermission.class)
-                                 .add(Restrictions.eq("userCrsId", user))
-                                 .add(Restrictions.eq("bin", this))
-                                 .list();
+        @SuppressWarnings("unchecked")
+        List<BinAccessPermission> permissions = session
+                .createCriteria(BinAccessPermission.class)
+                .add(Restrictions.eq("userCrsId", user))
+                .add(Restrictions.eq("bin", this)).list();
 
         return (!permissions.isEmpty());
     }
 
     /*
-    The Owner should be able to see any unmarkedSubmissions
-    The Dos should be able to see any unmarkedSubmissions
-    The Admin should be able to see any unmarkedSubmissions
-    The User who uploaded the unmarkedSubmission should be able to see it
+     * The Owner should be able to see any unmarkedSubmissions The Dos should be
+     * able to see any unmarkedSubmissions The Admin should be able to see any
+     * unmarkedSubmissions The User who uploaded the unmarkedSubmission should
+     * be able to see it
      */
-    public boolean canSeeSubmission(String user, UnmarkedSubmission unmarkedSubmission) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user) || isOwner(user) || unmarkedSubmission.getOwner().equals(user);
+    public boolean canSeeSubmission(String user,
+            UnmarkedSubmission unmarkedSubmission) {
+        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
+                || isOwner(user) || unmarkedSubmission.getOwner().equals(user);
 
     }
 
     public boolean canSeeBin(String user) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user) || isOwner(user) || canAddSubmission(user);
+        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
+                || isOwner(user) || canAddSubmission(user);
     }
 
-
     /*
-    The Owner SHOULDN'T be able to delete the unmarkedSubmission
-    The Dos SHOULDN'T be able to see delete the unmarkedSubmission
-    The Admin should be able to delete the unmarkedSubmission
-    The User who uploaded the unmarkedSubmission should be able to delete it
+     * The Owner SHOULDN'T be able to delete the unmarkedSubmission The Dos
+     * SHOULDN'T be able to see delete the unmarkedSubmission The Admin should
+     * be able to delete the unmarkedSubmission The User who uploaded the
+     * unmarkedSubmission should be able to delete it
      */
-    public boolean canDeleteSubmission(String user, Submission submission) {
-        return UserHelper.isAdmin(user) || this.token.equals(token) ||  submission.getOwner().equals(user);
+    public boolean canDeleteSubmission(String user, Submission<?> submission) {
+        return UserHelper.isAdmin(user) || this.token.equals(token)
+                || submission.getOwner().equals(user);
 
     }
 
     /*
-     Only by using a valid token can people modify the bin permissions
+     * Only by using a valid token can people modify the bin permissions
      */
     public boolean canAddPermission(String user, String token) {
         return this.owner.equals(user) || this.token.equals(token);
@@ -247,10 +261,11 @@ public class Bin {
     public boolean canAddMarkedSubmission(String user) {
         Session session = HibernateUtil.getSession();
 
-        List permissions = session.createCriteria(BinMarkingPermission.class)
-                                  .add(Restrictions.eq("userCrsId", user))
-                                  .add(Restrictions.eq("bin", this))
-                                  .list();
+        @SuppressWarnings("unchecked")
+        List<BinMarkingPermission> permissions = session
+                .createCriteria(BinMarkingPermission.class)
+                .add(Restrictions.eq("userCrsId", user))
+                .add(Restrictions.eq("bin", this)).list();
 
         return this.isOwner(user) || (!permissions.isEmpty());
     }
@@ -259,18 +274,23 @@ public class Bin {
         Session session = HibernateUtil.getSession();
 
         @SuppressWarnings("unchecked")
-        List<BinMarkingPermission> permissions = session.createCriteria(BinMarkingPermission.class)
-                                                        .add(Restrictions.eq("userCrsId", user))
-                                                        .add(Restrictions.eq("bin", this))
-                                                        .add(Restrictions.eq("questionId", answer.getQuestion().getId()))
-                                                        .add(Restrictions.eq("questionOwner", answer.getOwner()))
-                                                        .list();
+        List<BinMarkingPermission> permissions = session
+                .createCriteria(BinMarkingPermission.class)
+                .add(Restrictions.eq("userCrsId", user))
+                .add(Restrictions.eq("bin", this))
+                .add(Restrictions
+                        .eq("questionId", answer.getQuestion().getId()))
+                .add(Restrictions.eq("questionOwner", answer.getOwner()))
+                .list();
 
-        return user.equals(answer.getOwner()) || this.isOwner(user) || (!permissions.isEmpty());
+        return user.equals(answer.getOwner()) || this.isOwner(user)
+                || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user) || isOwner(user) || user.equals(answer.getAnnotator()) || user.equals(answer.getOwner());
+        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
+                || isOwner(user) || user.equals(answer.getAnnotator())
+                || user.equals(answer.getOwner());
     }
 
     @Transient
