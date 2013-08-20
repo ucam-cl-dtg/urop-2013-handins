@@ -190,7 +190,9 @@ function view(view, template) {
         return template;
     }
 }
-
+SOY_GLOBALS = {
+    URLPrefix: CONTEXT_PATH
+};
 $(document).ready(function() {
     router = Router({
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
