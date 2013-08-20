@@ -1,24 +1,108 @@
 package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.structures.Marking;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class FilesManip {
+
+    public static String newDirectory(String directoryPath) {
+        // Get storage folder
+        ServletContext context = ResteasyProviderFactory.getContextData(ServletContext.class);
+        String rootLocation = context.getInitParameter("storageLocation");
+
+        File tempFileDirectory = new File(rootLocation + directoryPath);
+        //noinspection ResultOfMethodCallIgnored
+        boolean ok = tempFileDirectory.mkdirs();
+
+        return rootLocation + directoryPath;
+    }
+
+    private static void extractFiles(String zipPath, String destinationFolder) throws Exception {
+        ZipFile zipFile = new ZipFile(zipPath);
+
+        zipFile.extractAll(destinationFolder);
+    }
+
+    private static Set<File> getFilesFromFolder(File folder) {
+        Set<File> files = new TreeSet<File>();
+
+        //noinspection ConstantConditions
+        for (File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory())
+                files.addAll(getFilesFromFolder(fileEntry));
+            else files.add(fileEntry);
+        }
+
+        return files;
+    }
+
+    public static void manage(String directory, String baseName, String destination) {
+        try {
+            String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
+
+            // Create directory
+            String elemDirectory = newDirectory(directory + "elem/");
+            String pdfDirectory = newDirectory(directory + "pdf/");
+
+            // Move everything in /elem
+            if (type.equals("application/zip"))
+                extractFiles(directory + baseName, elemDirectory);
+            else
+                fileMove(directory + baseName, elemDirectory + baseName);
+
+            Set<File> files = getFilesFromFolder(new File(elemDirectory));
+
+            for (File file : files) {
+                if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
+                    fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
+                else {
+                    Document document = new Document();
+
+                    PdfWriter.getInstance(document, new FileOutputStream(pdfDirectory + file.getName()));
+                    document.open();
+
+                    Image image1 = Image.getInstance(file.getAbsolutePath());
+                    document.add(image1);
+
+                    document.close();
+                }
+            }
+
+            files = getFilesFromFolder(new File(pdfDirectory));
+            Set<String> filePaths = new TreeSet<String>();
+
+            for (File file : files)
+                filePaths.add(file.getAbsolutePath());
+
+            mergePdf(new LinkedList<String>(filePaths), destination);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /*
     Done
@@ -26,12 +110,9 @@ public class FilesManip {
     public static Object resultingFile(List<Marking> questionList) {
 
         // Create directory
-        String directory = "temp/";
-        File fileDirectory = new File(directory);
-        //noinspection ResultOfMethodCallIgnored
-        fileDirectory.mkdirs();
+        String directory = newDirectory("temp/");
 
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         List<String> questionPathList = new LinkedList<String>();
         for (Marking marking : questionList)
@@ -39,20 +120,20 @@ public class FilesManip {
 
         PDFManip pdfManip;
         try {
-            FilesManip.mergePdf(questionPathList, randomTemp);
+            FilesManip.mergePdf(questionPathList, directory + randomTemp);
 
-            pdfManip = new PDFManip(randomTemp);
+            pdfManip = new PDFManip(directory + randomTemp);
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(404).build();
         }
 
         for (Marking marking : questionList)
             FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
 
         try {
-            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+            return Response.ok(new TemporaryFileInputStream(new File(directory + randomTemp))).build();
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(404).build();
         }
     }
 
@@ -70,7 +151,6 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + answer.getId() + ".pdf";
-        PDFManip pdfManip;
         try {
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
         } catch (Exception e) {
@@ -146,10 +226,7 @@ public class FilesManip {
         for (Distribution distribution : distributions)
         {
             // Create directory
-            String directory = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
-            File fileDirectory = new File(directory);
-            //noinspection ResultOfMethodCallIgnored
-            fileDirectory.mkdirs();
+            String directory = newDirectory("temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/");
 
             if (submission instanceof UnmarkedSubmission)
                 rememberAnswer(distribution, directory, submission);

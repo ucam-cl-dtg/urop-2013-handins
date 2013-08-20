@@ -1,6 +1,5 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.googlecode.htmleasy.RedirectException;
 import com.googlecode.htmleasy.ViewWith;
@@ -16,7 +15,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 @Path("/hack")

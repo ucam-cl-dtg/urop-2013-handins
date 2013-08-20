@@ -55,10 +55,7 @@ public class MarkingController {
         session.save(markedSubmission);
 
         // Create directory
-        String directory = "temp/" + user + "/submissions/annotated/";
-        File fileDirectory = new File(directory);
-        //noinspection ResultOfMethodCallIgnored
-        fileDirectory.mkdirs();
+        String directory = FilesManip.newDirectory("temp/" + user + "/submissions/annotated/");
 
         // Save the submission
         String fileName = "submission_" + markedSubmission.getId() + ".pdf";
