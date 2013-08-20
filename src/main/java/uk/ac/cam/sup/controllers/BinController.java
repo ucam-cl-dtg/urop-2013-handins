@@ -125,8 +125,8 @@ public class BinController {
             return Response.status(401).build();
 
         // Create directory
-        String tempDirectory = FilesManip.newDirectory("temp/" + user + "/submissions/temp/");
-        String directory = FilesManip.newDirectory("temp/" + user + "/submissions/answers/");
+        String tempDirectory = FilesManip.newDirectory("files/" + user + "/submissions/temp/", false);
+        String directory = FilesManip.newDirectory("files/" + user + "/submissions/answers/", false);
 
         // Save the submission
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4);
@@ -150,6 +150,8 @@ public class BinController {
         unmarkedSubmission.setOwner(user);
 
         session.update(unmarkedSubmission);
+
+        FilesManip.deleteFolder(new File(FilesManip.newDirectory("files/" + user + "/submissions/temp/", false)));
 
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", unmarkedSubmission.getId()),
                                                                      "bin", bin.getId());
@@ -300,7 +302,7 @@ public class BinController {
         }
 
         // Create directory
-        String directory = FilesManip.newDirectory("temp/" + user + "/submissions/temp/");
+        String directory = FilesManip.newDirectory("files/" + user + "/submissions/temp/", false);
 
         // Split questions
         List<Integer> startPageFinal = new LinkedList<Integer>();
@@ -354,6 +356,8 @@ public class BinController {
 
         // Split the resulting pdf
         FilesManip.distributeSubmission(user, unmarkedSubmission);
+
+        FilesManip.deleteFolder(new File(FilesManip.newDirectory("files/" + user + "/submissions/temp", false)));
 
         return Response.ok().build();
     }

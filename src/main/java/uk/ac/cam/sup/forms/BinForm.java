@@ -9,6 +9,7 @@ public class BinForm {
     @FormParam("owner") private String owner;
     @FormParam("questionSetName") private String questionSetName;
     @FormParam("archived") private Boolean archived;
+    @FormParam("peerMarking") private Boolean peerMarking;
 
     public void save(Bin bin) {
         if (owner != null)
@@ -19,5 +20,8 @@ public class BinForm {
 
         if (archived != null)
             bin.setArchived(archived);
+
+        if (peerMarking != null)
+            bin.setPeerMarking(peerMarking);
     }
 }

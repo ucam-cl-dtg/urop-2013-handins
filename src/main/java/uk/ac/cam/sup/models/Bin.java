@@ -37,6 +37,7 @@ public class Bin {
     private String questionSetName;
 
     private boolean isArchived;
+    private boolean peerMarking;
 
     @OneToMany(mappedBy = "bin")
     private Set<BinAccessPermission> accessPermissions;
@@ -187,6 +188,15 @@ public class Bin {
         this.markingPermissions = markingPermissions;
     }
 
+    // PeerMarking
+    public boolean isPeerMarking() {
+        return peerMarking;
+    }
+
+    public void setPeerMarking(boolean peerMarking) {
+        this.peerMarking = peerMarking;
+    }
+
     // Actual useful functions
 
     public static String generateToken() {
@@ -267,30 +277,28 @@ public class Bin {
                 .add(Restrictions.eq("userCrsId", user))
                 .add(Restrictions.eq("bin", this)).list();
 
-        return this.isOwner(user) || (!permissions.isEmpty());
+        return isPeerMarking() || this.isOwner(user) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
         Session session = HibernateUtil.getSession();
 
         @SuppressWarnings("unchecked")
-        List<BinMarkingPermission> permissions = session
-                .createCriteria(BinMarkingPermission.class)
-                .add(Restrictions.eq("userCrsId", user))
-                .add(Restrictions.eq("bin", this))
-                .add(Restrictions
-                        .eq("questionId", answer.getQuestion().getId()))
-                .add(Restrictions.eq("questionOwner", answer.getOwner()))
-                .list();
+        List<BinMarkingPermission> permissions = session.createCriteria(BinMarkingPermission.class)
+                                                        .add(Restrictions.eq("userCrsId", user))
+                                                        .add(Restrictions.eq("bin", this))
+                                                        .add(Restrictions.eq("questionId", answer.getQuestion().getId()))
+                                                        .add(Restrictions.eq("questionOwner", answer.getOwner()))
+                                                        .list();
 
-        return user.equals(answer.getOwner()) || this.isOwner(user)
+        return isPeerMarking() || user.equals(answer.getOwner()) || this.isOwner(user)
                 || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
         return UserHelper.isAdmin(user) || UserHelper.isDos(user)
                 || isOwner(user) || user.equals(answer.getAnnotator())
-                || user.equals(answer.getOwner());
+                || user.equals(answer.getOwner()) || isPeerMarking();
     }
 
     @Transient
