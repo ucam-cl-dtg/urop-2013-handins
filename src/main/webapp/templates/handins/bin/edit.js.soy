@@ -43,6 +43,21 @@
     </div>
 </div>
 
+<div class="row" style="margin-bottom: 20px">
+    <div class="columns">
+        <h5 style="display:inline-block"> Archived </h5>
+        <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
+            <input id="not-archived" name="switch-archived" type="radio" {if not $bin.archived} checked {/if}>
+            <label for="not-archived" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
+
+            <input id="archived" name="switch-archived" type="radio" {if $bin.archived} checked{/if} >
+            <label for="archived" onclick="" style="padding-left: 0px;">Yes</label>
+
+            <span></span>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="columns large-3">
         <div class="button expand save-bin">
@@ -57,7 +72,7 @@
 <div>
 {/template}
 /**
-* @param bin
+*
 */
 {template .edit}
 <div class="row">
@@ -97,56 +112,4 @@
         </div>
     </div>
 </div>
-<!--
-<div class="container">
-    <div class="update-permissions">
-        <div class="row">
-            <div class="large-12">
-            <fieldset>
-                <legend>Users with permission</legend>
-                <div class="permissions-container async-loader" data-path="bins/{$bin.id}/permissions" template-name="handins.bin.editPermissions">
-
-                </div>
-             </fieldset>
-             </div>
-        </div>
-
-        <form action="/api/bins/{$bin.id}/permissions" method="post">
-            <div class="row">
-                <div class="columns large-9">
-                    <input type="text" class="token-user-input" name="users[]"/>
-                </div>
-                <div class="columns large-3">
-                    <input type="submit" value="Add user" class="button"/>
-                </div>
-            </div>
-
-        </form>
-    </div>
-
-    <div class="update-problems">
-        <div class="row">
-            <div class="large-12">
-            <fieldset>
-                <legend>Problems in the bin</legend>
-                <div class="problems-container async-loader" data-path="bins/{$bin.id}/questions" template-name="handins.bin.showQuestions">
-
-                </div>
-             </fieldset>
-             </div>
-        </div>
-
-        <form action="/api/bins/{$bin.id}/questions" method="post">
-            <div class="row">
-                <div class="columns large-9">
-                    <input type="text" name="questionNames[]"/>
-                </div>
-                <div class="columns large-3">
-                    <input type="submit" value="Add Question" class="button"/>
-                </div>
-            </div>
-
-        </form>
-    </div>
-</div> -->
 {/template}
