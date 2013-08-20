@@ -111,7 +111,11 @@ public class BinEditor {
     @Path("/{binId}/permissions")
     public Response addBinAccessPermissions(@PathParam("binId") long binId,
                                             @FormParam("users[]") String[] newUsers,
-                                            @QueryParam("token") String token) {
+                                            @QueryParam("token") String token,
+                                            @FormParam("user") String _user) {
+
+        if (_user != null && (newUsers == null || newUsers.length == 0))
+            newUsers = new String[] {_user};
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
