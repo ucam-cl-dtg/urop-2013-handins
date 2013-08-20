@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BinControllerTest {
+    /*
     final String testOwner = "at666";
     final String testQuestionSet = "/questionSet/666013";
     final String randomUser ="at667";
@@ -196,4 +197,5 @@ public class BinControllerTest {
         Assert.assertTrue(permissions.contains(perm2u));
     }
 
+    */
 }

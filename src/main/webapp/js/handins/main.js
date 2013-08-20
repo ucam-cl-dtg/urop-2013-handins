@@ -239,6 +239,12 @@ moduleScripts['handins'] = {
                 router.navigate("/bins/" + id, { trigger: true });
             })
         }],
+        'edit': [function() {
+            pageView = new BinEditView({
+                el: $('.main')
+            })
+            pageView.render()
+        }],
         'permissions': [function(){
             $("form").ajaxForm(function() {
                asyncLoad($('.container .async-loader'));

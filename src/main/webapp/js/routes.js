@@ -5,10 +5,6 @@ The second term must be either a string representing the template name or
 a function that returns the template name. The function will receive the json returned
 by the request as the first parameter.
 */
-var BASE_PATH="/api/";
-var ROUTER_OPTIONS= {
-    pushState: true
-}
 
 function binInjector(templateName) {
     var bin = null;
@@ -185,11 +181,23 @@ function marking(students) {
 }
 
 
+function view(view, template) {
+    return function(json) {
+        pageView = new view({
+            el: $('.main'),
+            data: json
+        });
+        return template;
+    }
+}
+SOY_GLOBALS = {
+    URLPrefix: CONTEXT_PATH
+};
 $(document).ready(function() {
     router = Router({
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins": binList,
-        "bins/:binId": "handins.bin.permissions",
+        "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),

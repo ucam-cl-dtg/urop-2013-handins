@@ -1,6 +1,8 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
@@ -75,7 +77,7 @@ public class BinEditor {
     Checked
      */
     @PUT
-    @Path("/{binId}/change")
+    @Path("/{binId}")
     public Object changeBin(@PathParam("binId") long binId,
                             @Form BinForm binForm) {
 
@@ -109,7 +111,11 @@ public class BinEditor {
     @Path("/{binId}/permissions")
     public Response addBinAccessPermissions(@PathParam("binId") long binId,
                                             @FormParam("users[]") String[] newUsers,
-                                            @QueryParam("token") String token) {
+                                            @QueryParam("token") String token,
+                                            @FormParam("user") String _user) {
+
+        if (_user != null && (newUsers == null || newUsers.length == 0))
+            newUsers = new String[] {_user};
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -284,7 +290,11 @@ public class BinEditor {
     @POST
     @Path("/{binId}/questions")
     public Object addBinQuestions(@PathParam("binId") long binId,
-                                  @FormParam("questionNames[]") String[] newQuestionNames) {
+                                  @FormParam("name[]") String[] newQuestionNames,
+                                  @FormParam("name") String questionName) {
+
+        if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0))
+            newQuestionNames = new String[] {questionName};
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -324,6 +334,14 @@ public class BinEditor {
         return Response.ok().build();
     }
 
+
+    @DELETE
+    @Path("/{binId}/questions/{questionId}")
+    public Object deleteBinQuestion(@PathParam("binId") long binId,
+                                    @PathParam("questionId") long questionId) {
+        long[] questions = {questionId};
+        return deleteBinQuestions(binId, questions);
+    }
     /*
     Done
 

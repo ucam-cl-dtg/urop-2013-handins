@@ -8,11 +8,16 @@ public class BinForm {
     @FormParam("id") private long id;
     @FormParam("owner") private String owner;
     @FormParam("questionSetName") private String questionSetName;
-    @FormParam("isArchived") private boolean isArchived;
+    @FormParam("archived") private Boolean archived;
 
     public void save(Bin bin) {
-        bin.setQuestionSetName(questionSetName);
-        bin.setArchived(isArchived);
-        bin.setOwner(owner);
+        if (owner != null)
+            bin.setOwner(owner);
+
+        if (questionSetName != null)
+            bin.setQuestionSetName(questionSetName);
+
+        if (archived != null)
+            bin.setArchived(archived);
     }
 }

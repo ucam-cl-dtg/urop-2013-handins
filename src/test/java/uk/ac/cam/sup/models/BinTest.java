@@ -9,7 +9,7 @@ import uk.ac.cam.sup.HibernateUtil;
 
 //TODO add test for admins and dos
 public class BinTest {
-
+/*
     final String testOwner = "at666";
     final String testQuestionSet = "/questionSet/666013";
     final String randomUser ="at667";
@@ -106,4 +106,5 @@ public class BinTest {
         Assert.assertTrue(testBin.canDeletePermission("user", testBin.getToken()));
         Assert.assertFalse(testBin.canDeletePermission("user", "asdadas"));
     }
+    */
 }
