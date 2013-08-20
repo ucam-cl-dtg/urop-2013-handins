@@ -1,8 +1,12 @@
 package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
@@ -15,10 +19,79 @@ import uk.ac.cam.sup.structures.Marking;
 
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class FilesManip {
+
+    private static void extractFiles(String zipPath, String destinationFolder) throws Exception {
+        ZipFile zipFile = new ZipFile(zipPath);
+
+        zipFile.extractAll(destinationFolder);
+    }
+
+    private static Set<File> getFilesFromFolder(File folder) {
+        Set<File> files = new TreeSet<File>();
+
+        //noinspection ConstantConditions
+        for (File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory())
+                files.addAll(getFilesFromFolder(fileEntry));
+            else files.add(fileEntry);
+        }
+
+        return files;
+    }
+
+    public static void manage(String directory, String baseName, String destination) {
+        try {
+            String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
+
+            // Create directory
+            File fileDirectory = new File(directory + "elem/");
+            //noinspection ResultOfMethodCallIgnored
+            fileDirectory.mkdirs();
+
+            // Move everything in /elem
+            if (type.equals("application/zip"))
+                extractFiles(directory + baseName, directory + "elem/");
+            else
+                fileMove(directory + baseName, directory + "elem/" + baseName);
+
+            Set<File> files = getFilesFromFolder(new File(directory + "elem/"));
+
+            for (File file : files) {
+                if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
+                    fileMove(file.getAbsolutePath(), directory + "pdf/" + file.getName());
+                else {
+                    Document document = new Document();
+
+                    PdfWriter.getInstance(document, new FileOutputStream(directory + "pdf/" + file.getName()));
+                    document.open();
+
+                    Image image1 = Image.getInstance(file.getAbsolutePath());
+                    document.add(image1);
+
+                    document.close();
+                }
+            }
+
+            files = getFilesFromFolder(new File(directory + "pdf/"));
+            Set<String> filePaths = new TreeSet<String>();
+
+            for (File file : files)
+                filePaths.add(file.getAbsolutePath());
+
+            mergePdf(new LinkedList<String>(filePaths), destination);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /*
     Done
@@ -43,7 +116,7 @@ public class FilesManip {
 
             pdfManip = new PDFManip(randomTemp);
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(404).build();
         }
 
         for (Marking marking : questionList)
@@ -52,7 +125,7 @@ public class FilesManip {
         try {
             return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(404).build();
         }
     }
 
@@ -70,7 +143,6 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + answer.getId() + ".pdf";
-        PDFManip pdfManip;
         try {
             new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
         } catch (Exception e) {

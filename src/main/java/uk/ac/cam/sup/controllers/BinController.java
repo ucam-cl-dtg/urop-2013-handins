@@ -3,6 +3,7 @@ package uk.ac.cam.sup.controllers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -122,23 +123,29 @@ public class BinController {
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
 
+        // Create directory
+        String tempDirectory = "temp/" + user + "/submissions/temp/";
+        String directory = "temp/" + user + "/submissions/answers/";
+
+        File tempFileDirectory = new File(tempDirectory);
+        //noinspection ResultOfMethodCallIgnored
+        tempFileDirectory.mkdirs();
+
+        // Save the submission
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4);
+        try {
+            FilesManip.fileSave(uploadForm.file, tempDirectory + randomTemp);
+        } catch (Exception e) {
+            return Response.status(345).build();
+        }
+
         // New unmarkedSubmission to get id
         UnmarkedSubmission unmarkedSubmission = new UnmarkedSubmission();
         session.save(unmarkedSubmission);
 
-        // Create directory
-        String directory = "temp/" + user + "/submissions/answers/";
-        File fileDirectory = new File(directory);
-        //noinspection ResultOfMethodCallIgnored
-        fileDirectory.mkdirs();
-
-        // Save the submission
         String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
-        try {
-            FilesManip.fileSave(uploadForm.file, directory + fileName);
-        } catch (Exception e) {
-            return Response.status(345).build();
-        }
+
+        FilesManip.manage(tempDirectory, randomTemp, directory + fileName);
 
         // Add the submission to the database
         unmarkedSubmission.setFilePath(directory + fileName);
@@ -254,6 +261,8 @@ public class BinController {
 
         if (!bin.canAddSubmission(user))
             return Response.status(401).build();
+
+        //
 
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
