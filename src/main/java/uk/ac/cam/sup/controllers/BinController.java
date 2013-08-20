@@ -125,12 +125,8 @@ public class BinController {
             return Response.status(401).build();
 
         // Create directory
-        String tempDirectory = "temp/" + user + "/submissions/temp/";
-        String directory = "temp/" + user + "/submissions/answers/";
-
-        File tempFileDirectory = new File(tempDirectory);
-        //noinspection ResultOfMethodCallIgnored
-        tempFileDirectory.mkdirs();
+        String tempDirectory = FilesManip.newDirectory("temp/" + user + "/submissions/temp/");
+        String directory = FilesManip.newDirectory("temp/" + user + "/submissions/answers/");
 
         // Save the submission
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4);
@@ -304,10 +300,7 @@ public class BinController {
         }
 
         // Create directory
-        String directory = "temp/" + user + "/submissions/temp/";
-        File fileDirectory = new File(directory);
-        //noinspection ResultOfMethodCallIgnored
-        fileDirectory.mkdirs();
+        String directory = FilesManip.newDirectory("temp/" + user + "/submissions/temp/");
 
         // Split questions
         List<Integer> startPageFinal = new LinkedList<Integer>();

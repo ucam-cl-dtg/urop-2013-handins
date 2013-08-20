@@ -6,17 +6,19 @@ import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.structures.Marking;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.nio.file.*;
@@ -24,10 +26,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class FilesManip {
+
+    public static String newDirectory(String directoryPath) {
+        // Get storage folder
+        ServletContext context = ResteasyProviderFactory.getContextData(ServletContext.class);
+        String rootLocation = context.getInitParameter("storageLocation");
+
+        File tempFileDirectory = new File(rootLocation + directoryPath);
+        //noinspection ResultOfMethodCallIgnored
+        boolean ok = tempFileDirectory.mkdirs();
+
+        return rootLocation + directoryPath;
+    }
 
     private static void extractFiles(String zipPath, String destinationFolder) throws Exception {
         ZipFile zipFile = new ZipFile(zipPath);
@@ -53,25 +65,24 @@ public class FilesManip {
             String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
 
             // Create directory
-            File fileDirectory = new File(directory + "elem/");
-            //noinspection ResultOfMethodCallIgnored
-            fileDirectory.mkdirs();
+            String elemDirectory = newDirectory(directory + "elem/");
+            String pdfDirectory = newDirectory(directory + "pdf/");
 
             // Move everything in /elem
             if (type.equals("application/zip"))
-                extractFiles(directory + baseName, directory + "elem/");
+                extractFiles(directory + baseName, elemDirectory);
             else
-                fileMove(directory + baseName, directory + "elem/" + baseName);
+                fileMove(directory + baseName, elemDirectory + baseName);
 
-            Set<File> files = getFilesFromFolder(new File(directory + "elem/"));
+            Set<File> files = getFilesFromFolder(new File(elemDirectory));
 
             for (File file : files) {
                 if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
-                    fileMove(file.getAbsolutePath(), directory + "pdf/" + file.getName());
+                    fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
                 else {
                     Document document = new Document();
 
-                    PdfWriter.getInstance(document, new FileOutputStream(directory + "pdf/" + file.getName()));
+                    PdfWriter.getInstance(document, new FileOutputStream(pdfDirectory + file.getName()));
                     document.open();
 
                     Image image1 = Image.getInstance(file.getAbsolutePath());
@@ -81,7 +92,7 @@ public class FilesManip {
                 }
             }
 
-            files = getFilesFromFolder(new File(directory + "pdf/"));
+            files = getFilesFromFolder(new File(pdfDirectory));
             Set<String> filePaths = new TreeSet<String>();
 
             for (File file : files)
@@ -99,12 +110,9 @@ public class FilesManip {
     public static Object resultingFile(List<Marking> questionList) {
 
         // Create directory
-        String directory = "temp/";
-        File fileDirectory = new File(directory);
-        //noinspection ResultOfMethodCallIgnored
-        fileDirectory.mkdirs();
+        String directory = newDirectory("temp/");
 
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         List<String> questionPathList = new LinkedList<String>();
         for (Marking marking : questionList)
@@ -112,9 +120,9 @@ public class FilesManip {
 
         PDFManip pdfManip;
         try {
-            FilesManip.mergePdf(questionPathList, randomTemp);
+            FilesManip.mergePdf(questionPathList, directory + randomTemp);
 
-            pdfManip = new PDFManip(randomTemp);
+            pdfManip = new PDFManip(directory + randomTemp);
         } catch (Exception e) {
             return Response.status(404).build();
         }
@@ -123,7 +131,7 @@ public class FilesManip {
             FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
 
         try {
-            return Response.ok(new TemporaryFileInputStream(new File(randomTemp))).build();
+            return Response.ok(new TemporaryFileInputStream(new File(directory + randomTemp))).build();
         } catch (Exception e) {
             return Response.status(404).build();
         }
@@ -218,10 +226,7 @@ public class FilesManip {
         for (Distribution distribution : distributions)
         {
             // Create directory
-            String directory = "temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/";
-            File fileDirectory = new File(directory);
-            //noinspection ResultOfMethodCallIgnored
-            fileDirectory.mkdirs();
+            String directory = newDirectory("temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/");
 
             if (submission instanceof UnmarkedSubmission)
                 rememberAnswer(distribution, directory, submission);
