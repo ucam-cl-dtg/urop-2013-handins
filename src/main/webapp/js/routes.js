@@ -5,10 +5,6 @@ The second term must be either a string representing the template name or
 a function that returns the template name. The function will receive the json returned
 by the request as the first parameter.
 */
-var BASE_PATH="/api/";
-var ROUTER_OPTIONS= {
-    pushState: true
-}
 
 function binInjector(templateName) {
     var bin = null;
