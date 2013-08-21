@@ -94,8 +94,8 @@ function questionList(json) {
 
     _.map(json.elems, function(elem) {
         elem.name = elem.question;
-        // TODO fix this
-        elem.download = elem.link;
+        elem.download = prepareURL(elem.link);
+
     })
 
     return "shared.handins.generic.listPanel";
