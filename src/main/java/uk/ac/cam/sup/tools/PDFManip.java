@@ -125,7 +125,7 @@ public class PDFManip {
 
         String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-        FilesManip.fileMove(filePath, randomTemp);
+        FilesManip.fileMove(filePath, FilesManip.newDirectory("", false) + randomTemp);
 
         PdfReader reader = new PdfReader(randomTemp);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
