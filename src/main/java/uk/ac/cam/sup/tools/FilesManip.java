@@ -18,7 +18,6 @@ import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.structures.Marking;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.nio.file.*;
@@ -29,14 +28,17 @@ import java.util.TreeSet;
 
 public class FilesManip {
 
-    public static String newDirectory(String directoryPath) {
+    public static String newDirectory(String directoryPath, boolean hasRoot) {
         // Get storage folder
         ServletContext context = ResteasyProviderFactory.getContextData(ServletContext.class);
         String rootLocation = context.getInitParameter("storageLocation");
 
+        if (hasRoot)
+            rootLocation = "";
+
         File tempFileDirectory = new File(rootLocation + directoryPath);
         //noinspection ResultOfMethodCallIgnored
-        boolean ok = tempFileDirectory.mkdirs();
+        tempFileDirectory.mkdirs();
 
         return rootLocation + directoryPath;
     }
@@ -60,13 +62,28 @@ public class FilesManip {
         return files;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+
+        if (files != null)
+            for (File f: files)
+                if (f.isDirectory())
+                    deleteFolder(f);
+                else
+                    f.delete();
+
+        folder.delete();
+    }
+
     public static void manage(String directory, String baseName, String destination) {
+
+        // Create directories
+        String elemDirectory = newDirectory(directory + "elem/", true);
+        String pdfDirectory = newDirectory(directory + "pdf/", true);
+
         try {
             String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
-
-            // Create directory
-            String elemDirectory = newDirectory(directory + "elem/");
-            String pdfDirectory = newDirectory(directory + "pdf/");
 
             // Move everything in /elem
             if (type.equals("application/zip"))
@@ -110,7 +127,7 @@ public class FilesManip {
     public static Object resultingFile(List<Marking> questionList) {
 
         // Create directory
-        String directory = newDirectory("temp/");
+        String directory = newDirectory("files/", false);
 
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -226,7 +243,7 @@ public class FilesManip {
         for (Distribution distribution : distributions)
         {
             // Create directory
-            String directory = newDirectory("temp/" + distribution.getStudent() + "/" + submission.getFolder() + "/");
+            String directory = newDirectory("files/" + distribution.getStudent() + "/" + submission.getFolder() + "/", false);
 
             if (submission instanceof UnmarkedSubmission)
                 rememberAnswer(distribution, directory, submission);

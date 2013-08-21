@@ -45,7 +45,7 @@ public class PDFManip {
      */
    /* public void addHeader(String content) throws Exception {
 
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         FilesManip.fileMove(filePath, randomTemp);
 
@@ -123,7 +123,7 @@ public class PDFManip {
      */
     public void injectMetadata(String key, String value) throws Exception {
 
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         FilesManip.fileMove(filePath, randomTemp);
 
@@ -170,7 +170,7 @@ public class PDFManip {
      */
     public void add(String sourcePath) throws Exception {
 
-        String randomTemp = "temp/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
+        String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         Document document = new Document();
 
