@@ -11,4 +11,3 @@ src/main/webapp/app
 src/main/webapp/sup
 temp/
 frontend
-hibernate.cfg.xml
