@@ -123,11 +123,12 @@ public class PDFManip {
      */
     public void injectMetadata(String key, String value) throws Exception {
 
+        String directory = FilesManip.newDirectory("", false);
         String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-        FilesManip.fileMove(filePath, FilesManip.newDirectory("", false) + randomTemp);
+        FilesManip.fileMove(filePath, directory + randomTemp);
 
-        PdfReader reader = new PdfReader(randomTemp);
+        PdfReader reader = new PdfReader(directory + randomTemp);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
 
         Map <String, String> info = reader.getInfo();
@@ -137,7 +138,7 @@ public class PDFManip {
         stamper.setMoreInfo(info);
         stamper.close();
 
-        FilesManip.fileDelete(randomTemp);
+        FilesManip.fileDelete(directory + randomTemp);
     }
 
     /*
@@ -170,11 +171,12 @@ public class PDFManip {
      */
     public void add(String sourcePath) throws Exception {
 
+        String directory = FilesManip.newDirectory("", false);
         String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
         Document document = new Document();
 
-        PdfCopy copy = new PdfCopy(document, new FileOutputStream(randomTemp));
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(directory + randomTemp));
 
         document.open();
 
@@ -192,7 +194,7 @@ public class PDFManip {
 
         document.close();
 
-        FilesManip.fileMove(randomTemp, filePath);
+        FilesManip.fileMove(directory + randomTemp, filePath);
     }
 
     /*
