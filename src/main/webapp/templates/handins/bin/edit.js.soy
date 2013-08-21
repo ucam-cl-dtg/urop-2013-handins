@@ -45,13 +45,13 @@
 
 <div class="row" style="margin-bottom: 20px">
     <div class="columns">
-        <h5 style="display:inline-block"> Archived </h5>
+        <h5 style="display:inline-block"> Peer marking </h5>
         <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
-            <input id="not-archived" name="switch-archived" type="radio" {if not $bin.archived} checked {/if}>
-            <label for="not-archived" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
+            <input id="not-peer-marked" name="switch-peer-marked" type="radio" {if not $bin.archived} checked {/if}>
+            <label for="not-peer-marked" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
 
-            <input id="archived" name="switch-archived" type="radio" {if $bin.archived} checked{/if} >
-            <label for="archived" onclick="" style="padding-left: 0px;">Yes</label>
+            <input id="peer-marked" name="switch-peer-marked" type="radio" {if $bin.archived} checked{/if} >
+            <label for="peer-marked" onclick="" style="padding-left: 0px;">Yes</label>
 
             <span></span>
         </div>
@@ -75,6 +75,7 @@
 *
 */
 {template .edit}
+
 <div class="row">
     <div class="columns large-12 small-12">
         <div class="section-container tabs" data-section="tabs">
@@ -101,6 +102,7 @@
                     with beer
                 </div>
             </section>
+            <!--
             <section>
                 <p class="title" data-section-title="">
                     <a>Marking Permissions</a>
@@ -109,6 +111,7 @@
                     and cookies
                 </div>
             </section>
+            -->
         </div>
     </div>
 </div>

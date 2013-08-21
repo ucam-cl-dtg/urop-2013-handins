@@ -5,7 +5,7 @@
 */
 {template .user}
     <h3> Currently logged in as {$user} </h3>
-    <form action="/api/hack/user" method="post">
+    <form action="{$ij.URLPrefix}/api/hack/user" method="post">
         <input type="text" name="user"/>
         <input type="submit"/>
     </form>

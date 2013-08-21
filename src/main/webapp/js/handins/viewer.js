@@ -48,7 +48,7 @@ var FindStates = {
 };
 
 PDFJS.imageResourcesPath = './images/';
-PDFJS.workerSrc = '/js/vendor/pdf.js';
+PDFJS.workerSrc = CONTEXT_PATH + '/js/vendor/pdf.js';
 //PDFJS.disableWorker=true;
 
 //var magicViewer = function() {

@@ -17,7 +17,7 @@
         <div class="button-bar">
             <ul class="button-group">
                 <!-- TODO Fix this -->
-                <li><a href="/api/marking/bins/{$bin.id}/download" class="medium secondary button" data-bypass>Download all</a></li>
+                <li><a href="{$ij.URLPrefix}/api/marking/bins/{$bin.id}/download" class="medium secondary button" data-bypass>Download all</a></li>
             </ul>
         </div>
     </div>
@@ -40,7 +40,7 @@
 <div class="row">
     {foreach $annotator in $annotators}
         <div class="columns large-3">
-            <a class="button" href="/api/bins/{$bin}/marked/download" data-bypass>
+            <a class="button" href="{$ij.URLPrefix}/api/bins/{$bin}/marked/download" data-bypass>
                 {$annotator}
             </a>
         </div>

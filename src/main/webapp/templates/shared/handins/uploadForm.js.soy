@@ -8,7 +8,7 @@
     <h3>Upload answers to {$bin.name}</h3>
     <div class="row upload-work-form">
         <div class="columns large-12">
-            <form method="post" action="/api/bins/{$bin.id}" enctype="multipart/form-data">
+            <form method="post" action="{$ij.URLPrefix}/api/bins/{$bin.id}" enctype="multipart/form-data">
                 <fieldset>
                     <legend>Upload marked work</legend>
                     <input type="file" name="file"><input type="submit" name="submit" value="Upload">
