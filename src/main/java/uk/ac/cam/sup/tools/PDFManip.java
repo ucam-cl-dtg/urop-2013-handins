@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,7 +42,7 @@ public class PDFManip {
     /*
     FixMe: This function should be rewritten because it behaves badly in general
      */
-   /* public void addHeader(String content) throws Exception {
+   /*public void addHeader(String content) throws Exception {
 
         String randomTemp = "files/temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
@@ -228,21 +227,15 @@ public class PDFManip {
 
         document.open();
 
+        Image image = Image.getInstance("otterMark.jpg");
+        image.setAbsolutePosition(0, bottom * pageSize.getHeight());
+
         PdfContentByte content = writer.getDirectContent();
         PdfImportedPage page = writer.getImportedPage(reader, pageIndex);
 
-        content.addTemplate(page, 0, 0);
+        content.addTemplate(page, 0, 25);
+        content.addImage(image);
 
         document.close();
-    }
-
-    public static void main(String[] args) throws Exception {
-        PDFManip pdfManip = new PDFManip("2.pdf");
-
-        List <String> lista = new LinkedList<String>();
-        for (int i = 4; i >= 0; lista.add("e" + i + ".pdf"), i--)
-            pdfManip.takeBox(4, 0.2f * i, 0.2f * (i + 1), "e" + i + ".pdf");
-
-        FilesManip.mergePdf(lista, "eh.pdf");
     }
 }
