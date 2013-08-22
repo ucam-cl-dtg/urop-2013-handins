@@ -6,6 +6,7 @@ a function that returns the template name. The function will receive the json re
 by the request as the first parameter.
 */
 
+
 function binInjector(templateName) {
     var bin = null;
     isCached = function() {
