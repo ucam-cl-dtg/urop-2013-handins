@@ -207,9 +207,16 @@ public class Bin {
         return user.equals(owner);
     }
 
+    public boolean hasTotalAccess(String user) {
+        return hasTotalAccess(user, null);
+    }
+
+    public boolean hasTotalAccess(String user, String token) {
+        return isOwner(user) || UserHelper.isAdmin(user) || this.token.equals(token);
+    }
+
     public boolean canDelete(String user, String token) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
-                || isOwner(user);
+        return hasTotalAccess(user, token);
     }
 
     /*
@@ -219,10 +226,9 @@ public class Bin {
         Session session = HibernateUtil.getSession();
 
         @SuppressWarnings("unchecked")
-        List<BinAccessPermission> permissions = session
-                .createCriteria(BinAccessPermission.class)
-                .add(Restrictions.eq("userCrsId", user))
-                .add(Restrictions.eq("bin", this)).list();
+        List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
+                                                       .add(Restrictions.eq("userCrsId", user))
+                                                       .add(Restrictions.eq("bin", this)).list();
 
         return (!permissions.isEmpty());
     }
@@ -233,16 +239,13 @@ public class Bin {
      * unmarkedSubmissions The User who uploaded the unmarkedSubmission should
      * be able to see it
      */
-    public boolean canSeeSubmission(String user,
-            UnmarkedSubmission unmarkedSubmission) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
-                || isOwner(user) || unmarkedSubmission.getOwner().equals(user);
+    public boolean canSeeSubmission(String user, UnmarkedSubmission unmarkedSubmission) {
+        return hasTotalAccess(user) || unmarkedSubmission.getOwner().equals(user);
 
     }
 
-    public boolean canSeeBin(String user) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
-                || isOwner(user) || canAddSubmission(user);
+    public boolean canUploadIntoBin(String user) {
+        return hasTotalAccess(user) || UserHelper.isDos(user) || canAddSubmission(user);
     }
 
     /*
@@ -252,8 +255,7 @@ public class Bin {
      * unmarkedSubmission should be able to delete it
      */
     public boolean canDeleteSubmission(String user, Submission<?> submission) {
-        return UserHelper.isAdmin(user) || this.token.equals(token)
-                || submission.getOwner().equals(user);
+        return isOwner(user) || UserHelper.isAdmin(user) || this.token.equals(token) || submission.getOwner().equals(user);
 
     }
 
@@ -261,23 +263,22 @@ public class Bin {
      * Only by using a valid token can people modify the bin permissions
      */
     public boolean canAddPermission(String user, String token) {
-        return this.owner.equals(user) || this.token.equals(token);
+        return hasTotalAccess(user, token);
     }
 
     public boolean canDeletePermission(String user, String token) {
-        return this.owner.equals(user) || this.token.equals(token);
+        return hasTotalAccess(user, token);
     }
 
     public boolean canAddMarkedSubmission(String user) {
         Session session = HibernateUtil.getSession();
 
         @SuppressWarnings("unchecked")
-        List<BinMarkingPermission> permissions = session
-                .createCriteria(BinMarkingPermission.class)
-                .add(Restrictions.eq("userCrsId", user))
-                .add(Restrictions.eq("bin", this)).list();
+        List<BinMarkingPermission> permissions = session.createCriteria(BinMarkingPermission.class)
+                                                        .add(Restrictions.eq("userCrsId", user))
+                                                        .add(Restrictions.eq("bin", this)).list();
 
-        return isPeerMarking() || this.isOwner(user) || (!permissions.isEmpty());
+        return isPeerMarking() || isOwner(user) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
@@ -291,14 +292,11 @@ public class Bin {
                                                         .add(Restrictions.eq("questionOwner", answer.getOwner()))
                                                         .list();
 
-        return isPeerMarking() || user.equals(answer.getOwner()) || this.isOwner(user)
-                || (!permissions.isEmpty());
+        return isPeerMarking() || user.equals(answer.getOwner()) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
-        return UserHelper.isAdmin(user) || UserHelper.isDos(user)
-                || isOwner(user) || user.equals(answer.getAnnotator())
-                || user.equals(answer.getOwner()) || isPeerMarking();
+        return isPeerMarking() || hasTotalAccess(user) || UserHelper.isDos(user) || user.equals(answer.getAnnotator()) || user.equals(answer.getOwner());
     }
 
     @Transient

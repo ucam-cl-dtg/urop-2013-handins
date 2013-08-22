@@ -61,6 +61,9 @@ public class BinController {
         // Save and return bin details
         session.save(bin);
 
+        // Add owner to permissions
+        session.save(new BinAccessPermission(bin, user));
+
         return ImmutableMap.of("id", bin.getId(),
                                "token", bin.getToken());
     }
@@ -85,7 +88,7 @@ public class BinController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (! bin.canSeeBin(user))
+        if (! bin.canUploadIntoBin(user))
             return Response.status(401).build();
 
         // Return bin details
@@ -215,7 +218,7 @@ public class BinController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.canSeeBin(user))
+        if (!bin.canUploadIntoBin(user))
             return Response.status(401).build();
 
         // Get all submissions from the list
@@ -316,8 +319,7 @@ public class BinController {
 
         int actualPage = 0;
         try {
-            for (int i = 0; i < split.elements(); pathList.add(directory + "file" + i + ".pdf"), i++)
-            {
+            for (int i = 0; i < split.elements(); pathList.add(directory + "file" + i + ".pdf"), i++) {
                 if (split.getStartPage(i) == split.getEndPage(i)) {
 
                     pdfManip.takeBox(split.getStartPage(i), split.getEndLoc(i), split.getStartLoc(i), directory + "file" + i + ".pdf");
@@ -381,7 +383,7 @@ public class BinController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.canSeeBin(user))
+        if (!bin.canUploadIntoBin(user))
             return Response.status(401).build();
 
         // Query for all the questions in the bin

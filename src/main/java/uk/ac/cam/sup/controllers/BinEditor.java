@@ -176,12 +176,14 @@ public class BinEditor {
         @SuppressWarnings("unchecked")
         List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
                                                        .add(Restrictions.in("userCrsId", users))
+                                                       .add(Restrictions.not(Restrictions.eq("userCrsId", bin.getOwner())))
                                                        .add(Restrictions.eq("bin", bin))
                                                        .list();
 
         // Delete all BinPermissions
         for (BinAccessPermission perm: permissions)
-            session.delete(perm);
+            if (!perm.getUserCrsId().equals(bin.getOwner()))
+                session.delete(perm);
 
         return Response.ok().build();
     }
@@ -242,7 +244,7 @@ public class BinEditor {
     @Path("/{binId}/marking-permissions")
     public Response deleteBinMarkingPermissions(@PathParam("binId") long binId,
                                                 @QueryParam("markingUsers[]") String[] markingUsers,
-                                                @QueryParam("questionIds[]") long[] questionIds,
+                                                @QueryParam("questionIds[]") Long[] questionIds,
                                                 @QueryParam("questionOwners[]") String[] questionOwners,
                                                 @QueryParam("token") String token) {
 
@@ -260,24 +262,18 @@ public class BinEditor {
         if (!bin.canDeletePermission(user, token))
             return Response.status(401).build();
 
-        for (String markingUser : markingUsers)
-            for (long questionId : questionIds)
-                for (String questionOwner : questionOwners) {
+        // Check if marking permissions already exists and skip if it does
+        List permissions = session.createCriteria(BinMarkingPermission.class)
+                                  .add(Restrictions.eq("bin", bin))
+                                  .add(Restrictions.in("userCrsId", markingUsers))
+                                  .add(Restrictions.not(Restrictions.eq("userCrsId", bin.getOwner())))
+                                  .add(Restrictions.in("questionId", questionIds))
+                                  .add(Restrictions.in("questionOwner", questionOwners))
+                                  .list();
 
-                    // Check if marking permissions already exists and skip if it does
-                    List permissions = session.createCriteria(BinMarkingPermission.class)
-                                              .add(Restrictions.eq("bin", bin))
-                                              .add(Restrictions.eq("userCrsId", markingUser))
-                                              .add(Restrictions.eq("questionId", questionId))
-                                              .add(Restrictions.eq("questionOwner", questionOwner))
-                                              .list();
-
-                    if (permissions.size() == 0)
-                        continue;
-
-                    // Add the new user permission
-                    session.delete(permissions.get(0));
-                }
+        // Add the new user permission
+        for (int i = 0; i < permissions.size(); i++)
+            session.delete(permissions);
 
         return Response.ok().build();
     }

@@ -29,7 +29,29 @@ public class BinMenuController {
     @GET
     @Path("/marking")
     public Object showBinsToMark() {
-        throw new RedirectException("/bins");
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        // Get list of bins
+        @SuppressWarnings("unchecked")
+        List<Bin> binList = session.createCriteria(Bin.class)
+                                   .createAlias("markingPermissions", "perm")
+                                   .add(Restrictions.eq("perm.userCrsId", user))
+                                   .addOrder(Order.desc("id"))
+                                   .list();
+
+        // Filter all visible bins and return them
+        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+        for (Bin bin : binList)
+            finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                                             "name", bin.getName(),
+                                             "isArchived", bin.isArchived(),
+                                             "questions", bin.getQuestionCount()));
+
+        return ImmutableMap.of("bins", finalBinList);
     }
 
     /*
@@ -38,7 +60,8 @@ public class BinMenuController {
     Checked
      */
     @GET
-    public Object viewBinList() {
+    @Path("/upload")
+    public Object viewBinsToUpload() {
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -50,6 +73,39 @@ public class BinMenuController {
         List<Bin> binList = session.createCriteria(Bin.class)
                                    .createAlias("accessPermissions", "perm")
                                    .add(Restrictions.eq("perm.userCrsId", user))
+                                   .addOrder(Order.desc("id"))
+                                   .list();
+
+        // Filter all visible bins and return them
+        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+        for (Bin bin : binList)
+            finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                                             "name", bin.getName(),
+                                             "isArchived", bin.isArchived(),
+                                             "questions", bin.getQuestionCount()));
+
+        return ImmutableMap.of("bins", finalBinList);
+    }
+
+
+    /*
+    Done
+
+    Checked
+     */
+    @GET
+    @Path("/manage")
+    public Object viewBinsOwned() {
+
+        // Set Hibernate and get user
+        Session session = HibernateUtil.getSession();
+
+        String user = UserHelper.getCurrentUser(request);
+
+        // Get list of bins
+        @SuppressWarnings("unchecked")
+        List<Bin> binList = session.createCriteria(Bin.class)
+                                   .add(Restrictions.eq("owner", user))
                                    .addOrder(Order.desc("id"))
                                    .list();
 
