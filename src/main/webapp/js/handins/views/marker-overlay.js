@@ -64,10 +64,19 @@ var MarkerOverlay = Backbone.View.extend({
     },
 
     updateWidth: function() {
+        /*
         var pageMargin = this.parse(this.page.css("margin-left"));
         var pageBorder = this.parse(this.page.css("border-left-width"));
+        var FIREFOX = /Firefox/i.test(navigator.userAgent);
 
-        this.$el.css("margin-left", pageMargin + pageBorder + "px");
+        var margin = pageMargin + pageBorder;
+
+        if (FIREFOX)
+            margin = this.page[0].offsetLeft;
+        */
+        var pageBorder = this.parse(this.page.css("border-left-width"));
+        var margin = this.page[0].offsetLeft + pageBorder;
+        this.$el.css("margin-left", margin + "px");
 
         // Now lets fix the width
 

@@ -6,6 +6,7 @@ a function that returns the template name. The function will receive the json re
 by the request as the first parameter.
 */
 
+
 function binInjector(templateName) {
     var bin = null;
     isCached = function() {
@@ -190,11 +191,16 @@ function view(view, template) {
         return template;
     }
 }
+function homepage(json) {
+    router.navigate("bins/create", {trigger: true})
+    return 'handins.bin.create';
+}
 SOY_GLOBALS = {
     URLPrefix: CONTEXT_PATH
 };
 $(document).ready(function() {
     router = Router({
+        "": homepage,
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins": binList,
         "bins/:binId": "handins.bin.edit",

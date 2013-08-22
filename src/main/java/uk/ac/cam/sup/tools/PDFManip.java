@@ -4,7 +4,9 @@ import com.google.common.io.Files;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -227,7 +229,8 @@ public class PDFManip {
 
         document.open();
 
-        Image image = Image.getInstance("otterMark.jpg");
+        String otterPath = ResteasyProviderFactory.getContextData(ServletContext.class).getRealPath("/otterMark.jpg");
+        Image image = Image.getInstance(otterPath);
         image.setAbsolutePosition(0, bottom * pageSize.getHeight());
 
         PdfContentByte content = writer.getDirectContent();
