@@ -190,11 +190,16 @@ function view(view, template) {
         return template;
     }
 }
+function homepage(json) {
+    router.navigate("bins/create", {trigger: true})
+    return 'handins.bin.create';
+}
 SOY_GLOBALS = {
     URLPrefix: CONTEXT_PATH
 };
 $(document).ready(function() {
     router = Router({
+        "": homepage,
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins": binList,
         "bins/:binId": "handins.bin.edit",
