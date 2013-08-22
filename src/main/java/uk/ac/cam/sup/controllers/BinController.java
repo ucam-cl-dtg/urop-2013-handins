@@ -45,15 +45,18 @@ public class BinController {
     Checked
      */
     @POST
-    public Object addBin(@FormParam("questionSet") String questionSet ) {
+    public Object addBin(@FormParam("questionSet") String questionSet) {
+
+        // Sanity Checking
+        questionSet = questionSet.trim();
+
+        if (questionSet == null || questionSet.isEmpty())
+            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable name.")).build();
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
         String user = UserHelper.getCurrentUser(request);
-
-        if (questionSet.trim().isEmpty())
-            return Response.status(418).build();
 
         // Create a new bin
         Bin bin = new Bin(user, questionSet.trim());
@@ -88,8 +91,8 @@ public class BinController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (! bin.canUploadIntoBin(user))
-            return Response.status(401).build();
+        if (!bin.canUploadIntoBin(user))
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot see bin.")).build();
 
         // Return bin details
         return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
@@ -110,8 +113,9 @@ public class BinController {
     public Object addSubmission(@MultipartForm FileUploadForm uploadForm,
                                 @PathParam("binId") long binId) {
 
-        if (uploadForm.file.length == 0)
-            return Response.status(401).build();
+        // Sanity check
+        if (!uploadForm.validate())
+            return Response.status(400).entity(ImmutableMap.of("message", "File not found.")).build();
 
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
@@ -125,7 +129,7 @@ public class BinController {
             return Response.status(404).build();
 
         if (!bin.canAddSubmission(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload into bin.")).build();
 
         // Create directory
         String tempDirectory = FilesManip.newDirectory("files/" + user + "/submissions/temp/", false);
@@ -136,7 +140,7 @@ public class BinController {
         try {
             FilesManip.fileSave(uploadForm.file, tempDirectory + randomTemp);
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(500).entity(ImmutableMap.of("message", "Unable to save file.")).build();
         }
 
         // New unmarkedSubmission to get id
@@ -180,15 +184,15 @@ public class BinController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.isOwner(user))
-            return Response.status(401).build();
+        if (!bin.hasTotalAccess(user))
+            return Response.status(403).entity(ImmutableMap.of("message", "Unable to access details.")).build();
 
         // Get the list of people who can access the bin
         @SuppressWarnings("unchecked")
         List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
-                                                 .add(Restrictions.eq("bin", bin))
-                                                 .addOrder(Order.asc("userCrsId"))
-                                                 .list();
+                                                       .add(Restrictions.eq("bin", bin))
+                                                       .addOrder(Order.asc("userCrsId"))
+                                                       .list();
 
         // Create list of people who have access to the bin
         List<String> res = new LinkedList<String>();
@@ -219,7 +223,7 @@ public class BinController {
             return Response.status(404).build();
 
         if (!bin.canUploadIntoBin(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot see bin.")).build();
 
         // Get all submissions from the list
         // noinspection unchecked
@@ -241,14 +245,16 @@ public class BinController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("/{binId}/submissions/{submissionId}")
     public Object splitSubmission (@PathParam("binId") long binId,
                                    @PathParam("submissionId") long submissionId,
                                    @Form SplittingForm split) {
+
+        // Sanity check
+        if (!split.validate())
+            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable split.")).build();
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -262,19 +268,18 @@ public class BinController {
             return Response.status(404).build();
 
         if (!bin.canAddSubmission(user))
-            return Response.status(401).build();
-
-        //
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload into bin.")).build();
 
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
+        // Check the existence and validity of the submission
         if (!unmarkedSubmission.getOwner().equals(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Unable to split the submission.")).build();
 
         for (Answer answer : unmarkedSubmission.getAllAnswers())
             if (answer.isDownloaded())
-                return Response.status(401).build();
+                return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload answer to " + answer.getQuestion().getName() + ". Already downloaded for marking.")).build();
 
         // Delete all answers from the submission
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {
@@ -301,7 +306,7 @@ public class BinController {
         try {
             pdfManip = new PDFManip(unmarkedSubmission.getOriginalFilePath());
         } catch (Exception e) {
-            return Response.status(404).build();
+            return Response.status(500).entity(ImmutableMap.of("message", "Unable to save.")).build();
         }
 
         // Create directory
@@ -349,7 +354,7 @@ public class BinController {
             pdfManip.setFilePath(unmarkedSubmission.getFilePath());
         }
         catch (Exception e) {
-            return Response.status(401).build();
+            return Response.status(500).entity(ImmutableMap.of("message", "Unable to save.")).build();
         }
 
         // Mark simply
@@ -384,7 +389,7 @@ public class BinController {
             return Response.status(404).build();
 
         if (!bin.canUploadIntoBin(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload into bin.")).build();
 
         // Query for all the questions in the bin
         @SuppressWarnings("unchecked")

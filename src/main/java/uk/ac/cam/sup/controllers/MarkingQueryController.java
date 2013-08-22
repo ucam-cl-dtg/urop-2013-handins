@@ -30,8 +30,6 @@ public class MarkingQueryController {
 
     /*
     Done
-
-    Checked
      */
     private Object getQuery(long binId, Long questionId, String studentCrsId) {
 

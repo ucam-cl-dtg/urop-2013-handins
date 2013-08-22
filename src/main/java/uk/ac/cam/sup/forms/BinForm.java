@@ -11,6 +11,19 @@ public class BinForm {
     @FormParam("archived") private Boolean archived;
     @FormParam("peerMarking") private Boolean peerMarking;
 
+    public boolean validate() {
+        boolean valid = true;
+
+        if (owner != null)
+            //noinspection ConstantConditions
+            valid &= (!owner.trim().isEmpty());
+
+        if (questionSetName != null)
+            valid &= (!questionSetName.trim().isEmpty());
+
+        return valid;
+    }
+
     public void save(Bin bin) {
         if (owner != null)
             bin.setOwner(owner);

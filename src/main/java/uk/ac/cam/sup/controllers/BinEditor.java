@@ -1,15 +1,11 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
-import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
@@ -54,8 +50,11 @@ public class BinEditor {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.canDelete(user, token) || bin.getUnmarkedSubmissions().size() > 0)
-            return Response.status(401).build();
+        if (!bin.canDelete(user, token))
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete bin.")).build();
+
+        if (bin.getUnmarkedSubmissions().size() > 0)
+            return Response.status(403).entity(ImmutableMap.of("message", "Contains uploaded files. Unable to delete.")).build();
 
         // Delete all questions from the bin
         for (ProposedQuestion proposedQuestion : bin.getQuestionSet())
@@ -81,6 +80,10 @@ public class BinEditor {
     public Object changeBin(@PathParam("binId") long binId,
                             @Form BinForm binForm) {
 
+        // Sanity check
+        if (!binForm.validate())
+            return Response.status(400).entity(ImmutableMap.of("message", "Bad bin details.")).build();
+
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
@@ -93,7 +96,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.isOwner(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "No permissions to modify bin.")).build();
 
         // Update the bin accordingly
         binForm.save(bin);
@@ -129,7 +132,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.canAddPermission(user, token))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot add permissions to bin.")).build();
 
         // Get all existing users
         Set<String> usersWithPermission = new TreeSet<String>();
@@ -149,8 +152,6 @@ public class BinEditor {
 
     /*
     Done
-
-    Checked
      */
     @DELETE
     @Path("/{binId}/permissions")
@@ -170,7 +171,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.canDeletePermission(user, token))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete permissions from bin.")).build();
 
         // Get all BinPermissions
         @SuppressWarnings("unchecked")
@@ -190,8 +191,6 @@ public class BinEditor {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("/{binId}/marking-permissions")
@@ -213,7 +212,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.canAddPermission(user, token))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot add permissions to bin.")).build();
 
         for (String markingUser : markingUsers)
             for (long questionId : questionIds)
@@ -237,8 +236,6 @@ public class BinEditor {
 
     /*
     Done
-
-    Checked
      */
     @DELETE
     @Path("/{binId}/marking-permissions")
@@ -260,7 +257,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.canDeletePermission(user, token))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete permissions from bin.")).build();
 
         // Check if marking permissions already exists and skip if it does
         List permissions = session.createCriteria(BinMarkingPermission.class)
@@ -280,8 +277,6 @@ public class BinEditor {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("/{binId}/questions")
@@ -304,7 +299,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.isOwner(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot add question to bin.")).build();
 
         // Get all existing questions
         Set<String> existingQuestions = new TreeSet<String>();
@@ -335,13 +330,12 @@ public class BinEditor {
     @Path("/{binId}/questions/{questionId}")
     public Object deleteBinQuestion(@PathParam("binId") long binId,
                                     @PathParam("questionId") long questionId) {
+
         long[] questions = {questionId};
         return deleteBinQuestions(binId, questions);
     }
     /*
     Done
-
-    Checked
      */
     @DELETE
     @Path("/{binId}/questions")
@@ -360,7 +354,7 @@ public class BinEditor {
             return Response.status(404).build();
 
         if (!bin.isOwner(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete question from bin.")).build();
 
         // Get the question and delete it or add it to the list of undeletable
         List<ImmutableMap> unDel = new LinkedList<ImmutableMap>();

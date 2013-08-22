@@ -9,6 +9,13 @@ public class SplittingForm {
     @FormParam("startLoc[]") private float[] startLoc;
     @FormParam("endLoc[]") private float[] endLoc;
 
+    // ToDo:
+
+    public boolean validate() {
+        return false;
+    }
+
+
     public int elements() {
         return questionId.length;
     }
