@@ -27,9 +27,9 @@ var SelectingView = Backbone.View.extend({
     },
 
     remove: function() {
-        this.questionView.remove();
+        this.questionsView.remove();
 
-        Backbone.Model.prototype.remove.apply(this);
+        Backbone.View.prototype.remove.apply(this);
     },
 
     events: {
@@ -71,6 +71,7 @@ var SelectingView = Backbone.View.extend({
 
     closeSelection: function() {
         this.$el.foundation("reveal", "close");
+        this.remove();
     },
 
     saveSelection: function(evt) {
