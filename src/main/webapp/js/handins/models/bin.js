@@ -172,7 +172,8 @@ var EditQuestionsView = Backbone.View.extend({
             }
         })
         this.addQuestionView = new GeneralAddView({
-            el: this.$('.add-question-container')
+            el: this.$('.add-question-container'),
+            text: "Add Question"
         }).render();
 
         this.addQuestionView.on('add', this.addQuestion);
@@ -205,6 +206,7 @@ var EditAccessPermissionsView = Backbone.View.extend({
         })
         this.addPermissionView = new GeneralAddView({
             el: this.$('.add-permission-container'),
+            text: "Add User",
             autocomplete: {
                 source: function(request, response) {
                     $.get(prepareURL("hack/users"),request, function(data) {
@@ -309,6 +311,10 @@ var BinEditView = Backbone.View.extend({
 var GeneralAddView = Backbone.View.extend({
     initialize: function(options) {
         _.bindAll(this, 'selectElement', 'addElement');
+        if (options.text)
+            this.text = options.text;
+        else
+            this.text = "Add"
 
         if (options.autocomplete) {
             this.autocomplete = _.defaults(options.autocomplete, {
@@ -353,7 +359,9 @@ var GeneralAddView = Backbone.View.extend({
     },
 
     render: function() {
-        this.$el.html(handins.bin.addElement());
+        this.$el.html(handins.bin.addElement({
+            text: this.text
+        }));
         this.setupAutocomplete();
         this.setupNormalInput();
         return this;
