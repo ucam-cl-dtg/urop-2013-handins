@@ -1,6 +1,7 @@
 package uk.ac.cam.sup.tools;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
@@ -76,49 +77,44 @@ public class FilesManip {
         folder.delete();
     }
 
-    public static void manage(String directory, String baseName, String destination) {
+    public static void manage(String directory, String baseName, String destination) throws Exception {
 
         // Create directories
         String elemDirectory = newDirectory(directory + "elem/", true);
         String pdfDirectory = newDirectory(directory + "pdf/", true);
 
-        try {
-            String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
+        String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
 
-            // Move everything in /elem
-            if (type.equals("application/zip"))
-                extractFiles(directory + baseName, elemDirectory);
-            else
-                fileMove(directory + baseName, elemDirectory + baseName);
+        // Move everything in /elem
+        if (type.equals("application/zip"))
+            extractFiles(directory + baseName, elemDirectory);
+        else fileMove(directory + baseName, elemDirectory + baseName);
 
-            Set<File> files = getFilesFromFolder(new File(elemDirectory));
+        Set<File> files = getFilesFromFolder(new File(elemDirectory));
 
-            for (File file : files) {
-                if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
-                    fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
-                else {
-                    Document document = new Document();
+        for (File file : files) {
+            if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
+                fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
+            else {
+                Document document = new Document();
 
-                    PdfWriter.getInstance(document, new FileOutputStream(pdfDirectory + file.getName()));
-                    document.open();
+                PdfWriter.getInstance(document, new FileOutputStream(pdfDirectory + file.getName()));
+                document.open();
 
-                    Image image1 = Image.getInstance(file.getAbsolutePath());
-                    document.add(image1);
+                Image image1 = Image.getInstance(file.getAbsolutePath());
+                document.add(image1);
 
-                    document.close();
-                }
+                document.close();
             }
-
-            files = getFilesFromFolder(new File(pdfDirectory));
-            Set<String> filePaths = new TreeSet<String>();
-
-            for (File file : files)
-                filePaths.add(file.getAbsolutePath());
-
-            mergePdf(new LinkedList<String>(filePaths), destination);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        files = getFilesFromFolder(new File(pdfDirectory));
+        Set<String> filePaths = new TreeSet<String>();
+
+        for (File file : files)
+            filePaths.add(file.getAbsolutePath());
+
+        mergePdf(new LinkedList<String>(filePaths), destination);
     }
 
     /*
@@ -140,14 +136,10 @@ public class FilesManip {
             FilesManip.mergePdf(questionPathList, directory + randomTemp);
 
             pdfManip = new PDFManip(directory + randomTemp);
-        } catch (Exception e) {
-            return Response.status(404).build();
-        }
 
-        for (Marking marking : questionList)
-            FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
+            for (Marking marking : questionList)
+                FilesManip.markPdf(pdfManip, marking.getOwner(), marking.getQuestion(), marking.getFirst(), marking.getLast());
 
-        try {
             return Response.ok(new TemporaryFileInputStream(new File(directory + randomTemp))).build();
         } catch (Exception e) {
             return Response.status(404).build();
@@ -157,7 +149,7 @@ public class FilesManip {
     /*
     Done
      */
-    private static void rememberAnswer(Distribution distribution, String directory, Submission submission) {
+    private static void rememberAnswer(Distribution distribution, String directory, Submission submission) throws Exception {
 
         // Set Hibernate
         Session session = HibernateUtil.getSession();
@@ -168,17 +160,13 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + answer.getId() + ".pdf";
-        try {
-            new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
 
         for (Object object : session.createCriteria(Answer.class)
-                                     .add(Restrictions.eq("bin", submission.getBin()))
-                                     .add(Restrictions.eq("question", distribution.getQuestion()))
-                                     .add(Restrictions.eq("owner", distribution.getStudent()))
-                                     .list()) {
+                                    .add(Restrictions.eq("bin", submission.getBin()))
+                                    .add(Restrictions.eq("question", distribution.getQuestion()))
+                                    .add(Restrictions.eq("owner", distribution.getStudent()))
+                                    .list()) {
 
             Answer answer1 = (Answer) object;
 
@@ -199,7 +187,7 @@ public class FilesManip {
     /*
     Done
      */
-    private static void rememberMarkedAnswer(String user, Distribution distribution, String directory, Submission submission) {
+    private static void rememberMarkedAnswer(String user, Distribution distribution, String directory, Submission submission) throws Exception {
 
         // Set Hibernate
         Session session = HibernateUtil.getSession();
@@ -210,11 +198,7 @@ public class FilesManip {
 
         // Update Answer
         String filePath = directory + markedAnswer.getId() + ".pdf";
-        try {
-            new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new PDFManip(submission.getFilePath()).takePages(distribution.getStartPage(), distribution.getEndPage(), filePath);
 
         markedAnswer.setFilePath(filePath);
         markedAnswer.setOwner(distribution.getStudent());
@@ -233,7 +217,7 @@ public class FilesManip {
     /*
     Done
      */
-    public static void distributeSubmission(String user, Submission submission) {
+    public static void distributeSubmission(String user, Submission submission) throws Exception {
 
         // Split the file
 
@@ -268,36 +252,20 @@ public class FilesManip {
 
         for (String filePath : filePaths) {
 
-            PdfReader reader;
-            try {
-                reader = new PdfReader(filePath);
-            } catch (IOException e) {
-                continue;
-            }
+            PdfReader reader = new PdfReader(filePath);
             int n = reader.getNumberOfPages();
 
             for (int pn = 0; pn < n; )
-                try {
-                    copy.addPage(copy.getImportedPage(reader, ++pn));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                copy.addPage(copy.getImportedPage(reader, ++pn));
         }
 
         document.close();
     }
 
-    /*
-    Todo: maybe delete or change the function
-     */
-    public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) {
+    public static void markPdf(PDFManip pdfManip, String owner, ProposedQuestion question, int firstPage, int lastPage) throws Exception {
         for (int i = firstPage; i <= lastPage; i++) {
-            try {
-                pdfManip.injectMetadata("pageOwner" + i, owner);
-                pdfManip.injectMetadata("pageQuestion" + i, Long.toString(question.getId()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            pdfManip.injectMetadata("pageOwner" + i, owner);
+            pdfManip.injectMetadata("pageQuestion" + i, Long.toString(question.getId()));
         }
     }
 
