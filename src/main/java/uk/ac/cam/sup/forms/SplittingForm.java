@@ -1,5 +1,11 @@
 package uk.ac.cam.sup.forms;
 
+import org.hibernate.Session;
+import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.sup.models.ProposedQuestion;
+import uk.ac.cam.sup.models.UnmarkedSubmission;
+import uk.ac.cam.sup.tools.PDFManip;
+
 import javax.ws.rs.FormParam;
 
 public class SplittingForm {
@@ -8,6 +14,43 @@ public class SplittingForm {
     @FormParam("endPage[]") private int[] endPage;
     @FormParam("startLoc[]") private float[] startLoc;
     @FormParam("endLoc[]") private float[] endLoc;
+
+    public boolean validate(UnmarkedSubmission submission) {
+
+        try {
+            Session session = HibernateUtil.getSession();
+
+            int pages = (new PDFManip(submission.getFilePath())).getPageCount();
+
+            int elemCount = questionId.length;
+
+            if (elemCount != startPage.length || elemCount != endPage.length || elemCount != startLoc.length || elemCount != endLoc.length)
+                return false;
+
+            for (int i = 1; i <= elemCount; i++) {
+                if (startPage[i] > endPage[i])
+                    return false;
+
+                if (startPage[i] == endPage[i] && startLoc[i] <= endLoc[i])
+                    return false;
+
+                if (startPage[i] < 1)
+                    return false;
+
+                if (endPage[i] > pages)
+                    return false;
+
+                if (((ProposedQuestion) session.get(ProposedQuestion.class, questionId[i])).getBin().getId() != submission.getBin().getId())
+                    return false;
+            }
+        }
+        catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     public int elements() {
         return questionId.length;

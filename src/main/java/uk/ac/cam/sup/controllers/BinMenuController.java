@@ -1,7 +1,6 @@
 package uk.ac.cam.sup.controllers;
 
 import com.google.common.collect.ImmutableMap;
-import com.googlecode.htmleasy.RedirectException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -56,8 +55,6 @@ public class BinMenuController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/upload")
@@ -90,8 +87,6 @@ public class BinMenuController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/manage")

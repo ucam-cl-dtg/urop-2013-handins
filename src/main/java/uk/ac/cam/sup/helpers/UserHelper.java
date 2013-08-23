@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public class UserHelper {
 
-    public static String currentUser = "ap760";
-
     public static boolean isDos(String user) {
         return false;
     }

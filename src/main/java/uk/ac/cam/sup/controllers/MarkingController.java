@@ -16,7 +16,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.util.*;
 
 @Path("/marking/bins/{binId}")
@@ -28,8 +27,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -48,7 +45,7 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
         if (!bin.canAddMarkedSubmission(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot add marked submission.")).build();
 
         // New markedSubmission to get Id
         MarkedSubmission markedSubmission = new MarkedSubmission();
@@ -62,7 +59,7 @@ public class MarkingController {
         try {
             FilesManip.fileSave(uploadForm.file, directory + fileName);
         } catch (Exception e) {
-            return Response.status(345).build();
+            return Response.status(500).entity(ImmutableMap.of("message", "Could not save file.")).build();
         }
 
         // Add the submission to the database
@@ -82,8 +79,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @DELETE
     @Path("/{submissionId}")
@@ -102,14 +97,14 @@ public class MarkingController {
         if (bin == null)
             return Response.status(404).build();
         if (!bin.canAddMarkedSubmission(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete marked submission.")).build();
 
         // Get markedSubmission from database and check
         MarkedSubmission markedSubmission = (MarkedSubmission) session.get(MarkedSubmission.class, submissionId);
         if (markedSubmission == null)
             return Response.status(404).build();
         if (!markedSubmission.getOwner().equals(user))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete marked submission.")).build();
 
         // Delete its markedAnswers
         for (MarkedAnswer markedAnswer : markedSubmission.getAllAnswers()) {
@@ -129,8 +124,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/students")
@@ -187,8 +180,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("students/{studentCrsId}")
@@ -248,8 +239,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("students/{studentCrsId}")
@@ -287,7 +276,6 @@ public class MarkingController {
 
             /*
             if it exists and it is visible then change the annotation
-            if it is no visible then return 401
             if it doesn't exist then do nothing
              */
             if (answers.size() > 0)
@@ -296,7 +284,6 @@ public class MarkingController {
 
                     newState &= answers.get(0).isAnnotated();
                 }
-                else return Response.status(401).build();
         }
 
         // Set the !newState to all the Answers
@@ -308,8 +295,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("students/{studentCrsId}/questions/{questionId}")
@@ -323,8 +308,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/questions")
@@ -386,8 +369,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @GET
     @Path("/questions/{questionId}")
@@ -427,8 +408,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("questions/{questionId}")
@@ -458,7 +437,6 @@ public class MarkingController {
         /*
         And now change the answers
         if it exists and it is visible then change the annotation
-        if it is no visible then return 401
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
@@ -470,8 +448,6 @@ public class MarkingController {
 
     /*
     Done
-
-    Checked
      */
     @POST
     @Path("questions/{questionId}/students/{studentCrsId}")
@@ -503,7 +479,6 @@ public class MarkingController {
         /*
         And now change the answers
         if it exists and it is visible then change the annotation
-        if it is no visible then return 401
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)

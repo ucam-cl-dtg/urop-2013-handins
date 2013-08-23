@@ -49,7 +49,7 @@ public class SubmissionController {
         Bin bin = unmarkedSubmission.getBin();
 
         if (!bin.canSeeSubmission(user, unmarkedSubmission))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot see submission.")).build();
 
         List<ImmutableMap<String, String>> answerList = new LinkedList<ImmutableMap<String, String>>();
         for (Object answer : session.createCriteria(Answer.class)
@@ -85,16 +85,12 @@ public class SubmissionController {
         Bin bin = unmarkedSubmission.getBin();
 
         if (!bin.canDeleteSubmission(user, unmarkedSubmission))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete submission.")).build();
 
         // See if there are annotated answers
-        boolean canDelete = true;
         for (Answer answer : unmarkedSubmission.getAllAnswers())
             if (answer.isDownloaded())
-                canDelete = false;
-
-        if (!canDelete)
-            return Response.status(401).build();
+                return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete submission. Answer to " + answer.getQuestion().getName() + " has been downloaded for marking.")).build();
 
         // Delete all answers from the submission
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {
@@ -148,7 +144,7 @@ public class SubmissionController {
         Bin bin = unmarkedSubmission.getBin();
 
         if (!bin.canSeeSubmission(user, unmarkedSubmission))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot see submission.")).build();
 
         // returning the queried file
         return Response.ok(new File(unmarkedSubmission.getOriginalFilePath())).build();
@@ -178,7 +174,7 @@ public class SubmissionController {
         Bin bin = answer.getBin();
 
         if (!bin.canSeeAnswer(user, answer))
-            return Response.status(401).build();
+            return Response.status(403).entity(ImmutableMap.of("message", "Cannot see answer.")).build();
 
         // returning the queried file
         return Response.ok(new File(answer.getFilePath())).build();

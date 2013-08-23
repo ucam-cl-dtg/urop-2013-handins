@@ -124,6 +124,6 @@ public class AnnotatedAnswersController {
             return FilesManip.resultingFile(markedList);
         }
 
-        return Response.status(401).build();
+        return Response.status(500).entity(ImmutableMap.of("message", "File could not be processed.")).build();
     }
 }

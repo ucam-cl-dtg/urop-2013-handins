@@ -335,6 +335,7 @@ public class FilesManip {
         FileUtils.copyFile(sourceFile, destinationFile);
     }
     */
+
     /*
     Takes the path of the source and the destination where the file should be moved.
     Copies the file to the new location and deletes the original one.
