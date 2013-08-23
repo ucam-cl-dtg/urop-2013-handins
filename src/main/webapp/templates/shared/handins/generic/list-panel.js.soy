@@ -7,6 +7,7 @@
 * @param sublist - link / list
 * @param uploadTo - link
 * param id
+* @param edit
 * @param sublistTemplateName
 * @param sublistTemplateFunction
 * @param marking - link
@@ -46,6 +47,9 @@
                 >p</a>
 
             {/if}
+            {if $edit }
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array edit-element"><i class="icon icon-pen"></i></a>
+            {/if}
             {if $show }
                 <a class="icon-button panel-icon-button websymbols-icon icon-button-array show-element">X</a>
             {/if}
@@ -77,7 +81,7 @@
 {template .listElement}
 <li class="panel-wrapper columns large-12 delete-me">
     <div class="list-panel">
-        <div class="row list-inner-panel">
+        <div class="row list-inner-panel {$elem.type}">
             {call .elementContents data="$elem"}
             {/call}
         </div>
