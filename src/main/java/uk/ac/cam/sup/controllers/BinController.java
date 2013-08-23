@@ -150,7 +150,13 @@ public class BinController {
 
         String fileName = "submission_" + unmarkedSubmission.getId() + ".pdf";
 
-        FilesManip.manage(tempDirectory, randomTemp, directory + fileName);
+        try {
+            FilesManip.manage(tempDirectory, randomTemp, directory + fileName);
+        }
+        catch (Exception e) {
+            return Response.status(500).entity(ImmutableMap.of("message", "Unable to manage the file."));
+        }
+
 
         // Add the submission to the database
         unmarkedSubmission.setFilePath(directory + fileName);
@@ -246,6 +252,8 @@ public class BinController {
 
     /*
     Done
+
+    Checked
      */
     @POST
     @Path("/{binId}/submissions/{submissionId}")
@@ -270,10 +278,6 @@ public class BinController {
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
-        // Sanity check
-        if (!split.validate(unmarkedSubmission))
-            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable split.")).build();
-
         // Check the existence and validity of the submission
         if (!unmarkedSubmission.getOwner().equals(user))
             return Response.status(403).entity(ImmutableMap.of("message", "Unable to split the submission.")).build();
@@ -281,6 +285,10 @@ public class BinController {
         for (Answer answer : unmarkedSubmission.getAllAnswers())
             if (answer.isDownloaded())
                 return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload answer to " + answer.getQuestion().getName() + ". Already downloaded for marking.")).build();
+
+        // Sanity check
+        if (!split.validate(unmarkedSubmission))
+            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable split.")).build();
 
         // Delete all answers from the submission
         for (Answer answer : unmarkedSubmission.getAllAnswers()) {
@@ -353,17 +361,17 @@ public class BinController {
 
             FilesManip.mergePdf(pathList, unmarkedSubmission.getFilePath());
             pdfManip.setFilePath(unmarkedSubmission.getFilePath());
+
+            // Mark simply
+            for (int i = 0; i < split.elements(); i++)
+                FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, split.getQuestionId(i)), startPageFinal.get(i), endPageFinal.get(i));
+
+            // Split the resulting pdf
+            FilesManip.distributeSubmission(user, unmarkedSubmission);
         }
         catch (Exception e) {
             return Response.status(500).entity(ImmutableMap.of("message", "Unable to save.")).build();
         }
-
-        // Mark simply
-        for (int i = 0; i < split.elements(); i++)
-            FilesManip.markPdf(pdfManip, user, (ProposedQuestion) session.get(ProposedQuestion.class, split.getQuestionId(i)), startPageFinal.get(i), endPageFinal.get(i));
-
-        // Split the resulting pdf
-        FilesManip.distributeSubmission(user, unmarkedSubmission);
 
         FilesManip.deleteFolder(new File(FilesManip.newDirectory("files/" + user + "/submissions/temp", false)));
 

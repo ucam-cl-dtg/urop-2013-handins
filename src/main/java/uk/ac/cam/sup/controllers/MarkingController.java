@@ -70,12 +70,16 @@ public class MarkingController {
         session.update(markedSubmission);
 
         // Split the markedSubmission into markedAnswers
-        FilesManip.distributeSubmission(user, markedSubmission);
+        try {
+            FilesManip.distributeSubmission(user, markedSubmission);
+        }
+        catch (Exception e) {
+            return Response.status(500).entity(ImmutableMap.of("message", "Unable to distribute the submission."));
+        }
 
         return ImmutableMap.of("unmarkedSubmission", ImmutableMap.of("id", markedSubmission.getId()),
                                                                      "bin", bin.getId());
     }
-
 
     /*
     Done
@@ -108,11 +112,11 @@ public class MarkingController {
 
         // Delete its markedAnswers
         for (MarkedAnswer markedAnswer : markedSubmission.getAllAnswers()) {
+            markedAnswer.getAnswer().setAnnotated(false);
+
             FilesManip.fileDelete(markedAnswer.getFilePath());
 
             session.delete(markedAnswer);
-
-            // ToDo: refresh the annotation of their answers
         }
 
         // Delete the markedSubmission
