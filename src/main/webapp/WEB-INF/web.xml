@@ -20,14 +20,12 @@
 		<param-name>dashboardUrl</param-name>
 		<param-value>http://www.cl.cam.ac.uk/research/dtg/berrycider/dashboard</param-value>
 	</context-param>
-
     <!--
     <context-param>
         <param-name>dashboardUrl</param-name>
             <param-value>http://localhost:8080/dashboard</param-value>
     </context-param>
     -->
-
     <context-param>
         <param-name>apiKey</param-name>
         <param-value>4870v534lmomthfssb27ho4vjtidhujlmmssasuf</param-value>
@@ -41,6 +39,12 @@
                      /js/handins/models/marker.js,
                      /js/handins/models/bin.js,
                      /js/handins/models/questions.js,
+                     /js/handins/models/access-permission.js,
+                     /js/handins/views/edit-access-permission-view.js,
+                     /js/handins/views/edit-bin.js,
+                     /js/handins/views/edit-question-view.js,
+                     /js/handins/views/general-add-view.js,
+                     /js/handins/views/general-list-view.js,
                      /js/handins/views/marker-question.js,
                      /js/handins/views/marker-overlay.js,
                      /js/handins/views/marker-select-question.js,
