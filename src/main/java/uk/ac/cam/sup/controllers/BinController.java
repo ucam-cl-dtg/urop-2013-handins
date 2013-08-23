@@ -98,7 +98,8 @@ public class BinController {
         return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
                                                       "name", bin.getName(),
                                                       "token", bin.getToken(),
-                                                       "archived", bin.isArchived()));
+                                                      "archived", bin.isArchived(),
+                                                      "peerMarking", bin.isPeerMarking()));
     }
 
     /*

@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<div class="row" style="margin-bottom: 20px">
+<div class="row archived" style="margin-bottom: 20px">
     <div class="columns">
         <h5 style="display:inline-block"> Archived </h5>
         <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
@@ -46,14 +46,14 @@
     </div>
 </div>
 
-<div class="row" style="margin-bottom: 20px">
+<div class="row peer-marking" style="margin-bottom: 20px">
     <div class="columns">
         <h5 style="display:inline-block"> Peer marking </h5>
         <div class="switch medium round" style="display:inline-block; width: 75px;font-size: 16px; margin-bottom: -15px; margin-left: 20px">
-            <input id="not-peer-marked" name="switch-peer-marked" type="radio" {if not $bin.archived} checked {/if}>
+                    <input id="not-peer-marked" name="switch-peer-marked" type="radio" {if not $bin.peerMarking} checked {/if}>
             <label for="not-peer-marked" onclick="" style="padding-right: 0px; padding-left: 13px">No</label>
 
-            <input id="peer-marked" name="switch-peer-marked" type="radio" {if $bin.archived} checked{/if} >
+            <input id="peer-marked" name="switch-peer-marked" type="radio" {if $bin.peerMarking} checked{/if} >
             <label for="peer-marked" onclick="" style="padding-left: 0px;">Yes</label>
 
             <span></span>

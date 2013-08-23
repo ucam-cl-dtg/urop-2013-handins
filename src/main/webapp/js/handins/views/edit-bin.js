@@ -20,10 +20,12 @@ var EditGeneralBinView = Backbone.View.extend({
 
     saveBin: function() {
         var name = this.$('.bin-name').val();
-        var archived = this.$('input:checked').attr('id') == 'archived';
+        var archived = this.$('.archived input:checked').attr('id') == 'archived';
+        var peerMarking = this.$('.peer-marking input:checked').attr('id') == 'peer-marked';
         this.model.set("questionSetName", name, {silent: true}) ;
         this.model.set("name", name, {silent: true});
         this.model.set("archived", archived, {silent: true});
+        this.model.set("peerMarking", peerMarking, {silent: true})
 
         this.model.save();
     },
