@@ -21,7 +21,7 @@ $(document).on("click", ".upload-work-for-bin", function() {
         bin = elem.attr("bin");
 
     loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
-        this.slideToggle();
+        this.slideDown();
     });
 })
 
