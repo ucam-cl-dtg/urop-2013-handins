@@ -36,7 +36,7 @@ public class BinController {
     @GET
     @Path("/create")
     public Object viewForCreateBin() {
-        return Response.status(200).build();
+        return Response.ok().build();
     }
 
     /*
@@ -252,10 +252,6 @@ public class BinController {
                                    @PathParam("submissionId") long submissionId,
                                    @Form SplittingForm split) {
 
-        // Sanity check
-        if (!split.validate())
-            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable split.")).build();
-
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
@@ -272,6 +268,10 @@ public class BinController {
 
         // Get the unmarkedSubmission
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+
+        // Sanity check
+        if (!split.validate(unmarkedSubmission))
+            return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable split.")).build();
 
         // Check the existence and validity of the submission
         if (!unmarkedSubmission.getOwner().equals(user))

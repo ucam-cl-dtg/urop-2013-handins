@@ -59,7 +59,7 @@ public class MarkingController {
         try {
             FilesManip.fileSave(uploadForm.file, directory + fileName);
         } catch (Exception e) {
-            return Response.status(500).build();
+            return Response.status(500).entity(ImmutableMap.of("message", "Could not save file.")).build();
         }
 
         // Add the submission to the database
