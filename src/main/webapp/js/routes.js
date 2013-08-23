@@ -54,6 +54,17 @@ function binList (json) {
     return "shared.handins.generic.listPanel";
 }
 
+function manageBinList (json) {
+    json.elems = json.bins;
+    _.map(json.elems, function(elem) {
+        elem.edit = true;
+        elem.linkTo = "bins/" + elem.id;
+        elem.type = "bin";
+        return elem;
+    });
+    return "shared.handins.generic.listPanel";
+}
+
 function markingList(json) {
     json.elems = json.bins;
     _.map(json.elems, function(elem) {
@@ -210,6 +221,7 @@ $(document).ready(function() {
         "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
         "bins/upload": binList,
+        "bins/manage": manageBinList,
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
         "bins/marking": markingList,

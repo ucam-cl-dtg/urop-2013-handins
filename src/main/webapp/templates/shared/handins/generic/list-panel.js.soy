@@ -79,9 +79,9 @@
   @param elem
 */
 {template .listElement}
-<li class="panel-wrapper columns large-12 delete-me">
+<li class="panel-wrapper columns large-12 delete-me {$elem.type}" data-id="{$elem.id}">
     <div class="list-panel">
-        <div class="row list-inner-panel {$elem.type}">
+        <div class="row list-inner-panel">
             {call .elementContents data="$elem"}
             {/call}
         </div>

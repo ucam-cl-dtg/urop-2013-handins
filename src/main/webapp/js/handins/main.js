@@ -35,7 +35,11 @@ function uploadedSubmission(data) {
 }
 
 
-
+$(document).on("click", ".bin .edit-element", function(evt) {
+    var id = $(this).closest('li').data('id');
+    console.log(id);
+    router.navigate("bins/" + id, {trigger: true});
+})
 
 $(document).on("click", ".expand-sub-list", function() {
 
