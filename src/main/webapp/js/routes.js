@@ -72,6 +72,8 @@ function submissionSubList(json) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submissions/" + elem.id;
         elem.download = prepareURL("submissions/" + elem.id + "/download");
+        elem.edit = true;
+        elem.type = "submission"
     })
 
     return "shared.handins.generic.listPanel";
@@ -86,6 +88,8 @@ function submissionList(json) {
         elem.sublist = "submissions/" + elem.id;
         elem.sublistTemplateFunction = "questionList";
         elem.download = prepareURL("submissions/" + elem.id + "/download");
+        elem.edit = true;
+        elem.type = "submission";
     })
 }
 
@@ -198,13 +202,14 @@ function homepage(json) {
 SOY_GLOBALS = {
     URLPrefix: CONTEXT_PATH
 };
+
 $(document).ready(function() {
     router = Router({
         "": homepage,
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
-        "bins": binList,
         "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
+        "bins/upload": binList,
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
         "bins/marking": markingList,
