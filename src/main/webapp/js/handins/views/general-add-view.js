@@ -1,6 +1,6 @@
 var GeneralAddView = Backbone.View.extend({
     initialize: function(options) {
-        _.bindAll(this, 'selectElement', 'addElement');
+        _.bindAll(this, 'selectElement', 'addElement', 'handleFormSubmit');
         if (options.text)
             this.text = options.text;
         else
@@ -21,9 +21,9 @@ var GeneralAddView = Backbone.View.extend({
         this.selected = ui.item;
     },
 
-    events: {
+    /*events: {
         'click .add-element': 'addElement'
-    },
+    },*/
 
     addElement: function() {
         if (this.selected) {
@@ -49,11 +49,19 @@ var GeneralAddView = Backbone.View.extend({
             _this.selected = $(this).val();
         })
     },
+    handleFormSubmit: function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        this.addElement();
+        return false;
+    },
 
     render: function() {
         this.$el.html(handins.bin.addElement({
             text: this.text
         }));
+        this.$('form.add-element').submit(this.handleFormSubmit)
         this.setupAutocomplete();
         this.setupNormalInput();
         return this;
