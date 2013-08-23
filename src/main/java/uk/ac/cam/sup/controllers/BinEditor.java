@@ -150,6 +150,14 @@ public class BinEditor {
         return Response.ok().build();
     }
 
+    @DELETE
+    @Path("/{binId}/permissions/{user}")
+    public Object deleteBinAccessPermission(@PathParam("binId") long binId,
+                                            @PathParam("user") String user) {
+
+        String[] users = new String[] {user};
+        return deleteBinAccessPermissions(binId, users, null);
+    }
     /*
     Done
      */
@@ -172,6 +180,8 @@ public class BinEditor {
 
         if (!bin.canDeletePermission(user, token))
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete permissions from bin.")).build();
+
+        System.out.println(users.length);
 
         // Get all BinPermissions
         @SuppressWarnings("unchecked")

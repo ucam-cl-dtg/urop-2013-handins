@@ -1,5 +1,6 @@
 var AccessPermission = Backbone.CustomModel.extend({
 
+
 })
 
 
@@ -19,7 +20,8 @@ var  AccessPermissionCollection = Backbone.Collection.extend({
         return _.map(response.users, function(user){
             return {
                 user: user,
-                name: user
+                name: user,
+                id: user
             }
         });
     }

@@ -1,7 +1,7 @@
 var EditAccessPermissionsView = Backbone.View.extend({
     initialize: function(options) {
         this.bin = options.bin;
-        _.bindAll(this, 'addPermission');
+        _.bindAll(this, 'addPermission', 'deletePermission');
         this.render();
 
         this.questionsView = new GeneralListView({
@@ -33,10 +33,20 @@ var EditAccessPermissionsView = Backbone.View.extend({
         this.addPermissionView.on('add', this.addPermission);
     },
 
+    events: {
+        'click .delete-elem': 'deletePermission'
+    },
+
+    deletePermission: function(evt) {
+        console.log("debug");
+    },
     addPermission: function(user) {
+        var addedUser = this.bin.accessPermissions.findWhere({user: user.crsid})
+        if (addedUser)
+            return ;
         this.bin.accessPermissions.create({
             user: user.crsid,
-            name: user.name
+            name: user.crsid
         })
     },
 

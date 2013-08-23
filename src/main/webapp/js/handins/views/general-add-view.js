@@ -26,8 +26,10 @@ var GeneralAddView = Backbone.View.extend({
     },
 
     addElement: function() {
-        if (this.selected)
+        if (this.selected) {
             this.trigger('add', this.selected);
+            this.$('.element-input').val("");
+        }
     },
 
     setupAutocomplete: function(){
