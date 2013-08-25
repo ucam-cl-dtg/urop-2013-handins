@@ -21,13 +21,20 @@ var SelectingView = Backbone.View.extend({
 
         this.questions.fetch();
 
-        _.bindAll(this, 'newQuestion', 'deleteQuestion', 'selectQuestion', 'saveSelection', 'closeSelection');
+        _.bindAll(this, 'newQuestion', 'deleteQuestion', 'selectQuestion', 'saveSelection', 'closeSelection', 'handlePDFLoad');
 
         showPdf(this.options.submission)
+        window.addEventListener("documentload", this.handlePDFLoad);
+    },
+
+    handlePDFLoad: function() {
+        console.log("Pdf is loaded")
+        this.$('.select-question').removeClass("disabled");
     },
 
     remove: function() {
         this.questionsView.remove();
+        window.removeEventListener("documentload", this.handlePDFLoad);
 
         Backbone.View.prototype.remove.apply(this);
     },
@@ -161,9 +168,12 @@ var SelectingView = Backbone.View.extend({
     },
 
 
-    newQuestion: function() {
+    newQuestion: function(evt) {
         if (this.selecting)
             return false;
+        if ($(evt.target).hasClass("disabled")) {
+            return false;
+        }
 
         var marker = new Marker({
             delete: "",
