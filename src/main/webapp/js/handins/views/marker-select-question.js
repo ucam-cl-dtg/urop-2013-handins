@@ -1,6 +1,6 @@
 var QuestionSelectorView = Backbone.View.extend({
     initialize: function() {
-        _.bindAll(this, "render", "selectQuestion", "close");
+        _.bindAll(this, "render", "selectQuestion", "close", "closeDialog");
         this.collection.on('all', this.render);
     },
 
@@ -13,19 +13,26 @@ var QuestionSelectorView = Backbone.View.extend({
             title: 'Please select the question',
             minWidth: 400,
             resizable: false,
-            draggable: false
+            draggable: false,
+            close: this.close,
         })
+    },
+
+    closeDialog: function() {
+        this.$el.dialog("close");
     },
 
     close: function() {
         this.remove();
         if (this.selectedQuestionCID)  {
             this.marker.set("question", this.collection.get(this.selectedQuestionCID));
+        } else {
+            this.marker.destroy();
         }
     },
 
     events: {
-        'click .save-question-selection': 'close'
+        'click .save-question-selection': 'closeDialog'
     },
 
     selectQuestion: function(evt, ui) {
