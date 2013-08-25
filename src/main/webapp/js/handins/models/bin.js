@@ -24,7 +24,7 @@ var Bin = Backbone.CustomModel.extend({
         return prepareURL("bins/" + this.get('id'));
     },
     parse: function(response) {
-        if (response.bin)
+        if (response != undefined && response.bin)
             return response.bin;
         return response;
     }

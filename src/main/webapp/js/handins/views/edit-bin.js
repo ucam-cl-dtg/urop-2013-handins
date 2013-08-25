@@ -27,12 +27,21 @@ var EditGeneralBinView = Backbone.View.extend({
         this.model.set("archived", archived, {silent: true});
         this.model.set("peerMarking", peerMarking, {silent: true})
 
-        this.model.save();
+        this.model.save().success(function() {
+            successNotification("Bin successfully saved.");
+        }).fail(function() {
+            errorNotification("An error occured while saving the bin.");
+        });
     },
 
     deleteBin: function() {
         if (confirm("Are you sure you want to delete this Bin?"))
-            this.model.destroy();
+            this.model.destroy().success(function(){
+                successNotification("Bin successfuly deleted");
+                router.navigate("bins/manage", {trigger: true})
+            }).fail(function(){
+                errorNotification("There was an error while removing the bin")
+            });
     }
 
 })

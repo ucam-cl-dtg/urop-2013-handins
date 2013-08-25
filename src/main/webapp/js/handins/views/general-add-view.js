@@ -11,7 +11,7 @@ var GeneralAddView = Backbone.View.extend({
                 source: ['ana', 'are' ,'mere'],
                 delay: 0,
                 minLenght: 0,
-                select: this.selectElement
+                select: this.selectElement,
             })
         }
 
@@ -19,6 +19,7 @@ var GeneralAddView = Backbone.View.extend({
 
     selectElement: function(event, ui) {
         this.selected = ui.item;
+        this.addElement();
     },
 
     /*events: {
@@ -35,10 +36,10 @@ var GeneralAddView = Backbone.View.extend({
     setupAutocomplete: function(){
         if (this.autocomplete == undefined)
             return ;
-        var auto = this.$('.element-input').autocomplete(this.autocomplete);
+        this.auto = this.$('.element-input').autocomplete(this.autocomplete);
 
         if (this.autocomplete.render)
-            auto.data( "ui-autocomplete" )._renderItem = this.autocomplete.render ;
+            this.auto.data( "ui-autocomplete" )._renderItem = this.autocomplete.render ;
     },
 
     setupNormalInput: function() {
@@ -49,6 +50,7 @@ var GeneralAddView = Backbone.View.extend({
             _this.selected = $(this).val();
         })
     },
+
     handleFormSubmit: function(evt) {
         evt.stopPropagation();
         evt.preventDefault();
@@ -56,6 +58,7 @@ var GeneralAddView = Backbone.View.extend({
         this.addElement();
         return false;
     },
+
 
     render: function() {
         this.$el.html(handins.bin.addElement({

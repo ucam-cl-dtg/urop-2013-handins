@@ -67,7 +67,7 @@ public class BinEditor {
         // Delete the bin
         session.delete(bin);
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     /*
@@ -102,7 +102,7 @@ public class BinEditor {
         binForm.save(bin);
         session.update(bin);
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     /*
@@ -147,7 +147,7 @@ public class BinEditor {
                 session.save(new BinAccessPermission(bin, newUser));
         }
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     @DELETE
@@ -196,7 +196,7 @@ public class BinEditor {
             if (!perm.getUserCrsId().equals(bin.getOwner()))
                 session.delete(perm);
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     /*
@@ -241,7 +241,7 @@ public class BinEditor {
                     session.save(new BinMarkingPermission(bin, markingUser, questionId, questionOwner));
                 }
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     /*
@@ -282,7 +282,7 @@ public class BinEditor {
         for (int i = 0; i < permissions.size(); i++)
             session.delete(permissions);
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
     /*
@@ -332,7 +332,7 @@ public class BinEditor {
             }
         }
 
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 
 
@@ -380,6 +380,6 @@ public class BinEditor {
 
         if (unDel.size() > 0)
             return ImmutableMap.of("unDel", unDel);
-        return Response.ok().build();
+        return Response.status(204).build();
     }
 }
