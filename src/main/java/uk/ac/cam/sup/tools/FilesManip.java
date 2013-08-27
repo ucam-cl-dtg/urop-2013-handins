@@ -85,6 +85,10 @@ public class FilesManip {
 
         String type = Files.probeContentType(FileSystems.getDefault().getPath(directory, baseName));
 
+        // Just treat anything that is unrecognized as a pdf. The probeContentType fails on Mac OS ?!
+        if (type == null)
+            type="application/pdf";
+
         // Move everything in /elem
         if (type.equals("application/zip"))
             extractFiles(directory + baseName, elemDirectory);
@@ -93,7 +97,8 @@ public class FilesManip {
         Set<File> files = getFilesFromFolder(new File(elemDirectory));
 
         for (File file : files) {
-            if (Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath())).equals("application/pdf"))
+            String fileType = Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath()));
+            if (fileType == null || (fileType != null && fileType.equals("application/pdf")))
                 fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
             else {
                 Document document = new Document();
