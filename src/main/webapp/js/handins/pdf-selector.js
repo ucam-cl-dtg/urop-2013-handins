@@ -54,7 +54,7 @@ function magicCircle(evt) {
 
 function findInPage(index) {
     text = PDFFindController.pageContents[index];
-    re = /Question [0-9]+/g;
+    re = /«[a-zA-Z0-9 ]+»/g;
     var matches = [];
     var bidi = PDFFindController.pdfPageSource.pages[index].textLayer.textContent.bidiTexts;
 
@@ -77,7 +77,7 @@ function findInPage(index) {
         return {
             page: index,
             position: i,
-            name: matchedElem.value[0]
+            name: matchedElem.value[0].slice(1,matchedElem.value[0].length - 1)
         };
     }).value();
 
