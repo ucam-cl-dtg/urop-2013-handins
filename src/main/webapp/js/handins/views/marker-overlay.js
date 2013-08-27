@@ -130,6 +130,16 @@ var MarkerOverlay = Backbone.View.extend({
         this.model.set('width', this.parse(this.page.css("width")));
         this.model.set('scale', PDFView.currentScale);
         this.model.set('height', height);
+
+
+        this.$el.resizable({
+            handles: "n, s",
+            // Sync this.top when the element is resized upwards.
+            resize: this.handleResizableResize,
+            containment: this.pdfContainer
+
+        });
+        $(window).on("scalechange", this.handleRescale);
     },
     startSelecting: function(evt) {
         evt.preventDefault();
