@@ -41,6 +41,13 @@ $(document).on("click", ".bin .edit-element", function(evt) {
     router.navigate("bins/" + id, {trigger: true});
 })
 
+$(document).on("click", ".submission .edit-element", function(evt) {
+    var bin = parseInt(getRouteParams());
+    var submission = parseInt($(this).closest('li').data('id'));
+
+    showSelectingModal3(bin, submission);
+});
+
 $(document).on("click", ".expand-sub-list", function() {
 
   var elem = $(this).closest(".list-panel").siblings(".sublist-container");

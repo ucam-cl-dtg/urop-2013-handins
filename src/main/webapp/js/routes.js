@@ -83,7 +83,6 @@ function submissionSubList(json) {
         elem.name = "Submission " + elem.id;
         elem.delete = "/submissions/" + elem.id;
         elem.download = prepareURL("submissions/" + elem.id + "/download");
-        elem.edit = true;
         elem.type = "submission"
     })
 
