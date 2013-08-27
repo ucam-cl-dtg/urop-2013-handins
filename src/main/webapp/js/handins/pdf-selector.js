@@ -51,3 +51,85 @@ function magicCircle(evt) {
     })
     $('body').append(elem);
 }
+
+function findInPage(index) {
+    text = PDFFindController.pageContents[index];
+    re = /Question [0-9]+/g;
+    var matches = [];
+    var bidi = PDFFindController.pdfPageSource.pages[index].textLayer.textContent.bidiTexts;
+
+    while ((match = re.exec(text))!=null) {
+        matches.push(match.index);
+    }
+
+//    console.log(matches);
+    return _.chain(matches).map(function(match) {
+        var i = 0;
+        while (match > 0) {
+            match -= bidi[i].str.length;
+            i++;
+        };
+
+        return {
+            page: index,
+            position: i
+        };
+    }).value();
+
+
+}
+function createMarker(markers, begin, end) {
+    var marker = new Marker({
+        delete: "",
+        hidden: true,
+        show: true
+    });
+
+    marker.set("question", begin.question);
+
+    markers.add(marker);
+    var overlay = new MarkerOverlay({
+        model: marker
+    });
+
+    overlay.createFromPosition(begin, end);
+
+    marker.trigger("selected", marker);
+
+}
+function magicFind(markers, questions) {
+
+    positions = _.range(PDFFindController.pdfPageSource.pages.length).map(function(index) {
+        try {
+            return findInPage(index);
+        } catch (err) {
+            console.error(err);
+            return [];
+        }
+    });
+
+    positions = _.flatten(positions).map(function(position) {
+        try {
+            var elem = PDFFindController.pdfPageSource.pages[position.page].textLayer.textDivs[position.position];
+            var top = $(elem).css('top');
+            position.position = parseFloat(top.replace('px', ''));
+            position.question = questions.at(0);
+            return position;
+        } catch(err) {
+            console.error(err);
+            return null;
+        }
+    });
+
+    console.log(positions);
+    positions = _.filter(positions, function (elem) {
+        return elem != null;
+    });
+
+    for (var i = 0; i < positions.length - 1; i++) {
+        createMarker(markers, positions[i], positions[i + 1]);
+    }
+
+    return positions;
+
+}

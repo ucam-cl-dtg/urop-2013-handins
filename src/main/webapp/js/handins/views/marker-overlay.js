@@ -112,7 +112,25 @@ var MarkerOverlay = Backbone.View.extend({
         return parseFloat(value.replace('px', ''));
     },
 
+    createFromPosition: function(begin, end) {
+        this.page = $("#pageContainer" + (begin.page + 1));
 
+        this.$el.addClass("marker");
+        this.$el.appendTo(this.pdfContainer);
+
+        this.$el.zIndex(this.pdfContainer.find('.page').zIndex() + 1);
+
+        var top = this.pdfContainer.scrollTop() + this.page.position().top + begin.position;
+        var bottom = this.pdfContainer.scrollTop() + $('#pageContainer' + (end.page + 1)).position().top + end.position;
+        bottom -= 10 ;
+
+        var height = bottom - top;
+
+        this.model.set('top', top);
+        this.model.set('width', this.parse(this.page.css("width")));
+        this.model.set('scale', PDFView.currentScale);
+        this.model.set('height', height);
+    },
     startSelecting: function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
