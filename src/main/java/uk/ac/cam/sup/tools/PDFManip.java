@@ -219,13 +219,14 @@ public class PDFManip {
      */
     public void takeBox(int pageIndex, float bottom, float top, String destinationPath) throws IOException, DocumentException {
 
+        //TODO  fix this to cut where it should, otter is evil
         PdfReader reader = new PdfReader(filePath);
         Rectangle pageSize = reader.getPageSizeWithRotation(pageIndex);
 
         Document document = new Document();
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(destinationPath));
 
-        writer.setBoxSize("crop", new Rectangle(0, bottom * pageSize.getHeight(), pageSize.getWidth(), top * pageSize.getHeight()));
+        writer.setBoxSize("crop", new Rectangle(0, bottom * pageSize.getHeight(), pageSize.getWidth(), top * pageSize.getHeight() + 25));
 
         document.open();
 
