@@ -8,6 +8,7 @@ import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.MarkedAnswer;
+import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 
@@ -60,7 +61,12 @@ public class AnnotatedAnswersController {
         for (MarkedAnswer markedAnswer : markedAnswers)
             if (bin.canSeeAnnotated(user, markedAnswer)) {
 
-                markedList.add(new Marking(markedAnswer.getFilePath()));
+                Marking marking = new Marking(markedAnswer.getFilePath());
+                ProposedQuestion trash = new ProposedQuestion();
+
+                marking.setOwner(UserHelper.getCurrentUser(request));
+                marking.setQuestion(trash);
+                markedList.add(marking);
 
             }
         return FilesManip.resultingFile(markedList);
