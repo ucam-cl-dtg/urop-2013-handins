@@ -59,20 +59,25 @@ function findInPage(index) {
     var bidi = PDFFindController.pdfPageSource.pages[index].textLayer.textContent.bidiTexts;
 
     while ((match = re.exec(text))!=null) {
-        matches.push(match.index);
+        matches.push({
+            index: match.index,
+            value: match
+        });
     }
 
 //    console.log(matches);
-    return _.chain(matches).map(function(match) {
+    return _.chain(matches).map(function(matchedElem) {
         var i = 0;
+        var match = matchedElem.index;
         while (match > 0) {
             match -= bidi[i].str.length;
             i++;
-        };
+        }
 
         return {
             page: index,
-            position: i
+            position: i,
+            name: matchedElem.value[0]
         };
     }).value();
 
@@ -99,7 +104,7 @@ function createMarker(markers, begin, end) {
 }
 function magicFind(markers, questions) {
 
-    positions = _.range(PDFFindController.pdfPageSource.pages.length).map(function(index) {
+    var positions = _.range(PDFFindController.pdfPageSource.pages.length).map(function(index) {
         try {
             return findInPage(index);
         } catch (err) {
@@ -113,7 +118,9 @@ function magicFind(markers, questions) {
             var elem = PDFFindController.pdfPageSource.pages[position.page].textLayer.textDivs[position.position];
             var top = $(elem).css('top');
             position.position = parseFloat(top.replace('px', ''));
-            position.question = questions.at(0);
+            position.question = questions.findWhere({name: position.name});
+            if (position.question == null || position.question == undefined)
+                return null;
             return position;
         } catch(err) {
             console.error(err);
@@ -125,6 +132,7 @@ function magicFind(markers, questions) {
     positions = _.filter(positions, function (elem) {
         return elem != null;
     });
+    console.log(positions);
 
     for (var i = 0; i < positions.length - 1; i++) {
         createMarker(markers, positions[i], positions[i + 1]);
