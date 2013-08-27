@@ -5,7 +5,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
-	
+
     <context-param>
         <param-name>cssNamespace</param-name>
         <param-value></param-value>
@@ -15,17 +15,15 @@
         <param-name>cssFiles</param-name>
         <param-value>/css/pdf-selector.css</param-value>
     </context-param>
-
 	<context-param>
 		<param-name>dashboardUrl</param-name>
 		<param-value>http://www.cl.cam.ac.uk/research/dtg/berrycider/dashboard</param-value>
 	</context-param>
-
 	<context-param>
 		<param-name>excludeFromLogger</param-name>
 		<param-value>/dashboard/api/notifications</param-value>
 	</context-param>
-	
+
     <!--
     <context-param>
         <param-name>dashboardUrl</param-name>
@@ -80,11 +78,6 @@
 		<filter-name>Hibernate</filter-name>
 		<filter-class>uk.ac.cam.sup.HibernateSessionRequestFilter</filter-class>
 	</filter>
-	<!-- Include this for the raven filter -->
-	<filter>
-		<filter-name>ravenFilter</filter-name>
-		<filter-class>uk.ac.cam.ucs.webauth.RavenFilter</filter-class>
-	</filter>
 
 
 	<filter>
@@ -96,12 +89,6 @@
 		</init-param>
 	</filter>
 
-	<!-- Include for raven filter (url-pattern set to /* for securing all
-	pages of the website with raven -->
-	<filter-mapping>
-		<filter-name>ravenFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>Hibernate</filter-name>
