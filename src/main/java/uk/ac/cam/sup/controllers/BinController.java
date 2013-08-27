@@ -356,7 +356,7 @@ public class BinController {
 
                     actualPage++;
                     startPageFinal.add(actualPage);
-                    actualPage += (new PDFManip(directory + "file" + i + ".pdf")).getPageCount();
+                    actualPage += (new PDFManip(directory + "file" + i + ".pdf")).getPageCount() - 1;
                     endPageFinal.add(actualPage);
                 }
             }
