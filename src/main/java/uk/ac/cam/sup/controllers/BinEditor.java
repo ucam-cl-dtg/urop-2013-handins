@@ -135,7 +135,7 @@ public class BinEditor {
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot add permissions to bin.")).build();
 
         // Get all existing users
-        Set<String> usersWithPermission = new TreeSet<String>();
+        Set<String> usersWithPermission = new TreeSet<>();
         for (BinAccessPermission perm: bin.getAccessPermissions())
             usersWithPermission.add(perm.getUserCrsId());
 
@@ -312,7 +312,7 @@ public class BinEditor {
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot add question to bin.")).build();
 
         // Get all existing questions
-        Set<String> existingQuestions = new TreeSet<String>();
+        Set<String> existingQuestions = new TreeSet<>();
         for (ProposedQuestion question : bin.getQuestionSet())
             existingQuestions.add(question.getName());
 
@@ -367,7 +367,7 @@ public class BinEditor {
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete question from bin.")).build();
 
         // Get the question and delete it or add it to the list of undeletable
-        List<ImmutableMap> unDel = new LinkedList<ImmutableMap>();
+        List<ImmutableMap> unDel = new LinkedList<>();
         for (long questionId : questionIds) {
             ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
 

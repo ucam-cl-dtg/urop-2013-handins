@@ -51,7 +51,7 @@ public class SubmissionController {
         if (!bin.canSeeSubmission(user, unmarkedSubmission))
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot see submission.")).build();
 
-        List<ImmutableMap<String, String>> answerList = new LinkedList<ImmutableMap<String, String>>();
+        List<ImmutableMap<String, String>> answerList = new LinkedList<>();
         for (Object answer : session.createCriteria(Answer.class)
                                     .add(Restrictions.eq("unmarkedSubmission", unmarkedSubmission))
                                     .addOrder(Order.asc("question.id"))

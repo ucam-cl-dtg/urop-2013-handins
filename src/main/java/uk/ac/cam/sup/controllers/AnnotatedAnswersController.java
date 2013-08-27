@@ -54,7 +54,7 @@ public class AnnotatedAnswersController {
                                                   .add(Restrictions.eq("owner", user))
                                                   .list();
 
-        List<Marking> markedList = new LinkedList<Marking>();
+        List<Marking> markedList = new LinkedList<>();
 
 
         for (MarkedAnswer markedAnswer : markedAnswers)
@@ -117,7 +117,7 @@ public class AnnotatedAnswersController {
         MarkedAnswer markedAnswer = (MarkedAnswer) session.get(MarkedAnswer.class, markedAnswerId);
 
         if (bin.canSeeAnnotated(user, markedAnswer)) {
-            List<Marking> markedList = new LinkedList<Marking>();
+            List<Marking> markedList = new LinkedList<>();
 
             markedList.add(new Marking(markedAnswer.getFilePath()));
 

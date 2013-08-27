@@ -202,7 +202,7 @@ public class BinController {
                                                        .list();
 
         // Create list of people who have access to the bin
-        List<String> res = new LinkedList<String>();
+        List<String> res = new LinkedList<>();
         for (BinAccessPermission binPermission : permissions)
             res.add(binPermission.getUserCrsId());
 
@@ -241,7 +241,7 @@ public class BinController {
                                                                  .list();
 
         // Filter all visible submissions and get their link and Id
-        List<ImmutableMap<String, ?> > mapList = new LinkedList<ImmutableMap<String, ?>>();
+        List<ImmutableMap<String, ?> > mapList = new LinkedList<>();
         for (UnmarkedSubmission unmarkedSubmission : allUnmarkedSubmissions)
             if (bin.canSeeSubmission(user, unmarkedSubmission))
                 mapList.add(ImmutableMap.of("link", unmarkedSubmission.getId(),
@@ -275,8 +275,10 @@ public class BinController {
         if (!bin.canAddSubmission(user))
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot upload into bin.")).build();
 
-        // Get the unmarkedSubmission
+        // Get the unmarkedSubmission and reset the path
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
+
+        unmarkedSubmission.setSplitFilePath(null);
 
         // Check the existence and validity of the submission
         if (!unmarkedSubmission.getOwner().equals(user))
@@ -322,9 +324,9 @@ public class BinController {
         String directory = FilesManip.newDirectory("files/" + user + "/submissions/temp/", false);
 
         // Split questions
-        List<Integer> startPageFinal = new LinkedList<Integer>();
-        List<Integer> endPageFinal = new LinkedList<Integer>();
-        List<String> pathList = new LinkedList<String>();
+        List<Integer> startPageFinal = new LinkedList<>();
+        List<Integer> endPageFinal = new LinkedList<>();
+        List<String> pathList = new LinkedList<>();
 
         // Adding the new File
         String splitName = unmarkedSubmission.getFilePath();
@@ -408,7 +410,7 @@ public class BinController {
                                                   .list();
 
         // Create the list of questions as json
-        List<ImmutableMap> result = new LinkedList<ImmutableMap>();
+        List<ImmutableMap> result = new LinkedList<>();
         for (ProposedQuestion question: questions) {
             result.add(ImmutableMap.of("id", question.getId(),
                                        "name", question.getName(),

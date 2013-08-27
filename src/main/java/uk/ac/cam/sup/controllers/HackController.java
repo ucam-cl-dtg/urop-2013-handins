@@ -45,7 +45,7 @@ public class HackController {
             matches = LDAPPartialQuery.partialUserByCrsid(query);
         } catch (LDAPObjectNotFoundException e){
             log.error("Error performing LDAPQuery: " + e.getMessage());
-            return new ArrayList<HashMap<String, String>>();
+            return new ArrayList<>();
         }
         return matches;
     }
@@ -56,7 +56,7 @@ public class HackController {
             matches = LDAPPartialQuery.partialUserBySurname(query);
         } catch (LDAPObjectNotFoundException e){
             log.error("Error performing LDAPQuery: " + e.getMessage());
-            return new ArrayList<HashMap<String, String>>();
+            return new ArrayList<>();
         }
         return matches;
     }

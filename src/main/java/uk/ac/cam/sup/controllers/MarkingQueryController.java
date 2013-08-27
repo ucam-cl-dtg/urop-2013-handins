@@ -53,7 +53,7 @@ public class MarkingQueryController {
                                       .list();
 
         // Create the marking list for the file
-        List<Marking> markingList = new LinkedList<Marking>();
+        List<Marking> markingList = new LinkedList<>();
         int actualPage = 1;
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer) && answer.isLast() &&
@@ -114,7 +114,7 @@ public class MarkingQueryController {
     @Produces("application/pdf")
     public Object downloadStudentQuestionAnswer(@PathParam("binId") long binId,
                                                 @PathParam("studentCrsId") String studentCrsId,
-                                                @PathParam("questionId}") long questionId) {
+                                                @PathParam("questionId") long questionId) {
 
         return getQuery(binId, questionId, studentCrsId);
     }

@@ -51,7 +51,7 @@ public class FilesManip {
     }
 
     private static Set<File> getFilesFromFolder(File folder) {
-        Set<File> files = new TreeSet<File>();
+        Set<File> files = new TreeSet<>();
 
         //noinspection ConstantConditions
         for (File fileEntry : folder.listFiles()) {
@@ -98,7 +98,7 @@ public class FilesManip {
 
         for (File file : files) {
             String fileType = Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath()));
-            if (fileType == null || (fileType != null && fileType.equals("application/pdf")))
+            if (fileType == null || fileType.equals("application/pdf"))
                 fileMove(file.getAbsolutePath(), pdfDirectory + file.getName());
             else {
                 Document document = new Document();
@@ -114,12 +114,12 @@ public class FilesManip {
         }
 
         files = getFilesFromFolder(new File(pdfDirectory));
-        Set<String> filePaths = new TreeSet<String>();
+        Set<String> filePaths = new TreeSet<>();
 
         for (File file : files)
             filePaths.add(file.getAbsolutePath());
 
-        mergePdf(new LinkedList<String>(filePaths), destination);
+        mergePdf(new LinkedList<>(filePaths), destination);
     }
 
     /*
@@ -132,7 +132,7 @@ public class FilesManip {
 
         String randomTemp = "temp" + RandomStringUtils.randomAlphabetic(4) + ".pdf";
 
-        List<String> questionPathList = new LinkedList<String>();
+        List<String> questionPathList = new LinkedList<>();
         for (Marking marking : questionList)
             questionPathList.add(marking.getFilePath());
 

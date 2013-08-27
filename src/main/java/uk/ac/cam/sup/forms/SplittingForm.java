@@ -27,7 +27,7 @@ public class SplittingForm {
             if (elemCount != startPage.length || elemCount != endPage.length || elemCount != startLoc.length || elemCount != endLoc.length)
                 return false;
 
-            for (int i = 1; i <= elemCount; i++) {
+            for (int i = 0; i < elemCount; i++) {
                 if (startPage[i] > endPage[i])
                     return false;
 

@@ -146,10 +146,10 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get the list of all students in the bin
-        List<BinAccessPermission> allAccess = new LinkedList<BinAccessPermission>(bin.getAccessPermissions());
+        List<BinAccessPermission> allAccess = new LinkedList<>(bin.getAccessPermissions());
 
         // Filter all students
-        List<ImmutableMap<String, ?>> studentSubmissions = new LinkedList<ImmutableMap<String, ?>>();
+        List<ImmutableMap<String, ?>> studentSubmissions = new LinkedList<>();
         for (BinAccessPermission permission : allAccess) {
             String student = permission.getUserCrsId();
 
@@ -210,7 +210,7 @@ public class MarkingController {
                                                   .list();
 
         // And now filter for the student
-        List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<ImmutableMap<String, ?>>();
+        List<ImmutableMap<String, ?>> studentQuestions = new LinkedList<>();
         for (ProposedQuestion question : questions) {
 
             // Query the database
@@ -262,10 +262,10 @@ public class MarkingController {
             return Response.status(404).build();
 
         // Get all the questions associated to the bin
-        List<ProposedQuestion> questions = new LinkedList<ProposedQuestion>(bin.getQuestionSet());
+        List<ProposedQuestion> questions = new LinkedList<>(bin.getQuestionSet());
 
         // And now filter the questions and get the newState
-        List<Answer> answerList = new LinkedList<Answer>();
+        List<Answer> answerList = new LinkedList<>();
         boolean newState = true;
         for (ProposedQuestion question : questions) {
 
@@ -337,7 +337,7 @@ public class MarkingController {
                                                   .list();
 
         // And now filter the questions
-        List<ImmutableMap<String, ?>> questionList = new LinkedList<ImmutableMap<String, ?>>();
+        List<ImmutableMap<String, ?>> questionList = new LinkedList<>();
         for (ProposedQuestion question : questions) {
 
             // Get the answers
@@ -400,7 +400,7 @@ public class MarkingController {
                                       .list();
 
         // Filter the answers to get the ones which are visible
-        List<ImmutableMap<String, ?>> studentList = new LinkedList<ImmutableMap<String, ?>>();
+        List<ImmutableMap<String, ?>> studentList = new LinkedList<>();
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer))
                 studentList.add(ImmutableMap.of("owner", answer.getOwner(),
@@ -438,14 +438,24 @@ public class MarkingController {
                                       .add(Restrictions.eq("last", true))
                                       .list();
 
+        boolean newState = true;
+        List<Answer> answerList = new LinkedList<>();
         /*
         And now change the answers
         if it exists and it is visible then change the annotation
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
+            if (bin.canSeeAnswer(user, answer)) {
+                answerList.add(answer);
+
+                newState &= answer.isAnnotated();
+            }
+
+        // Set the !newState to all the Answers
+        for (Answer answer : answerList)
             if (bin.canSeeAnswer(user, answer))
-                answer.setAnnotated(!answer.isAnnotated());
+               answer.setAnnotated(!newState);
 
         return Response.ok().build();
     }
@@ -481,13 +491,13 @@ public class MarkingController {
                                       .list();
 
         /*
-        And now change the answers
+        And now change the answers (which should be only 1)
         if it exists and it is visible then change the annotation
         if it doesn't exist then do nothing
          */
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer))
-                    answer.setAnnotated(!answer.isAnnotated());
+                answer.setAnnotated(!answer.isAnnotated());
 
         return Response.ok().build();
     }

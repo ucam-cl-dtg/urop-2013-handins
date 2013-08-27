@@ -37,18 +37,19 @@ public class BinMenuController {
         // Get list of bins
         @SuppressWarnings("unchecked")
         List<Bin> binList = session.createCriteria(Bin.class)
-                                   .createAlias("markingPermissions", "perm")
+                                   .createAlias("accessPermissions", "perm")
                                    .add(Restrictions.eq("perm.userCrsId", user))
                                    .addOrder(Order.desc("id"))
                                    .list();
 
         // Filter all visible bins and return them
-        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+        List<Map<String, ?>> finalBinList = new LinkedList<>();
         for (Bin bin : binList)
-            finalBinList.add(ImmutableMap.of("id", bin.getId(),
-                                             "name", bin.getName(),
-                                             "isArchived", bin.isArchived(),
-                                             "questions", bin.getQuestionCount()));
+            if (bin.canAddMarkedSubmission(user))
+                finalBinList.add(ImmutableMap.of("id", bin.getId(),
+                                                 "name", bin.getName(),
+                                                 "isArchived", bin.isArchived(),
+                                                 "questions", bin.getQuestionCount()));
 
         return ImmutableMap.of("bins", finalBinList);
     }
@@ -74,7 +75,7 @@ public class BinMenuController {
                                    .list();
 
         // Filter all visible bins and return them
-        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+        List<Map<String, ?>> finalBinList = new LinkedList<>();
         for (Bin bin : binList)
             finalBinList.add(ImmutableMap.of("id", bin.getId(),
                                              "name", bin.getName(),
@@ -105,7 +106,7 @@ public class BinMenuController {
                                    .list();
 
         // Filter all visible bins and return them
-        List<Map<String, ?>> finalBinList = new LinkedList<Map<String, ?>>();
+        List<Map<String, ?>> finalBinList = new LinkedList<>();
         for (Bin bin : binList)
             finalBinList.add(ImmutableMap.of("id", bin.getId(),
                                              "name", bin.getName(),

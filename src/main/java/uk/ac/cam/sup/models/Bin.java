@@ -255,7 +255,7 @@ public class Bin {
      * unmarkedSubmission should be able to delete it
      */
     public boolean canDeleteSubmission(String user, Submission<?> submission) {
-        return isOwner(user) || UserHelper.isAdmin(user) || this.token.equals(token) || submission.getOwner().equals(user);
+        return hasTotalAccess(user, token) || submission.getOwner().equals(user);
 
     }
 
@@ -278,7 +278,7 @@ public class Bin {
                                                         .add(Restrictions.eq("userCrsId", user))
                                                         .add(Restrictions.eq("bin", this)).list();
 
-        return isPeerMarking() || isOwner(user) || (!permissions.isEmpty());
+        return hasTotalAccess(user) || isPeerMarking() || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
@@ -292,11 +292,11 @@ public class Bin {
                                                         .add(Restrictions.eq("questionOwner", answer.getOwner()))
                                                         .list();
 
-        return isPeerMarking() || user.equals(answer.getOwner()) || (!permissions.isEmpty());
+        return hasTotalAccess(user) || isPeerMarking() || user.equals(answer.getOwner()) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
-        return isPeerMarking() || hasTotalAccess(user) || UserHelper.isDos(user) || user.equals(answer.getAnnotator()) || user.equals(answer.getOwner());
+        return hasTotalAccess(user) || isPeerMarking() || UserHelper.isDos(user) || user.equals(answer.getAnnotator()) || user.equals(answer.getOwner());
     }
 
     @Transient
