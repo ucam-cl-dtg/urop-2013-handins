@@ -33,6 +33,18 @@
 			<type>war</type>
 		</dependency>
 
+		<dependency>
+			<groupId>uk.ac.cam.cl.dtg.teaching</groupId>
+			<artifactId>supervision-api</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>uk.ac.cam.cl.dtg</groupId>
+			<artifactId>ldap</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+
 		<!-- Jetty -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
@@ -86,19 +98,6 @@
 			<artifactId>zip4j</artifactId>
 			<version>1.3.1</version>
 		</dependency>
-
-		<dependency>
-			<groupId>uk.ac.cam.cl.dtg.teaching</groupId>
-			<artifactId>supervision-api</artifactId>
-			<version>1.0.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>uk.ac.cam.cl.dtg</groupId>
-			<artifactId>ldap</artifactId>
-			<version>1.1.3</version>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
