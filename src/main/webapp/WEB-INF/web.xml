@@ -15,21 +15,16 @@
         <param-name>cssFiles</param-name>
         <param-value>/css/pdf-selector.css</param-value>
     </context-param>
+
 	<context-param>
 		<param-name>dashboardUrl</param-name>
-    <param-value>http://ott.cl.cam.ac.uk/dashboard</param-value>
+		<param-value>http://localhost:8080/dashboard</param-value>
 	</context-param>
 	<context-param>
 		<param-name>excludeFromLogger</param-name>
 		<param-value>/dashboard/api/notifications</param-value>
 	</context-param>
 
-    <!--
-    <context-param>
-        <param-name>dashboardUrl</param-name>
-            <param-value>http://localhost:8080/dashboard</param-value>
-    </context-param>
-    -->
     <context-param>
         <param-name>apiKey</param-name>
         <param-value>4870v534lmomthfssb27ho4vjtidhujlmmssasuf</param-value>
