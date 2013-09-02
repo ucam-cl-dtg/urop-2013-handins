@@ -11,3 +11,4 @@ src/main/webapp/sup
 temp/
 frontend
 .sass-cache
+overlays
