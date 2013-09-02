@@ -15,12 +15,23 @@ function showSelectingModal3(bin, submission) {
     $('#selectingModal').remove();
     var html = shared.handins.selectingModal({bin: this.bin, submission: this.submission});
     var elem = $(html);
+    var height = $(document).height();
 
-    elem.prependTo($('body')).foundation().foundation("reveal","open", {
-            closeOnBackgroundClick: false,
-            closeOnEsc: false
+    elem.prependTo($('.main'))
+    elem.foundation('reveal',{
+        opened: function() {
+            elem.css('top', height * 0.05);
+        }
     });
 
+    $('.main').foundation();
+
+    elem.foundation("reveal","open", {
+            closeOnBackgroundClick: false,
+            closeOnEsc: false,
+    });
+
+    elem.height(height * 0.9);
     elem.find('.pdf-viewer').css('height',elem.height() + "px");
 
     view = new SelectingView({
