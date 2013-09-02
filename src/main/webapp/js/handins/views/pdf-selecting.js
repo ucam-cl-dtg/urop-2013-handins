@@ -82,6 +82,11 @@ var SelectingView = Backbone.View.extend({
     closeSelection: function() {
         this.$el.foundation("reveal", "close");
         this.remove();
+
+        var fragment = Backbone.history.fragment;
+        Backbone.history.fragment = null;
+
+        router.navigate(fragment, {trigger: true});
     },
 
     saveSelection: function(evt) {
