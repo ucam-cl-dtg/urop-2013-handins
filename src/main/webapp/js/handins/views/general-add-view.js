@@ -30,6 +30,7 @@ var GeneralAddView = Backbone.View.extend({
         if (this.selected) {
             this.trigger('add', this.selected);
             this.$('.element-input').val("");
+            this.selected = undefined;
         }
     },
 
