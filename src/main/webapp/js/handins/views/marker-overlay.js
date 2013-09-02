@@ -219,17 +219,21 @@ var MarkerOverlay = Backbone.View.extend({
     hitTest: function (dist) {
         var borderSize = this.parse(this.page.css('border-top-width'));
 
-        var resultElem, resultDist;
+        var resultElem, resultDist, found=false;
 
         this.pdfContainer.find('.page').each(function(index, _elem) {
+            if (found)
+                return ;
+
             var elem = $(_elem);
             var size = parseFloat(elem.css('height').replace('px', ''));
 
             dist -= borderSize;
 
-            if (dist < size && dist > 0) {
+            if (dist < size) {
                 resultElem = elem;
                 resultDist = dist;
+                found = true;
             }
             dist -= size;
         })
