@@ -44,23 +44,23 @@
                 {if $sublistTemplateFunction}
                     template-function = "{$sublistTemplateFunction}"
                 {/if}
-                >p</a>
+                >p<i class="icon"></i></a>
 
             {/if}
             {if $edit }
                 <a class="icon-button panel-icon-button websymbols-icon icon-button-array edit-element"><i class="icon icon-pen"></i></a>
             {/if}
             {if $show }
-                <a class="icon-button panel-icon-button websymbols-icon icon-button-array show-element">X</a>
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array show-element">X<i class="icon"></i></a>
             {/if}
             {if $download }
-                <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$download}" data-bypass>X</a>
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array" href="{$download}" data-bypass>X<i class="icon"></i></a>
             {/if}
             {if $uploadTo}
-                <a class="icon-button panel-icon-button websymbols-icon icon-button-array upload-work-for-bin" bin="{$uploadTo}">J</a>
+                <a class="icon-button panel-icon-button websymbols-icon icon-button-array upload-work-for-bin" bin="{$uploadTo}">J<i class="icon"></i></a>
             {/if}
             {if isNonnull($delete) }
-                <a class="icon-button panel-icon-button websymbols-icon delete-element" delete-link="{$delete}">'</a>
+                <a class="icon-button panel-icon-button websymbols-icon delete-element" delete-link="{$delete}">'<i class="icon"></i></a>
             {/if}
             {if $marking}
                 <a class="icon-button panel-icon-button websymbols-icon toggle-mark" marking-link="{$marking}">
@@ -69,6 +69,7 @@
                     {else}
                         .
                     {/if}
+                    <i class="icon"></i>
                 </a>
             {/if}
         </div>
