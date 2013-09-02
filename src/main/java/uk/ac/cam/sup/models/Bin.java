@@ -4,12 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
@@ -26,8 +21,8 @@ import com.sun.istack.NotNull;
 public class Bin {
     // Fields
     @Id
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="logIdSeq")
+    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;

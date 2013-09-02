@@ -17,8 +17,8 @@ import java.util.Set;
 public abstract class Submission<T> {
     // Fields
     @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy="increment")
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="logIdSeq")
+    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;
