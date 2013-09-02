@@ -23,6 +23,8 @@ public class HackController {
 
     @Context
     HttpServletRequest request;
+    /*
+    This hack was used for logging by force into different users
 
     @Path("/user")
     @GET
@@ -37,6 +39,7 @@ public class HackController {
         request.getSession().setAttribute("RavenRemoteUser", user);
         throw new RedirectException("/hack/user");
     }
+    */
 
 
     private List<HashMap<String, String>> searchByCrsid(String query) {
