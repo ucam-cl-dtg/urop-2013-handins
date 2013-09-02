@@ -49,6 +49,7 @@
                      /js/handins/views/marker-select-question.js,
                      /js/handins/views/pdf-selecting.js,
                      /js/handins/pdf-selector.js,
+                     /js/handins/automark.js,
                      /js/handins/legacy-selector.js,
                      /js/handins/main.js,
                      /soy/js/1/handins.submission.js,

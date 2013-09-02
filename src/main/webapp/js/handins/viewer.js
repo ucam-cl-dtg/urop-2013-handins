@@ -1960,8 +1960,10 @@ var PDFView = {
         var zoom = store.get('zoom', PDFView.currentScale);
         var left = store.get('scrollLeft', '0');
         var top = store.get('scrollTop', '0');
-
-        storedHash = 'page=' + pageNum + '&zoom=' + zoom + ',' +
+        // Modified so that we always start with page 1
+        //storedHash = 'page=' + pageNum + '&zoom=' + zoom + ',' +
+        //            left + ',' + top;
+        storedHash = 'page=' + 1 + '&zoom=' + zoom + ',' +
                      left + ',' + top;
       }
       // Initialize the browsing history.

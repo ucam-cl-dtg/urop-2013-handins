@@ -32,16 +32,7 @@ var SelectingView = Backbone.View.extend({
         this.$('.select-question').removeClass("disabled");
         var self = this;
 
-//        try {
-            setTimeout(function() {
-                PDFFindController.extractText();
-                setTimeout(function() {
-                    magicFind(self.markers, self.questions);
-                }, 1500);
-            }, 1500);
-//        } catch(err) {
-    //        console.err(err);
-  //      }
+        automark(self.markers, self.questions);
     },
 
     remove: function() {
