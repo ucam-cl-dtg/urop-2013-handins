@@ -22,6 +22,12 @@ var EditQuestionsView = Backbone.View.extend({
     addQuestion: function(name) {
         this.bin.questions.create({
             name: name
+        }, {
+            error: function (model, resp) {
+                model.destroy();
+                var msg = JSON.parse(resp.responseText).message;
+                errorNotification(msg);
+            }
         })
     },
 

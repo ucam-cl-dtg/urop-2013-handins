@@ -316,6 +316,7 @@ public class BinEditor {
         for (ProposedQuestion question : bin.getQuestionSet())
             existingQuestions.add(question.getName());
 
+        int newQuestions = 0;
         // Add the new questions
         for (String newQuestion : newQuestionNames) {
             newQuestion = newQuestion.trim();
@@ -329,8 +330,14 @@ public class BinEditor {
                 question.setBin(bin);
 
                 session.update(question);
+                newQuestions ++;
             }
         }
+
+        if (questionName != null && newQuestions == 0)
+            return Response.status(400).entity(ImmutableMap.of(
+                    "message", "New question name is invalid"
+            )).build();
 
         return Response.status(204).build();
     }
