@@ -28,9 +28,6 @@ $(document).on("click", ".upload-work-for-bin", function() {
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
 
 function uploadedSubmission(data) {
-    var fragment = Backbone.history.fragment;
-    Backbone.history.fragment = null;
-    router.navigate(fragment, {trigger: true});
     showSelectingModal3(data.bin, data.unmarkedSubmission.id);
 }
 
