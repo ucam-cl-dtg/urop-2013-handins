@@ -7,7 +7,7 @@ import javax.ws.rs.FormParam;
 public class BinForm {
     @FormParam("id") private long id;
     @FormParam("owner") private String owner;
-    @FormParam("questionSetName") private String questionSetName;
+    @FormParam("questionSetName") private String name;
     @FormParam("archived") private Boolean archived;
     @FormParam("peerMarking") private Boolean peerMarking;
 
@@ -18,8 +18,8 @@ public class BinForm {
             //noinspection ConstantConditions
             valid &= (!owner.trim().isEmpty());
 
-        if (questionSetName != null)
-            valid &= (!questionSetName.trim().isEmpty());
+        if (name != null)
+            valid &= (!name.trim().isEmpty());
 
         return valid;
     }
@@ -28,8 +28,8 @@ public class BinForm {
         if (owner != null)
             bin.setOwner(owner);
 
-        if (questionSetName != null)
-            bin.setQuestionSetName(questionSetName);
+        if (name != null)
+            bin.setName(name);
 
         if (archived != null)
             bin.setArchived(archived);

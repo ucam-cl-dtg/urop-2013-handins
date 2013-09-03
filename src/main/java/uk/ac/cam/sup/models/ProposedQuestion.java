@@ -13,13 +13,14 @@ import java.util.Set;
 public class ProposedQuestion {
     // Fields
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="logIdSeq")
-    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="proposedQuestionIdSeq")
+    @SequenceGenerator(name="proposedQuestionIdSeq", sequenceName="ProposedQuestionSEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;
 
     private String name;
+    private String link;
 
     @ManyToOne
     private Bin bin;
@@ -71,5 +72,14 @@ public class ProposedQuestion {
 
     public Date getDateCreated() {
         return dateCreated;
+    }
+
+    // Link
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

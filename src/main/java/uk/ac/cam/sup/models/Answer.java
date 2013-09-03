@@ -11,8 +11,8 @@ import java.util.Set;
 public class Answer {
     // Fields
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="logIdSeq")
-    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="answerIdSeq")
+    @SequenceGenerator(name="answerIdSeq", sequenceName="AnswerSEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;

@@ -8,7 +8,6 @@ import javax.persistence.*;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.criterion.Restrictions;
 
 import uk.ac.cam.sup.HibernateUtil;
@@ -21,15 +20,15 @@ import com.sun.istack.NotNull;
 public class Bin {
     // Fields
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="logIdSeq")
-    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="binIdSeq")
+    @SequenceGenerator(name="binIdSeq", sequenceName="BinSEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;
 
     private String owner;
     private String token;
-    private String questionSetName;
+    private String name;
 
     private boolean isArchived;
     private boolean peerMarking;
@@ -57,10 +56,10 @@ public class Bin {
         dateCreated = new Date();
     }
 
-    public Bin(String owner, String questionSetName) {
+    public Bin(String owner, String name) {
         dateCreated = new Date();
 
-        setQuestionSetName(questionSetName);
+        setName(name);
         setOwner(owner);
         setToken(generateToken());
     }
@@ -89,15 +88,15 @@ public class Bin {
         this.unmarkedSubmissions = unmarkedSubmissions;
     }
 
-    // QuestionSetName
-    public String getQuestionSetName() {
-        if (questionSetName == null)
+    // Name
+    public String getName() {
+        if (name == null)
             return "";
-        return questionSetName;
+        return name;
     }
 
-    public void setQuestionSetName(String questionSetName) {
-        this.questionSetName = questionSetName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     // Owner
@@ -126,11 +125,6 @@ public class Bin {
 
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
-    }
-
-    @Transient
-    public String getName() {
-        return getQuestionSetName();
     }
 
     // MarkedSubmissions
