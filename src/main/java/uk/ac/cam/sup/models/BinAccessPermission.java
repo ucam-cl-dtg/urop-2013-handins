@@ -10,8 +10,8 @@ import java.util.Date;
 public class BinAccessPermission {
     // Fields
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="logIdSeq")
-    @SequenceGenerator(name="logIdSeq",sequenceName="LOG_SEQ", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="binAccessPermissionIdSeq")
+    @SequenceGenerator(name="binAccessPermissionIdSeq", sequenceName="BinAccessPermissionSEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;
