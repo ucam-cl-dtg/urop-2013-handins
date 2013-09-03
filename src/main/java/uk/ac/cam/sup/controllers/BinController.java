@@ -45,30 +45,34 @@ public class BinController {
     Checked
      */
     @POST
-    public Object addBin(@FormParam("questionSet") String questionSet) {
+    public Object addBin(@FormParam("name") String name,
+                         @FormParam("owner") String owner) {
 
         // Sanity Checking
-        questionSet = questionSet.trim();
+        name = name.trim();
 
-        if (questionSet == null || questionSet.isEmpty())
+        if (name == null || name.isEmpty())
             return Response.status(400).entity(ImmutableMap.of("message", "Unacceptable name.")).build();
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
         String user = UserHelper.getCurrentUser(request);
+        if (owner == null )
+            owner = user;
 
         // Create a new bin
-        Bin bin = new Bin(user, questionSet.trim());
+        Bin bin = new Bin(owner, name.trim());
 
         // Save and return bin details
         session.save(bin);
 
         // Add owner to permissions
-        session.save(new BinAccessPermission(bin, user));
+        session.save(new BinAccessPermission(bin, owner));
 
-        return ImmutableMap.of("id", bin.getId(),
-                               "token", bin.getToken());
+        return ImmutableMap.of(
+                "id", bin.getId(),
+                "name", bin.getName());
     }
 
     /*
