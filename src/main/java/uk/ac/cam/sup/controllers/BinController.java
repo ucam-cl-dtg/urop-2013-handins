@@ -417,6 +417,7 @@ public class BinController {
         List<ImmutableMap> result = new LinkedList<>();
         for (ProposedQuestion question: questions) {
             result.add(ImmutableMap.of("id", question.getId(),
+                                       "link", question.getLink(),
                                        "name", question.getName(),
                                        "bin", binId));
         }

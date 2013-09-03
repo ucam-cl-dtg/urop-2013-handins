@@ -292,10 +292,14 @@ public class BinEditor {
     @Path("/{binId}/questions")
     public Object addBinQuestions(@PathParam("binId") long binId,
                                   @FormParam("name[]") String[] newQuestionNames,
-                                  @FormParam("name") String questionName) {
+                                  @FormParam("link[]") String[] newLinks,
+                                  @FormParam("name") String questionName,
+                                  @FormParam("link") String link) {
 
-        if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0))
+        if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0)) {
             newQuestionNames = new String[] {questionName};
+            newLinks = new String[] {link};
+        }
 
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
@@ -318,7 +322,8 @@ public class BinEditor {
 
         int newQuestions = 0;
         // Add the new questions
-        for (String newQuestion : newQuestionNames) {
+        for (int i = 0; i < newQuestionNames.length; i++) {
+            String newQuestion = newQuestionNames[i], newLink = newLinks[i];
             newQuestion = newQuestion.trim();
 
             if (!newQuestion.isEmpty() && !existingQuestions.contains(newQuestion)) {
@@ -327,6 +332,7 @@ public class BinEditor {
 
                 // Add the question details to the database
                 question.setName(newQuestion);
+                question.setLink(newLink);
                 question.setBin(bin);
 
                 session.update(question);
@@ -335,9 +341,7 @@ public class BinEditor {
         }
 
         if (questionName != null && newQuestions == 0)
-            return Response.status(400).entity(ImmutableMap.of(
-                    "message", "New question name is invalid"
-            )).build();
+            return Response.status(400).entity(ImmutableMap.of("message", "New question name is invalid")).build();
 
         return Response.status(204).build();
     }
