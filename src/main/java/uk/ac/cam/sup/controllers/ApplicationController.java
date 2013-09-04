@@ -1,5 +1,7 @@
 package uk.ac.cam.sup.controllers;
 
+import uk.ac.cam.sup.helpers.UserHelper;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
@@ -20,7 +22,7 @@ public class ApplicationController {
     }
 
     public String getCurrentUser() {
-        return (String) request.getAttribute("userId");
+        return UserHelper.getCurrentUser(request);
     }
 
     public HttpServletRequest getRequest() {
