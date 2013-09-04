@@ -11,7 +11,7 @@ public class UserHelper {
     }
 
     public static boolean isAdmin(String user) {
-        return false;
+        return user == null;
     }
 
     public static String getCurrentUser(HttpServletRequest req) {

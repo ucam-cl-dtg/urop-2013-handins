@@ -193,6 +193,8 @@ public class Bin {
     }
 
     public boolean isOwner(String user) {
+        if (user == null)
+            return false;
         return user.equals(owner);
     }
 
@@ -213,6 +215,9 @@ public class Bin {
      */
     public boolean canAddSubmission(String user) {
         Session session = HibernateUtil.getSession();
+
+        if (user == null)
+            return false;
 
         @SuppressWarnings("unchecked")
         List<BinAccessPermission> permissions = session.createCriteria(BinAccessPermission.class)
@@ -262,6 +267,9 @@ public class Bin {
     public boolean canAddMarkedSubmission(String user) {
         Session session = HibernateUtil.getSession();
 
+        if (user == null)
+            return false;
+
         @SuppressWarnings("unchecked")
         List<BinMarkingPermission> permissions = session.createCriteria(BinMarkingPermission.class)
                                                         .add(Restrictions.eq("userCrsId", user))
@@ -273,6 +281,8 @@ public class Bin {
     public boolean canSeeAnswer(String user, Answer answer) {
         Session session = HibernateUtil.getSession();
 
+
+        //TODO will this crash if user is null ?!
         @SuppressWarnings("unchecked")
         List<BinMarkingPermission> permissions = session.createCriteria(BinMarkingPermission.class)
                                                         .add(Restrictions.eq("userCrsId", user))
@@ -281,11 +291,11 @@ public class Bin {
                                                         .add(Restrictions.eq("questionOwner", answer.getOwner()))
                                                         .list();
 
-        return hasTotalAccess(user) || isPeerMarking() || user.equals(answer.getOwner()) || (!permissions.isEmpty());
+        return hasTotalAccess(user) || isPeerMarking() || answer.getOwner().equals(user) || (!permissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
-        return hasTotalAccess(user) || isPeerMarking() || UserHelper.isDos(user) || user.equals(answer.getAnnotator()) || user.equals(answer.getOwner());
+        return hasTotalAccess(user) || isPeerMarking() || UserHelper.isDos(user) || answer.getAnnotator().equals(user) || answer.getOwner().equals(user);
     }
 
     @Transient
