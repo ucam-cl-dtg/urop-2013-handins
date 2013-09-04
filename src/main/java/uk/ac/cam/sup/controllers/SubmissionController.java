@@ -19,11 +19,8 @@ import java.io.File;
 import java.util.*;
 
 @Path ("/submissions")
-public class SubmissionController {
+public class SubmissionController extends ApplicationController{
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     /*
     Done
@@ -38,7 +35,7 @@ public class SubmissionController {
         // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -74,7 +71,7 @@ public class SubmissionController {
         // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -133,7 +130,7 @@ public class SubmissionController {
         // Set Hibernate and get user and submission
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         UnmarkedSubmission unmarkedSubmission = (UnmarkedSubmission) session.get(UnmarkedSubmission.class, submissionId);
 
@@ -163,7 +160,7 @@ public class SubmissionController {
         // Set Hibernate and get user and answer
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Answer answer = (Answer) session.get(Answer.class, answerId);
 

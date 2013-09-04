@@ -22,11 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Path("/marking/bins/{binId}")
-public class MarkingQueryController {
+public class MarkingQueryController extends ApplicationController {
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     /*
     Done
@@ -36,7 +33,7 @@ public class MarkingQueryController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 

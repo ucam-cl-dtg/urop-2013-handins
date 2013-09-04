@@ -27,11 +27,8 @@ import java.util.*;
 
 @Path("/bins")
 @Produces("application/json")
-public class BinController {
+public class BinController extends ApplicationController{
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     @GET
     @Path("/create")
@@ -57,7 +54,7 @@ public class BinController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
         if (owner == null )
             owner = user;
 
@@ -87,7 +84,7 @@ public class BinController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -125,7 +122,7 @@ public class BinController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -187,7 +184,7 @@ public class BinController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -225,7 +222,7 @@ public class BinController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -268,7 +265,7 @@ public class BinController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -396,7 +393,7 @@ public class BinController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
         // Check the existence of the bin
@@ -417,7 +414,6 @@ public class BinController {
         List<ImmutableMap> result = new LinkedList<>();
         for (ProposedQuestion question: questions) {
             result.add(ImmutableMap.of("id", question.getId(),
-                                       "link", question.getLink(),
                                        "name", question.getName(),
                                        "bin", binId));
         }

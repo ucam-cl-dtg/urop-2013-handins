@@ -6,31 +6,25 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 @Path("/bins")
 @Produces("application/json")
-public class BinMenuController {
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
+public class BinMenuController extends ApplicationController {
 
     @GET
     @Path("/marking")
     public Object showBinsToMark() {
         return searchBins(null, null, false, null, null, true);
+
     }
 
     /*
@@ -49,7 +43,7 @@ public class BinMenuController {
     @GET
     @Path("/manage")
     public Object viewBinsOwned() {
-        return searchBins(null, UserHelper.getCurrentUser(request), false, null, null, null);
+        return searchBins(null, getCurrentUser(), false, null, null, null);
     }
 
     /*
@@ -67,7 +61,7 @@ public class BinMenuController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         // Get list of bins
         @SuppressWarnings("unchecked")

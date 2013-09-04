@@ -23,11 +23,8 @@ import java.util.TreeSet;
 
 @Path("/bins")
 @Produces("application/json")
-public class BinEditor {
+public class BinEditor extends ApplicationController {
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     /*
     Done
@@ -42,7 +39,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -87,7 +84,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -123,7 +120,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -170,7 +167,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -213,7 +210,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -258,7 +255,7 @@ public class BinEditor {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -285,6 +282,14 @@ public class BinEditor {
         return Response.status(204).build();
     }
 
+    @POST
+    @Path("/{binId}/questions/import")
+    public Object importQuestionSet(@PathParam("binId") long binId,
+                                    @FormParam("questionSet") String questionSet) {
+
+
+        return addBinQuestions(binId, null, null, null, null);
+    }
     /*
     Done
      */
@@ -304,7 +309,7 @@ public class BinEditor {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -366,7 +371,7 @@ public class BinEditor {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
