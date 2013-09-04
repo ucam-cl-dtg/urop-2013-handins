@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
 import uk.ac.cam.sup.helpers.UserHelper;
@@ -20,6 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.Question;
+import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionSet;
+import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionsApiWrapper;
 
 @Path("/bins")
 @Produces("application/json")
@@ -285,10 +290,28 @@ public class BinEditor extends ApplicationController {
     @POST
     @Path("/{binId}/questions/import")
     public Object importQuestionSet(@PathParam("binId") long binId,
-                                    @FormParam("questionSet") String questionSet) {
+                                    @FormParam("questionSetId") long questionSetId) {
+
+        QuestionsApiWrapper api = new QuestionsApiWrapper(getQuestionsUrl(), getApiKey());
+
+        // TODO Fix this when questions support global admin keys
+        String debug = getCurrentUser();
+        String debug2 = getQuestionsUrl();
+        String debug3 = getApiKey();
+
+        QuestionSet set = api.getQuestionSet(questionSetId, getCurrentUser());
+
+        String[] names = new String[set.getQuestions().size()],
+                 links = new String[set.getQuestions().size()];
+
+        int index = 0;
+        for (Question question: set.getQuestions()) {
+            names[index] = question.getTitle();
+            links[index] = "/questions/q/" + question.getId();
+        }
 
 
-        return addBinQuestions(binId, null, null, null, null);
+        return addBinQuestions(binId, names, links, null, null);
     }
     /*
     Done
