@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
 import uk.ac.cam.cl.dtg.ldap.LDAPPartialQuery;
+import uk.ac.cam.cl.dtg.teaching.api.HandinsApi;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.helpers.ArrayHelper;
 import uk.ac.cam.sup.helpers.UserHelper;
 
@@ -18,11 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 
 @Path("/hack")
-public class HackController {
+public class HackController extends ApplicationController {
     private static Logger log = LoggerFactory.getLogger(HackController.class);
 
-    @Context
-    HttpServletRequest request;
     /*
     This hack was used for logging by force into different users
 
@@ -30,7 +30,7 @@ public class HackController {
     @GET
     @ViewWith("/soy/handins.hack.user")
     public Object showHackUser(){
-        return ImmutableMap.of("user", UserHelper.getCurrentUser(request));
+        return ImmutableMap.of("user", getCurrentUser());
     }
 
     @Path("/user")
@@ -81,5 +81,24 @@ public class HackController {
 
 
         return matches;
+    }
+
+    @Path("/tester")
+    @GET
+    @Produces("application/json")
+    public Object testApi() {
+        String apiKey = getRequest().getSession().getServletContext().getInitParameter("apiKey");
+        /*
+        log.error(apiKey);
+        HandinsApi.HandinsApiWrapper api = new HandinsApi.HandinsApiWrapper("http://localhost:8080/handins", apiKey);
+
+        HandinsApi.Bin bin = api.createBin("Api merge", "at628");
+        String[] users = new String[] {"at628", "ap760", "igs23"};
+        api.setUsers(bin, users);
+        */
+
+        QuestionsApi.QuestionsApiWrapper api = new QuestionsApi.QuestionsApiWrapper("http://localhost:8080/questions", apiKey);
+        return api.getQuestionSet(1, "at628");
+
     }
 }

@@ -19,11 +19,7 @@ import java.util.Map;
 
 @Path("/bins")
 @Produces("application/json")
-public class BinMenuController {
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
+public class BinMenuController extends ApplicationController {
 
     @GET
     @Path("/marking")
@@ -32,7 +28,7 @@ public class BinMenuController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         // Get list of bins
         @SuppressWarnings("unchecked")
@@ -64,7 +60,7 @@ public class BinMenuController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         // Get list of bins
         @SuppressWarnings("unchecked")
@@ -96,7 +92,7 @@ public class BinMenuController {
         // Set Hibernate and get user
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         // Get list of bins
         @SuppressWarnings("unchecked")

@@ -15,6 +15,6 @@ public class UserHelper {
     }
 
     public static String getCurrentUser(HttpServletRequest req) {
-        return (String) req.getSession().getAttribute("RavenRemoteUser");
+        return (String) req.getAttribute("userId");
     }
 }

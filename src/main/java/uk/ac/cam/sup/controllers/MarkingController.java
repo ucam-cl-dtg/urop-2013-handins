@@ -19,11 +19,8 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 
 @Path("/marking/bins/{binId}")
-public class MarkingController {
+public class MarkingController extends ApplicationController{
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     /*
     Done
@@ -37,7 +34,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -93,7 +90,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -137,7 +134,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -194,7 +191,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -253,7 +250,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -321,7 +318,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -383,7 +380,7 @@ public class MarkingController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -422,7 +419,7 @@ public class MarkingController {
         // Set Hibernate and get user, bin and question
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -473,7 +470,7 @@ public class MarkingController {
         // Set Hibernate and get user, bin and question
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 

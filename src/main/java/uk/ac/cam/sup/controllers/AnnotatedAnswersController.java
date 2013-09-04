@@ -23,11 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Path("/bins")
-public class AnnotatedAnswersController {
+public class AnnotatedAnswersController extends ApplicationController{
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    @Context
-    private HttpServletRequest request;
 
     /*
     Done
@@ -40,7 +37,7 @@ public class AnnotatedAnswersController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -64,7 +61,7 @@ public class AnnotatedAnswersController {
                 Marking marking = new Marking(markedAnswer.getFilePath());
                 ProposedQuestion trash = new ProposedQuestion();
 
-                marking.setOwner(UserHelper.getCurrentUser(request));
+                marking.setOwner(getCurrentUser());
                 marking.setQuestion(trash);
                 markedList.add(marking);
 
@@ -80,7 +77,7 @@ public class AnnotatedAnswersController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getTransaction();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
@@ -111,7 +108,7 @@ public class AnnotatedAnswersController {
         // Set Hibernate and get user and bin
         Session session = HibernateUtil.getSession();
 
-        String user = UserHelper.getCurrentUser(request);
+        String user = getCurrentUser();
 
         Bin bin = (Bin) session.get(Bin.class, binId);
 
