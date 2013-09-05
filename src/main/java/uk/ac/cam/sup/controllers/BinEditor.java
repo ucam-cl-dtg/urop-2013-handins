@@ -308,6 +308,7 @@ public class BinEditor extends ApplicationController {
         for (Question question: set.getQuestions()) {
             names[index] = question.getTitle();
             links[index] = "/questions/q/" + question.getId();
+            index ++;
         }
 
 
