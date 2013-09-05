@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.ResultTransformer;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
@@ -61,6 +62,7 @@ public class BinQuery {
                           .createAlias("accessPermissions", "perm")
                           .createAlias("dosAccess", "dos")
                           .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser), Restrictions.eq("dos.userCrsId", currentUser)))
+                          .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                           .addOrder(Order.desc("id"));
 
         addName();
