@@ -113,6 +113,8 @@
 	<filter-mapping>
 		<filter-name>Htmleasy</filter-name>
 		<url-pattern>/api/*</url-pattern>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
   &frontend;

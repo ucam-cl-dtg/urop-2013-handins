@@ -1,11 +1,13 @@
 package uk.ac.cam.sup.models;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -302,4 +304,26 @@ public class Bin {
     public int getQuestionCount() {
         return questionSet.size();
     }
+
+    public static Object toJSON(List<Bin> bins) {
+        List result = new LinkedList();
+        for (Bin task: bins) {
+            result.add(task.toJSON());
+        }
+        return result;
+    }
+
+    public Object toJSON() {
+        ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<String, Object>();
+
+        return builder.put("id", getId())
+                .put("name", getName())
+                .put("owner", getOwner())
+                .put("dateCreated", getDateCreated())
+                .put("archived", isArchived())
+                .put("peerMarking", isPeerMarking())
+                .build();
+
+    }
+
 }
