@@ -66,10 +66,10 @@ public class BinController extends ApplicationController{
 
         // Add owner to permissions
         session.save(new BinAccessPermission(bin, owner));
+        session.save(new BinUserMarkingPermission(bin, owner));
 
-        return ImmutableMap.of(
-                "id", bin.getId(),
-                "name", bin.getName());
+        return ImmutableMap.of("id", bin.getId(),
+                               "name", bin.getName());
     }
 
     /*

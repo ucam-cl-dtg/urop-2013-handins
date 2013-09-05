@@ -39,6 +39,9 @@ public class Bin {
     private Set<BinAccessPermission> accessPermissions;
 
     @OneToMany(mappedBy = "bin")
+    private Set<BinUserMarkingPermission> userMarkingPermissions;
+
+    @OneToMany(mappedBy = "bin")
     private Set<BinMarkingPermission> markingPermissions;
 
     @OneToMany(mappedBy = "bin")
@@ -188,6 +191,15 @@ public class Bin {
         this.peerMarking = peerMarking;
     }
 
+    // UserMarkingPermissions
+    public Set<BinUserMarkingPermission> getUserMarkingPermissions() {
+        return userMarkingPermissions;
+    }
+
+    public void setUserMarkingPermissions(Set<BinUserMarkingPermission> userMarkingPermissions) {
+        this.userMarkingPermissions = userMarkingPermissions;
+    }
+
     // Actual useful functions
 
     public static String generateToken() {
@@ -195,9 +207,7 @@ public class Bin {
     }
 
     public boolean isOwner(String user) {
-        if (user == null)
-            return false;
-        return user.equals(owner);
+        return user != null && user.equals(owner);
     }
 
     public boolean hasTotalAccess(String user) {
@@ -226,7 +236,7 @@ public class Bin {
                                                        .add(Restrictions.eq("userCrsId", user))
                                                        .add(Restrictions.eq("bin", this)).list();
 
-        return (!permissions.isEmpty());
+        return hasTotalAccess(user) || (!permissions.isEmpty());
     }
 
     /*
@@ -277,12 +287,17 @@ public class Bin {
                                                         .add(Restrictions.eq("userCrsId", user))
                                                         .add(Restrictions.eq("bin", this)).list();
 
-        return hasTotalAccess(user) || isPeerMarking() || (!permissions.isEmpty());
+        @SuppressWarnings("unchecked")
+        List<BinUserMarkingPermission> userPermissions = session.createCriteria(BinUserMarkingPermission.class)
+                                                                .add(Restrictions.eq("userCrsId", user))
+                                                                .add(Restrictions.eq("bin", this))
+                                                                .list();
+
+        return hasTotalAccess(user) || isPeerMarking() || (!permissions.isEmpty()) || (!userPermissions.isEmpty());
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
         Session session = HibernateUtil.getSession();
-
 
         //TODO will this crash if user is null ?!
         @SuppressWarnings("unchecked")
@@ -293,7 +308,13 @@ public class Bin {
                                                         .add(Restrictions.eq("questionOwner", answer.getOwner()))
                                                         .list();
 
-        return hasTotalAccess(user) || isPeerMarking() || answer.getOwner().equals(user) || (!permissions.isEmpty());
+        @SuppressWarnings("unchecked")
+        List<BinUserMarkingPermission> userPermissions = session.createCriteria(BinUserMarkingPermission.class)
+                                                                .add(Restrictions.eq("userCrsId", user))
+                                                                .add(Restrictions.eq("bin", this))
+                                                                .list();
+
+        return hasTotalAccess(user) || isPeerMarking() || answer.getOwner().equals(user) || (!permissions.isEmpty()) || (!userPermissions.isEmpty());
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
@@ -307,9 +328,10 @@ public class Bin {
 
     public static Object toJSON(List<Bin> bins) {
         List result = new LinkedList();
-        for (Bin task: bins) {
+        for (Bin task: bins)
+            //noinspection unchecked
             result.add(task.toJSON());
-        }
+
         return result;
     }
 
@@ -317,13 +339,11 @@ public class Bin {
         ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<String, Object>();
 
         return builder.put("id", getId())
-                .put("name", getName())
-                .put("owner", getOwner())
-                .put("dateCreated", getDateCreated())
-                .put("archived", isArchived())
-                .put("peerMarking", isPeerMarking())
-                .build();
-
+                      .put("name", getName())
+                      .put("owner", getOwner())
+                      .put("dateCreated", getDateCreated())
+                      .put("archived", isArchived())
+                      .put("peerMarking", isPeerMarking())
+                      .build();
     }
-
 }

@@ -4,12 +4,12 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "BinAccessPermission")
-public class BinAccessPermission {
+@Table(name = "BinUserMarkingPermission")
+public class BinUserMarkingPermission {
     // Fields
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="binAccessPermissionIdSeq")
-    @SequenceGenerator(name="binAccessPermissionIdSeq", sequenceName="BinAccessPermissionSEQ", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="binUserMarkingPermissionIdSeq")
+    @SequenceGenerator(name="binUserMarkingPermissionIdSeq", sequenceName="BinUserMarkingPermissionSEQ", allocationSize=1)
     private long id;
 
     private Date dateCreated;
@@ -20,11 +20,11 @@ public class BinAccessPermission {
     private Bin bin;
 
     // Constructors
-    public BinAccessPermission() {
+    public BinUserMarkingPermission() {
         dateCreated = new Date();
     }
 
-    public BinAccessPermission(Bin bin, String userCrsId) {
+    public BinUserMarkingPermission(Bin bin, String userCrsId) {
         dateCreated = new Date();
 
         setBin(bin);

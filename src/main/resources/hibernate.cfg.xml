@@ -48,12 +48,13 @@
         <property name="show_sql">true</property>
 
         <!-- Drop and re-create the database schema on startup -->
-        <property name="hbm2ddl.auto">validate</property>
+        <property name="hbm2ddl.auto">create</property>
 
         <mapping class="uk.ac.cam.sup.models.Answer" />
         <mapping class="uk.ac.cam.sup.models.MarkedAnswer" />
         <mapping class="uk.ac.cam.sup.models.Bin" />
         <mapping class="uk.ac.cam.sup.models.BinAccessPermission" />
+        <mapping class="uk.ac.cam.sup.models.BinUserMarkingPermission" />
         <mapping class="uk.ac.cam.sup.models.BinMarkingPermission" />
         <mapping class="uk.ac.cam.sup.models.UnmarkedSubmission" />
         <mapping class="uk.ac.cam.sup.models.MarkedSubmission" />

@@ -58,16 +58,16 @@ public class BinQuery {
         Session session = HibernateUtil.getTransaction();
         
         criteria = session.createCriteria(Bin.class)
-                .createAlias("accessPermissions", "perm")
-                .add(Restrictions.eq("perm.userCrsId", currentUser))
-                .addOrder(Order.desc("id"));
+                          .createAlias("accessPermissions", "perm")
+                          .add(Restrictions.eq("perm.userCrsId", currentUser))
+                          .addOrder(Order.desc("id"));
 
         addName();
         addOwner();
         addArchived();
+        addMarkable();
         addOffset();
         addLimit();
-        addMarkable();
         
         return (List<Bin>) criteria.list();
     }
@@ -84,7 +84,13 @@ public class BinQuery {
     
     private void addArchived() {
         if (archived != null)
-            criteria.add(Restrictions.eq("archived", archived));
+            criteria.add(Restrictions.eq("isArchived", archived));
+    }
+
+    private void addMarkable() {
+        if (markable != null && markable)
+            criteria.createAlias("userMarkingPermissions", "userPerm")
+                    .add(Restrictions.eq("userPerm.userCrsId", currentUser));
     }
     
     private void addOffset() {
@@ -96,14 +102,4 @@ public class BinQuery {
         if (limit != null)
             criteria.setMaxResults(limit.intValue());
     }
-    
-    private void addMarkable() {
-        if (markable != null)
-            ;
-        // TODO 
-        // criteria.add(Restrictions.eq("name", name));
-    }
-
-
-    
 }
