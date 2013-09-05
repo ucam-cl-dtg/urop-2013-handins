@@ -174,6 +174,9 @@ public class MarkingController extends ApplicationController{
             // Add if visible
             if (available)
                 studentSubmissions.add(ImmutableMap.of("student", student, "isMarked", isMarked));
+
+            if (bin.getQuestionCount() == 0)
+                studentSubmissions.add(ImmutableMap.of("student", student, "isMarked", false));
         }
 
         return ImmutableMap.of("students", studentSubmissions);

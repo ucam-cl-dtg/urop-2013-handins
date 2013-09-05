@@ -133,6 +133,9 @@ public abstract class Submission<T> {
                 continue;
             }
 
+            if (question == null || student == null)
+                continue;
+
             if (prevQuestion != null && question.getId() == prevQuestion.getId() && student.equals(prevStudent))
                 distribution.setEndPage(i);
             else {

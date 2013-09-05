@@ -321,6 +321,9 @@ public class BinController extends ApplicationController{
             }
         }
 
+        if (split.elements() == 0)
+            return Response.ok().build();
+
         // Inject the pdf with the metadata needed to split it
         PDFManip pdfManip;
         try {

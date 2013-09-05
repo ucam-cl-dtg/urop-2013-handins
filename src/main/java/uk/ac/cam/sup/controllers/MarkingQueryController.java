@@ -1,12 +1,12 @@
 package uk.ac.cam.sup.controllers;
 
+import com.google.common.collect.ImmutableList;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
-import uk.ac.cam.sup.models.Answer;
-import uk.ac.cam.sup.models.Bin;
+import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
@@ -20,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Path("/marking/bins/{binId}")
 public class MarkingQueryController extends ApplicationController {
@@ -41,6 +42,50 @@ public class MarkingQueryController extends ApplicationController {
         if (bin == null)
             return Response.status(404).build();
 
+        // List of files to download
+        List<Marking> markingList = new LinkedList<>();
+        int actualPage = 1;
+
+        // Pete's useless desire
+        if (bin.getQuestionCount() == 0) {
+
+            //noinspection MismatchedQueryAndUpdateOfCollection
+            List<String> ids = new LinkedList<>();
+
+            for (BinAccessPermission perm : bin.getAccessPermissions())
+                ids.add(perm.getUserCrsId());
+
+            for (String p : ((studentCrsId == null)? ids : ImmutableList.of(studentCrsId))) {
+                @SuppressWarnings("unchecked")
+                List <UnmarkedSubmission> subs = session.createCriteria(UnmarkedSubmission.class)
+                                                        .add(Restrictions.eq("bin", bin))
+                                                        .add(Restrictions.eq("owner", p))
+                                                        .addOrder(Order.asc("dateCreated"))
+                                                        .list();
+
+                for (UnmarkedSubmission sub : subs) {
+                    Marking marking = new Marking();
+
+                    marking.setFilePath(sub.getFilePath());
+                    marking.setFirst(actualPage);
+
+                    try {
+                        actualPage += new PDFManip(sub.getFilePath()).getPageCount();
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    marking.setLast(actualPage - 1);
+                    marking.setOwner(sub.getOwner());
+                    marking.setQuestion(new ProposedQuestion());
+
+                    markingList.add(marking);
+                }
+            }
+
+            return FilesManip.resultingFile(markingList);
+        }
+
         // Get all answers from the bin
         @SuppressWarnings("unchecked")
         List<Answer> answers = session.createCriteria(Answer.class)
@@ -50,8 +95,6 @@ public class MarkingQueryController extends ApplicationController {
                                       .list();
 
         // Create the marking list for the file
-        List<Marking> markingList = new LinkedList<>();
-        int actualPage = 1;
         for (Answer answer : answers)
             if (bin.canSeeAnswer(user, answer) && answer.isLast() &&
                     (questionId == null || answer.getQuestion().getId() == questionId) &&
