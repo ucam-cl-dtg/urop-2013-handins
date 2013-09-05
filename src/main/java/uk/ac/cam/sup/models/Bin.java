@@ -39,6 +39,9 @@ public class Bin {
     private Set<BinAccessPermission> accessPermissions;
 
     @OneToMany(mappedBy = "bin")
+    private Set<BinDosAccess> dosAccess;
+
+    @OneToMany(mappedBy = "bin")
     private Set<BinUserMarkingPermission> userMarkingPermissions;
 
     @OneToMany(mappedBy = "bin")
@@ -251,7 +254,7 @@ public class Bin {
     }
 
     public boolean canUploadIntoBin(String user) {
-        return hasTotalAccess(user) || UserHelper.isDos(user) || canAddSubmission(user);
+        return hasTotalAccess(user) || isDos(user) || canAddSubmission(user);
     }
 
     /*
@@ -277,6 +280,7 @@ public class Bin {
     }
 
     public boolean canAddMarkedSubmission(String user) {
+
         Session session = HibernateUtil.getSession();
 
         if (user == null)
@@ -297,6 +301,7 @@ public class Bin {
     }
 
     public boolean canSeeAnswer(String user, Answer answer) {
+
         Session session = HibernateUtil.getSession();
 
         //TODO will this crash if user is null ?!
@@ -318,7 +323,7 @@ public class Bin {
     }
 
     public boolean canSeeAnnotated(String user, MarkedAnswer answer) {
-        return hasTotalAccess(user) || isPeerMarking() || UserHelper.isDos(user) || answer.getAnnotator().equals(user) || answer.getOwner().equals(user);
+        return hasTotalAccess(user) || isPeerMarking() || isDos(user) || answer.getAnnotator().equals(user) || answer.getOwner().equals(user);
     }
 
     @Transient
@@ -326,8 +331,23 @@ public class Bin {
         return questionSet.size();
     }
 
+    @Transient
+    public boolean isDos(String user) {
+
+        Session session = HibernateUtil.getSession();
+
+        @SuppressWarnings("unchecked")
+        List<BinDosAccess> Doses = session.createCriteria(BinDosAccess.class)
+                                          .add(Restrictions.eq("userCrsId", user))
+                                          .add(Restrictions.eq("bin", this))
+                                          .list();
+
+        return !Doses.isEmpty();
+    }
+
     public static Object toJSON(List<Bin> bins) {
         List result = new LinkedList();
+
         for (Bin task: bins)
             //noinspection unchecked
             result.add(task.toJSON());

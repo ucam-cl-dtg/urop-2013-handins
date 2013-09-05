@@ -1,20 +1,13 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableMap;
-import com.googlecode.htmleasy.RedirectException;
-import com.googlecode.htmleasy.ViewWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
 import uk.ac.cam.cl.dtg.ldap.LDAPPartialQuery;
-import uk.ac.cam.cl.dtg.teaching.api.HandinsApi;
 import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.helpers.ArrayHelper;
-import uk.ac.cam.sup.helpers.UserHelper;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

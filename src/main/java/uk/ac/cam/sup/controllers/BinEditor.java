@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
+import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
+import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
 import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
@@ -146,7 +148,11 @@ public class BinEditor extends ApplicationController {
             newUser = newUser.trim();
 
             if (!newUser.isEmpty() && !usersWithPermission.contains(newUser))
-                session.save(new BinAccessPermission(bin, newUser));
+                try {
+                    session.save(new BinAccessPermission(bin, newUser, new DashboardApi.DashboardApiWrapper(getDashboardUrl(), getApiKey())));
+                } catch (LDAPObjectNotFoundException e) {
+                    Response.status(202).build();
+                }
         }
 
         return Response.status(204).build();

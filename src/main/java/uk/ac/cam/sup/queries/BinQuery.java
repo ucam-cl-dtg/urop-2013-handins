@@ -59,7 +59,8 @@ public class BinQuery {
         
         criteria = session.createCriteria(Bin.class)
                           .createAlias("accessPermissions", "perm")
-                          .add(Restrictions.eq("perm.userCrsId", currentUser))
+                          .createAlias("dosAccess", "dos")
+                          .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser), Restrictions.eq("dos.userCrsId", currentUser)))
                           .addOrder(Order.desc("id"));
 
         addName();

@@ -9,6 +9,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.forms.SplittingForm;
@@ -24,6 +25,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
+
+import static uk.ac.cam.cl.dtg.teaching.api.DashboardApi.DashboardApiWrapper;
 
 @Path("/bins")
 @Produces("application/json")
@@ -65,8 +68,13 @@ public class BinController extends ApplicationController{
         session.save(bin);
 
         // Add owner to permissions
-        session.save(new BinAccessPermission(bin, owner));
-        session.save(new BinUserMarkingPermission(bin, owner));
+        try {
+            session.save(new BinUserMarkingPermission(bin, owner));
+            session.save(new BinAccessPermission(bin, owner, new DashboardApiWrapper(getDashboardUrl(), getApiKey())));
+        }
+        catch (Exception e) {
+            return Response.status(202).entity(ImmutableMap.of("id", bin.getId(), "name", bin.getName())).build();
+        }
 
         return ImmutableMap.of("id", bin.getId(),
                                "name", bin.getName());
