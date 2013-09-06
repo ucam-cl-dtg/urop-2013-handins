@@ -194,7 +194,7 @@ var MarkerOverlay = Backbone.View.extend({
     },
 
     handleResizableResize:  function (evt, ui) {
-        this.model.set('top', ui.position.top);
+        this.model.set('top', ui.position.top - this.pdfContainer.scrollTop());
     },
 
     handleMouseMove: function(evt) {
