@@ -7,7 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.ResultTransformer;
+import org.hibernate.sql.JoinType;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
@@ -67,9 +67,10 @@ public class BinQuery {
         Session session = HibernateUtil.getTransaction();
         
         criteria = session.createCriteria(Bin.class)
-                          .createAlias("accessPermissions", "perm")
-                          .createAlias("dosAccess", "dos")
-                          .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser), Restrictions.eq("dos.userCrsId", currentUser)))
+                          .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
+                          .createAlias("dosAccess", "dos", JoinType.LEFT_OUTER_JOIN)
+                          .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser),
+                                               Restrictions.eq("dos.userCrsId", currentUser)))
                           .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                           .addOrder(Order.desc("id"));
 
@@ -87,8 +88,11 @@ public class BinQuery {
         Session session = HibernateUtil.getTransaction();
 
         criteria = session.createCriteria(Bin.class)
-                .createAlias("accessPermissions", "perm")
-                .add(Restrictions.eq("perm.userCrsId", currentUser))
+                .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("dosAccess", "dos", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser),
+                                     Restrictions.eq("dos.userCrsId", currentUser)))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .addOrder(Order.desc("id"));
 
         addName();
