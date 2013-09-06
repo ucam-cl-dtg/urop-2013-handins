@@ -9,22 +9,19 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.forms.SplittingForm;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static uk.ac.cam.cl.dtg.teaching.api.DashboardApi.DashboardApiWrapper;
 
@@ -76,8 +73,7 @@ public class BinController extends ApplicationController{
             return Response.status(202).entity(ImmutableMap.of("id", bin.getId(), "name", bin.getName())).build();
         }
 
-        return ImmutableMap.of("id", bin.getId(),
-                               "name", bin.getName());
+        return bin.toJSON();
     }
 
     /*
@@ -104,11 +100,7 @@ public class BinController extends ApplicationController{
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot see bin.")).build();
 
         // Return bin details
-        return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
-                                                      "name", bin.getName(),
-                                                      "token", bin.getToken(),
-                                                      "archived", bin.isArchived(),
-                                                      "peerMarking", bin.isPeerMarking()));
+        return bin.toJSON();
     }
 
     /*
