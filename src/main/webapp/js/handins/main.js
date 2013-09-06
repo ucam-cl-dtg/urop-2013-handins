@@ -256,25 +256,40 @@ function searchForm(evt) {
 
 function basicSearch() {
     $('a.toggle-search').data('type', 'basic').text("Advance Search");
-    $('.advance-search').fadeOut();
+    $('.advance-search').fadeOut(function() {
+        $('.name-row').removeClass("large-12").addClass("large-9");
+    });
+    $('.main input[name="type"]').val("basic");
 }
 
 function advanceSearch() {
     $('a.toggle-search').data('type', 'advance').text("Basic Search");
-    $('.advance-search').fadeIn();
+    $('.advance-search').fadeIn(function() {
+    });
+    $('.main input[name="type"]').val("advance");
+    $('.name-row').removeClass("large-9").addClass("large-12");
+}
+
+function updateSearch() {
+    var type = $('.main input[name="type"]').val();
+    if (type == "basic")
+        basicSearch();
+    else
+        advanceSearch();
 }
 
 function toggleSearch(evt) {
     evt.preventDefault();
     evt.stopPropagation();
 
-    var elem = $(this);
-    var type = elem.data("type");
+    var type = $('.main input[name="type"]').val();
     if (type == "basic") {
-        advanceSearch();
+        $('.main input[name="type"]').val("advance");
     } else {
-        basicSearch();
+        $('.main input[name="type"]').val("basic");
     }
+
+    updateSearch();
 }
 
 moduleScripts['handins'] = {
@@ -289,10 +304,10 @@ moduleScripts['handins'] = {
         }]
     },
     'bin': {
-        'index': [function() {
-            paginate($('.pagination'));
+        'index': [function(x,y,z) {
             $('.main form').submit(searchForm);
             $('.main a.toggle-search').click(toggleSearch);
+            updateSearch();
         }],
         'create': [function() {
             $(".create-bin form").ajaxForm(function(data) {

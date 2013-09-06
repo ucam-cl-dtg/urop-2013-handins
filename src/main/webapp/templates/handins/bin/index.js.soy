@@ -26,12 +26,12 @@
         <form action="" method="get">
             <h3> Search </h3>
             <div class="row">
-                <div class="columns large-9">
+                <div class="name-row columns large-9">
                     <label> Name </label>
                     <input type="text" name="name" placeholder="Enter the name..."
                         {if $query.name} value="{$query.name}" {/if}/>
                 </div>
-                <div class="advance-search" style="display:none;overflow-y:visible">
+                <div class="advance-search" style="display:none;">
                     <div class="columns large-12">
                         <label> Owner </label>
                         <input type="text" name="owner" placeholder="Enter the crsid..."
@@ -51,15 +51,15 @@
 
                     <div class="columns large-6">
                     <h5> Archived </h5>
-                    <label for="supervisor-radio-x" style="float: left; margin-right: 10px; margin-left: 3px">
+                    <label for="supervisor-radio-x" style="float: left; margin-right: 10px;">
                         <input type="radio" name="archived" value="" {if not isNonnull($query.archived)} checked="" {/if} id="supervisor-radio-x">
                         &nbsp;&nbsp;Don't care
                     </label>
-                    <label for="supervisor-radio-y" style="float: left; margin-right: 10px; margin-left: 3px">
+                    <label for="supervisor-radio-y" style="float: left; margin-right: 10px;">
                         <input type="radio" name="archived" value="true" {if $query.archived == 'true'} checked="" {/if} id="supervisor-radio-y">
                         &nbsp;&nbsp;Yes
                     </label>
-                    <label for="supervisor-radio-n" style="float: left; margin-right: 10px; padding-left: 5px">
+                    <label for="supervisor-radio-n" style="float: left; margin-right: 10px;">
                         <input type="radio" name="archived" value="false" {if $query.archvied == 'false'} checked="" {/if} id="supervisor-radio-n">
                         &nbsp;&nbsp;No
                      </label>
@@ -72,6 +72,12 @@
                 <div class="left columns large-9" style="margin-top: 25px">
                     <a class="toggle-search" data-type="basic">Show Advance Search</a>
                 </div>
+                <input type="hidden" name="type"
+                    {if (not $query.type) or ($query.type == 'basic')}
+                        value="basic"
+                    {else}
+                        value="advance"
+                    {/if} />
             </div>
 
         </form>
