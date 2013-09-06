@@ -63,7 +63,8 @@ function manageBinList (json) {
         elem.type = "bin";
         return elem;
     });
-    return "shared.handins.generic.listPanel";
+    //return "shared.handins.generic.listPanel";
+    return "handins.bin.index";
 }
 
 function markingList(json) {
@@ -72,7 +73,8 @@ function markingList(json) {
         elem.linkTo = "marking/bins/" + elem.id + "/students";
         return elem;
     });
-    return "shared.handins.generic.listPanel";
+    //return "shared.handins.generic.listPanel";
+    return "handins.bin.index"
 
 }
 
@@ -241,10 +243,10 @@ $(document).ready(function() {
         "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
         "bins/upload(?:params)": combine(extractQueryOptions, binList),
-        "bins/manage": manageBinList,
+        "bins/manage(?:params)": combine(extractQueryOptions, manageBinList),
+        "bins/marking(?:params)": combine(extractQueryOptions,markingList),
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
-        "bins/marking": markingList,
         "test": "main.index2"
 
     })
