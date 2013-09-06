@@ -20,9 +20,10 @@ $(document).on("click", ".upload-work-for-bin", function() {
     var elem = $(this),
         bin = elem.attr("bin");
 
-    loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
+    /*loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
         this.slideDown();
-    });
+    });*/
+    router.navigate("bins/" + bin + "/submissions", {trigger: true});
 })
 
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
