@@ -305,7 +305,11 @@ moduleScripts['handins'] = {
         }]
     },
     'bin': {
-        'index': [function(x,y,z) {
+        'index': [function() {
+            paginate($('.pagination'));
+            $('.main input.date').datepicker({
+                dateFormat: "dd/mm/yy"
+            });
             $('.main form').submit(searchForm);
             $('.main a.toggle-search').click(toggleSearch);
             updateSearch();

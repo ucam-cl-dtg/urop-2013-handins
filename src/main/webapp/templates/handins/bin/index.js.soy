@@ -39,13 +39,13 @@
                     </div>
                     <div class="columns large-6">
                         <label> Created after: </label>
-                        <input type="date" name="datecreate_after"
+                        <input type="text" class="date" name="datecreate_after"
                             {if $query.datecreated_after} value="{$query.datecreate_after}" {/if}/>
                     </div>
 
                     <div class="columns large-6">
                         <label> Created before: </label>
-                        <input type="date" name="datecreated_before"
+                        <input type="text" class="date" name="datecreated_before"
                             {if $query.datacreated_before} value="{$query.datecreated_before}" {/if}/>
                     </div>
 
@@ -78,6 +78,8 @@
                     {else}
                         value="advance"
                     {/if} />
+                <div style="clear:both">
+                </div>
             </div>
 
         </form>
