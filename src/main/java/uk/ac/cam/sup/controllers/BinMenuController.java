@@ -35,6 +35,12 @@ public class BinMenuController extends ApplicationController {
 
 
     @GET
+    @Path("/dos")
+    public Object dosView() {
+        return Util.forward(request, "/api/bins/");
+    }
+
+    @GET
     @Path("/marking")
     public Object showBinsToMark() {
         request.setAttribute("markable", true);

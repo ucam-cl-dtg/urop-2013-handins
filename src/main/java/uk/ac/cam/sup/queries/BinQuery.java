@@ -7,7 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.ResultTransformer;
+import org.hibernate.sql.JoinType;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
@@ -15,6 +15,8 @@ import uk.ac.cam.sup.models.Bin;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class BinQuery {
@@ -25,6 +27,12 @@ public class BinQuery {
     @QueryParam("offset") private Long offset;
     @QueryParam("limit") private Long limit;
     @QueryParam("markable") private Boolean markable;
+
+    @QueryParam("datecreated_after") private String after_str;
+                                     private Date after;
+    @QueryParam("datecreated_before") private String before_str;
+                                      private Date before;
+
 
     @Context HttpServletRequest request;
 
@@ -40,6 +48,9 @@ public class BinQuery {
 
         if (offset == null)
             offset = 0L;
+
+        after = extractDate(after_str);
+        before = extractDate(before_str);
 
         if (request.getAttribute("name") != null)
             name = (String) request.getAttribute("name");
@@ -59,6 +70,12 @@ public class BinQuery {
         if (request.getAttribute("markable") != null)
             markable = (Boolean) request.getAttribute("markable");
 
+        if (request.getAttribute("datecreate_after") != null)
+            after = (Date) request.getAttribute("datecreate_after");
+
+        if (request.getAttribute("datecreate_before") != null)
+            before = (Date) request.getAttribute("datecreate_before");
+
         currentUser = UserHelper.getCurrentUser(request);
     }
 
@@ -67,9 +84,10 @@ public class BinQuery {
         Session session = HibernateUtil.getTransaction();
         
         criteria = session.createCriteria(Bin.class)
-                          .createAlias("accessPermissions", "perm")
-                          .createAlias("dosAccess", "dos")
-                          .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser), Restrictions.eq("dos.userCrsId", currentUser)))
+                          .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
+                          .createAlias("dosAccess", "dos", JoinType.LEFT_OUTER_JOIN)
+                          .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser),
+                                               Restrictions.eq("dos.userCrsId", currentUser)))
                           .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                           .addOrder(Order.desc("id"));
 
@@ -77,6 +95,8 @@ public class BinQuery {
         addOwner();
         addArchived();
         addMarkable();
+        addBefore();
+        addAfter();
         addOffset();
         addLimit();
         
@@ -87,20 +107,34 @@ public class BinQuery {
         Session session = HibernateUtil.getTransaction();
 
         criteria = session.createCriteria(Bin.class)
-                .createAlias("accessPermissions", "perm")
-                .add(Restrictions.eq("perm.userCrsId", currentUser))
+                .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("dosAccess", "dos", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.or(Restrictions.eq("perm.userCrsId", currentUser),
+                                     Restrictions.eq("dos.userCrsId", currentUser)))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .addOrder(Order.desc("id"));
 
         addName();
         addOwner();
         addArchived();
         addMarkable();
+        addBefore();
+        addAfter();
 
         ScrollableResults scroll = criteria.scroll(ScrollMode.SCROLL_INSENSITIVE);
         scroll.last();
         return scroll.getRowNumber() + 1;
     }
 
+    private void addBefore() {
+        if (before != null)
+            criteria.add(Restrictions.le("dateCreated", before));
+    }
+
+    private void addAfter() {
+        if (after != null)
+            criteria.add(Restrictions.ge("dateCreated", after));
+    }
 
     private void addCount() {
     }
@@ -143,5 +177,23 @@ public class BinQuery {
 
     public Long getOffset() {
         return offset;
+    }
+
+    private Date extractDate(String str) {
+        if (str == null)
+            return null;
+        Date result = new Date();
+        Calendar c = Calendar.getInstance();
+        try {
+            String[] split = str.split("/");
+            int day = Integer.parseInt(split[0]);
+            int month = Integer.parseInt(split[1]);
+            int year = Integer.parseInt(split[2]);
+            c.set(year, month-1, day, 0, 0, 0);
+            result = c.getTime();
+        } catch(Exception e) {
+            return null;
+        }
+        return result;
     }
 }

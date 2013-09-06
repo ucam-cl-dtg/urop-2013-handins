@@ -20,7 +20,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static uk.ac.cam.cl.dtg.teaching.api.DashboardApi.DashboardApiWrapper;
 
@@ -74,8 +75,7 @@ public class BinController extends ApplicationController{
             return Response.status(202).entity(ImmutableMap.of("id", bin.getId(), "name", bin.getName())).build();
         }
 
-        return ImmutableMap.of("id", bin.getId(),
-                               "name", bin.getName());
+        return bin.toJSON();
     }
 
     /*
@@ -102,11 +102,7 @@ public class BinController extends ApplicationController{
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot see bin.")).build();
 
         // Return bin details
-        return ImmutableMap.of("bin", ImmutableMap.of("id", bin.getId(),
-                                                      "name", bin.getName(),
-                                                      "token", bin.getToken(),
-                                                      "archived", bin.isArchived(),
-                                                      "peerMarking", bin.isPeerMarking()));
+        return ImmutableMap.of("bin", bin.toJSON());
     }
 
     /*
@@ -422,9 +418,7 @@ public class BinController extends ApplicationController{
         // Create the list of questions as json
         List<ImmutableMap> result = new LinkedList<>();
         for (ProposedQuestion question: questions) {
-            result.add(ImmutableMap.of("id", question.getId(),
-                                       "name", question.getName(),
-                                       "bin", binId));
+            result.add(question.toJSON());
         }
 
         return ImmutableMap.of("questions", result);

@@ -25,6 +25,10 @@
 {call shared.handins.generic.listPanel}
     {param elems: $elems /}
 {/call}
+<h3> Questions: <h3>
+<div class="async-loader" data-path="bins/{$bin.id}/questions" template-name="handins.submission.questions">
+    Loading ...
+</div>
 <h3> Marked Work: <h3>
 <div class="async-loader" data-path="bins/{$bin.id}/marked" template-name="handins.submission.markedWork">
     Loading ...
@@ -46,4 +50,23 @@
         </div>
     {/foreach}
 </div>
+{/template}
+
+/**
+* @param questions
+*/
+{template .questions}
+    <div class="row collapse submission-questions">
+        {foreach $question in $questions}
+            <div class="columns left large-3 small-4" style="padding: 5px">
+                <div class="label" style="display:block; width: 100%">
+                {if $question.link }
+                    <a href="{$question.link}" data-absolute>{$question.name}</a>
+                {else}
+                    {$question.name}
+                {/if}
+                </div>
+            </div>
+        {/foreach}
+    </div>
 {/template}

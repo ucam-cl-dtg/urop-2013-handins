@@ -20,9 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.Question;
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionSet;
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionsApiWrapper;
+import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.*;
 
 // Documented
 
@@ -327,10 +325,11 @@ public class BinEditor extends ApplicationController {
                                   @FormParam("link[]") String[] newLinks,
                                   @FormParam("name") String questionName,
                                   @FormParam("link") String link) {
-
+        boolean singleItem = false;
         if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0)) {
             newQuestionNames = new String[] {questionName};
             newLinks = new String[] {link};
+            singleItem = true;
         }
 
         // Set Hibernate and get user
@@ -353,6 +352,7 @@ public class BinEditor extends ApplicationController {
             existingQuestions.add(question.getName());
 
         int newQuestions = 0;
+        ProposedQuestion lastQuestion = null;
         // Add the new questions
         for (int i = 0; i < newQuestionNames.length; i++) {
             String newQuestion = newQuestionNames[i], newLink = newLinks[i];
@@ -368,13 +368,16 @@ public class BinEditor extends ApplicationController {
                 question.setBin(bin);
 
                 session.update(question);
+                lastQuestion = question;
                 newQuestions ++;
             }
         }
 
-        if (questionName != null && newQuestions == 0)
+        if (singleItem && newQuestions == 0)
             return Response.status(400).entity(ImmutableMap.of("message", "New question name is invalid")).build();
-
+        if (singleItem) {
+            return ImmutableMap.of("id", lastQuestion.getId());
+        }
         return Response.status(204).build();
     }
 

@@ -2,7 +2,7 @@ package uk.ac.cam.sup.models;
 
 // TODO: KILL ME!
 
-import org.hibernate.annotations.GenericGenerator;
+import com.google.common.collect.ImmutableMap;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -81,5 +81,18 @@ public class ProposedQuestion {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public ImmutableMap toJSON() {
+        ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<String, Object>();
+
+        builder.put("id", getId())
+               .put("name", getName())
+               .put("bin", getBin().getId());
+
+        if (link != null)
+            builder.put("link", getLink());
+
+        return builder.build();
     }
 }

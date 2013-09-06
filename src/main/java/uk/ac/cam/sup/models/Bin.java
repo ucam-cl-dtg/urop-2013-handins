@@ -61,7 +61,6 @@ public class Bin {
 
     // Constructors
     public Bin() {
-        dateCreated = new Date();
     }
 
     public Bin(String owner, String name) {
