@@ -245,6 +245,7 @@ $(document).ready(function() {
         "bins/upload(?:params)": combine(extractQueryOptions, binList),
         "bins/manage(?:params)": combine(extractQueryOptions, manageBinList),
         "bins/marking(?:params)": combine(extractQueryOptions,markingList),
+        "bins/dos(?:params)": combine(extractQueryOptions, markingList),
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
         "test": "main.index2"
