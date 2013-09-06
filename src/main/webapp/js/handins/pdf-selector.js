@@ -21,6 +21,11 @@ function showSelectingModal3(bin, submission) {
     elem.foundation('reveal',{
         opened: function() {
             elem.css('top', height * 0.05);
+            var questionsContainer = elem.find('.questions-container');
+
+            var availableHeight = height * 0.9 - elem.find('.save-container').height() - elem.find('.select-container').height() - 10;
+
+            questionsContainer.css("max-height", availableHeight + "px");
         }
     });
 
@@ -33,6 +38,7 @@ function showSelectingModal3(bin, submission) {
 
     elem.height(height * 0.9);
     elem.find('.pdf-viewer').css('height',elem.height() + "px");
+
 
     view = new SelectingView({
         bin: bin,

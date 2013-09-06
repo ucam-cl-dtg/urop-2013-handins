@@ -27,49 +27,6 @@
 </div>
 {/template}
 /**
-* @param bin
-* @param submission
-*/
-{template .selectingModal2}
-<div id="selectingModal" class="reveal-modal expand">
-    <div class="row">
-        <div class="columns large-8">
-            <div class="pdf-container" style="overflow: scroll; height:600px;">
-            </div>
-        </div>
-        <div class="columns large-4">
-            <form action="{$ij.URLPrefix}/bins/{$bin}/submissions/{$submission}" method="post">
-                <fieldset>
-                    <legend> Selected questions</legend>
-                    <div class="input-line-container">
-                    </div>
-                    <div class="row">
-                        <input type="submit" class="button small" value="Save"/>
-                    </div>
-                </fieldset>
-            </form>
-            <fieldset>
-                <legend> Select a question</legend>
-                <div class="row">
-                    <div class="async-loader" data-path="bins/{$bin}/questions" template-name="shared.handins.selectQuestion">
-                    </div>
-                </div>
-                {call .selectingLine}
-                {/call}
-                <div class="row">
-                    <div class="button small more-inputs">
-                        Add
-                    </div>
-                    <!--<input type="submit" class="button small"/> -->
-                </div>
-            </fieldset>
-            </form>
-        </div>
-    </div>
-</div>
-{/template}
-
-/**
 */
 {template .pdf}
    <div id="outerContainer" class="loadingInProgress">
@@ -293,7 +250,7 @@
     </div>
     <div class="row full-width relative">
         <div class="columns push-8 large-4 absolute full-height">
-            <div class="row">
+            <div class="row select-container">
                 <div class="columns large-6">
                     <h4> Questions </h4>
                 </div>
@@ -303,7 +260,7 @@
             </div>
             <div class="questions-container">
             </div>
-            <div class="row absolute full-width" style="bottom: 0; right: 20px">
+            <div class="row absolute full-width save-container" style="bottom: 0; right: 20px">
                 <div class="columns">
                     <div class="button full-width save-selection" >
                         Save
