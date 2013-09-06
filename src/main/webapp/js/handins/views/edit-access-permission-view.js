@@ -46,7 +46,8 @@ var EditAccessPermissionsView = Backbone.View.extend({
             return ;
         this.bin.accessPermissions.create({
             user: user.crsid,
-            name: user.crsid
+            name: user.crsid,
+            id: user.crsid
         })
     },
 

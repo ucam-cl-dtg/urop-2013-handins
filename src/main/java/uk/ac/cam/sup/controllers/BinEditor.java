@@ -6,27 +6,21 @@ import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
 import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
-import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
 import uk.ac.cam.sup.models.BinMarkingPermission;
 import uk.ac.cam.sup.models.ProposedQuestion;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.Question;
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionSet;
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionsApiWrapper;
+import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.*;
 
 @Path("/bins")
 @Produces("application/json")
@@ -330,10 +324,11 @@ public class BinEditor extends ApplicationController {
                                   @FormParam("link[]") String[] newLinks,
                                   @FormParam("name") String questionName,
                                   @FormParam("link") String link) {
-
+        boolean singleItem = false;
         if (questionName != null && (newQuestionNames == null || newQuestionNames.length == 0)) {
             newQuestionNames = new String[] {questionName};
             newLinks = new String[] {link};
+            singleItem = true;
         }
 
         // Set Hibernate and get user
@@ -356,6 +351,7 @@ public class BinEditor extends ApplicationController {
             existingQuestions.add(question.getName());
 
         int newQuestions = 0;
+        ProposedQuestion lastQuestion = null;
         // Add the new questions
         for (int i = 0; i < newQuestionNames.length; i++) {
             String newQuestion = newQuestionNames[i], newLink = newLinks[i];
@@ -371,13 +367,16 @@ public class BinEditor extends ApplicationController {
                 question.setBin(bin);
 
                 session.update(question);
+                lastQuestion = question;
                 newQuestions ++;
             }
         }
 
-        if (questionName != null && newQuestions == 0)
+        if (singleItem && newQuestions == 0)
             return Response.status(400).entity(ImmutableMap.of("message", "New question name is invalid")).build();
-
+        if (singleItem) {
+            return ImmutableMap.of("id", lastQuestion.getId());
+        }
         return Response.status(204).build();
     }
 
