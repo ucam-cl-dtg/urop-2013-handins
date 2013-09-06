@@ -7,13 +7,10 @@ import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.tools.FilesManip;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;

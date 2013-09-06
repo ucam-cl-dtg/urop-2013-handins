@@ -25,14 +25,11 @@ public class ApplicationController {
         return UserHelper.getCurrentUser(request);
     }
 
-    public String getHandinsUrl() {
-        return "http://localhost:8080/handins";
-    }
-
     public HttpServletRequest getRequest() {
         return request;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public boolean isAdmin() {
         return getCurrentUser() == null;
     }

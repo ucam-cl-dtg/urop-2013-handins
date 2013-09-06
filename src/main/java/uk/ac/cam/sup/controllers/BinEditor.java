@@ -6,18 +6,14 @@ import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
 import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
-import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
 import uk.ac.cam.sup.models.BinMarkingPermission;
 import uk.ac.cam.sup.models.ProposedQuestion;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +23,8 @@ import java.util.TreeSet;
 import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.Question;
 import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionSet;
 import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionsApiWrapper;
+
+// Documented
 
 @Path("/bins")
 @Produces("application/json")
@@ -99,7 +97,7 @@ public class BinEditor extends ApplicationController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.isOwner(user))
+        if (!bin.hasTotalAccess(user))
             return Response.status(403).entity(ImmutableMap.of("message", "No permissions to modify bin.")).build();
 
         // Update the bin accordingly
@@ -116,10 +114,10 @@ public class BinEditor extends ApplicationController {
      */
     @POST
     @Path("/{binId}/permissions")
-    public Response addBinAccessPermissions(@PathParam("binId") long binId,
-                                            @FormParam("users[]") String[] newUsers,
-                                            @QueryParam("token") String token,
-                                            @FormParam("user") String _user) {
+        public Response addBinAccessPermissions(@PathParam("binId") long binId,
+                                                @FormParam("users[]") String[] newUsers,
+                                                @QueryParam("token") String token,
+                                                @FormParam("user") String _user) {
 
         if (_user != null && (newUsers == null || newUsers.length == 0))
             newUsers = new String[] {_user};
@@ -166,6 +164,7 @@ public class BinEditor extends ApplicationController {
         String[] users = new String[] {user};
         return deleteBinAccessPermissions(binId, users, null);
     }
+
     /*
     Done
      */
@@ -300,10 +299,7 @@ public class BinEditor extends ApplicationController {
 
         QuestionsApiWrapper api = new QuestionsApiWrapper(getQuestionsUrl(), getApiKey());
 
-        // TODO Fix this when questions support global admin keys
-        String debug = getCurrentUser();
-        String debug2 = getQuestionsUrl();
-        String debug3 = getApiKey();
+        // TODO: Fix this when questions support global admin keys
 
         QuestionSet set = api.getQuestionSet(questionSetId, getCurrentUser());
 
@@ -320,6 +316,7 @@ public class BinEditor extends ApplicationController {
 
         return addBinQuestions(binId, names, links, null, null);
     }
+
     /*
     Done
      */
@@ -347,7 +344,7 @@ public class BinEditor extends ApplicationController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.isOwner(user))
+        if (!bin.hasTotalAccess(user))
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot add question to bin.")).build();
 
         // Get all existing questions
@@ -381,7 +378,6 @@ public class BinEditor extends ApplicationController {
         return Response.status(204).build();
     }
 
-
     @DELETE
     @Path("/{binId}/questions/{questionId}")
     public Object deleteBinQuestion(@PathParam("binId") long binId,
@@ -390,6 +386,7 @@ public class BinEditor extends ApplicationController {
         long[] questions = {questionId};
         return deleteBinQuestions(binId, questions);
     }
+
     /*
     Done
      */
@@ -409,7 +406,7 @@ public class BinEditor extends ApplicationController {
         if (bin == null)
             return Response.status(404).build();
 
-        if (!bin.isOwner(user))
+        if (!bin.hasTotalAccess(user))
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete question from bin.")).build();
 
         // Get the question and delete it or add it to the list of undeletable

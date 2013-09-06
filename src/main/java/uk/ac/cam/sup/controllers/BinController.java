@@ -9,24 +9,22 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
 import uk.ac.cam.sup.forms.SplittingForm;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
 
 import static uk.ac.cam.cl.dtg.teaching.api.DashboardApi.DashboardApiWrapper;
+
+// Documented
 
 @Path("/bins")
 @Produces("application/json")

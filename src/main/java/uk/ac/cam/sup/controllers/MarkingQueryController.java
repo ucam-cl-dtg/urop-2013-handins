@@ -5,22 +5,18 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.*;
 import uk.ac.cam.sup.structures.Marking;
 import uk.ac.cam.sup.tools.FilesManip;
 import uk.ac.cam.sup.tools.PDFManip;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Path("/marking/bins/{binId}")
 public class MarkingQueryController extends ApplicationController {

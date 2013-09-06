@@ -1,0 +1,1402 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Handins Documentation</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+
+    <body>
+        <header>
+            <h1>Handins Documentation</h1>
+        </header>
+
+        <div id="main-wrapper">
+
+            <div class="category">
+                <input type="checkbox" id="req-binController" checked />
+                <label for="req-binController">
+                    <h2>Bin Basics &ndash; /bins</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        <li class="request post global">
+                            <input type="checkbox" id="req-q-addbin" />
+                            <label for="req-q-addbin">
+                                <h3>/bins</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Creates a bin</h4>
+                                <p class="description">Adds a newly created bin to the database the with specified details.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>name (form parameter)</dt>
+	                            <dd> The name of the newly created bin.</dd>
+
+	                            <dt>owner (form parameter)</dt>
+	                            <dd> The CrsId of the owner of the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 400</dt>
+                                    <dd>Unacceptable name.</dd>
+                                    
+                                    <dt>Status 202</dt>
+                                    <dd>Bin successfully created but no Dos found for the supervisor. Returns a map containing the ID and the name of the bin.</dd>
+                                     
+                                    <dt>Status 200</dt>
+                                    <dd>Bin successfully creted. Returns a map containg the ID and the name of the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                        <li class="request get">
+                            <input type="checkbox" id="req-q-viewbin" />
+                            <label for="req-q-viewbin">
+                                <h3>/bins/[binId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>View bin</h4>
+                                <p class="description">Asks for the details of the bin if permissions are allow it.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+				    <dd>Bin not visible to the user and/or user cannot access the requested bin details.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>Returns a map containing the id, name, archive status and peer marking status of the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                        <li class="request post">
+                            <input type="checkbox" id="req-q-addsubmission" />
+                            <label for="req-q-addsubmission">
+                                <h3>/bins/[binId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Add submission</h4>
+                                <p class="description">Saves an uploaded submission.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>file name (form parameter)</dt>
+                                    <dd>The name of the uploaded file.</dd>
+
+                                    <dt>file byte array (form parameter)</dt>
+                                    <dd>The byte array representing the uploaded file's content.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin not visible to the user and/or user cannot upload into respective bin.</dd>
+
+                                    <dt>Status 500</dt>
+                                    <dd>Unable to save the file or unable to manage the saved file.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>A map containing the id of the submission and the id of the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-viewbinpermissions" />
+                            <label for="req-q-viewbinpermissions">
+                                <h3>/bins/[binId]/permissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Bin access permissions</h4>
+                                <p class="description">Asks for the list of bin access permissions if the queries is allowed to.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin not visible to the user and/or user cannot access the requested bin details.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>A map containing a list of strings representing the CrsIds of the users who have permissions to upload to the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-viewbinquestions" />
+                            <label for="req-q-viewbinquestions">
+                                <h3>/bins/[binId]/questions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Bin questions</h4>
+                                <p class="description">Asks for the questions assigned to if user is allowed to.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin not visible to the user and/or user cannot access the requested bin details.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>A list of maps each containing the id and the name of a question from the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+	
+			<li class="request get">
+                            <input type="checkbox" id="req-q-viewbinsubmissions" />
+                            <label for="req-q-viewbinsubmissions">
+                                <h3>/bins/[binId]/submissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Bin uploaded submissions by the user</h4>
+                                <p class="description">Resturns the list of submissions that have bin uploaded into the bin by the calling user.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path paramefater)</dt>
+                                    <dd>The id of the queried bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin not visible to the user and/or user cannot access the requested bin details.</dd>
+
+				    <dt>Status 200</dt>
+                                    <dd>A list of maps containing the index and the id of the submissions that the user has uploaded into the bin.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-splitsubmission" />
+                            <label for="req-q-splitsubmission">
+                                <h3>/bins/[binId]/submissions/[submissionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>The pdf splitting screen</h4>
+                                <p class="description">Splits the specified submission from the bin according to a given list of parameters.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>submissionid (path parameter)</dt>
+                                    <dd>The id of the queried submission.</dd>
+
+                                    <dt>splitting form (form parameter)</dt>
+                                    <dd>5 equally long lists: id[] (the id of the question), startpage[] and endpage[] (the starting and ending page for that question), startloc[] and endloc[] (floats between 0 and 1 specifying the exact procentual coordinate on pages for the question)</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin not visible to the user and/or user cannot access the requested bin details.</dd>
+
+                                    <dt>Status 400</dt>
+                                    <dd>Unacceptable split.</dd>
+
+                                    <dt>Status 500</dt>
+                                    <dd>Unable to save split files.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>Successfully saved.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+		    </ul>
+                </div>
+            </div>
+
+            <div class="category">
+                <input type="checkbox" id="req-binEditor" checked />
+                <label for="req-binEditor">
+                    <h2>Bin Editor &ndash; /bins</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteBin" />
+                            <label for="req-q-deleteBin">
+                                <h3>/bins/[binId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Bin</h4>
+                                <p class="description">Deletes the bin if there are no uploads associated to it.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin cannot be deleted. Either it does not exist or contains uploaded files. Error details are specified.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request put">
+                            <input type="checkbox" id="req-q-changeBin" />
+                            <label for="req-q-changeBin">
+                                <h3>/bins/[binId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Updates the Bin</h4>
+                                <p class="description">Adds the provided user to the list of access permissions of the bin.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>binForm (form parameter)</dt>
+                                    <dd>The id of the bin and any of the changeable bin details: owner, name, archive state, peermarking state.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+                                    <dt>Status 403</dt>
+                                    <dd>Bin cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Successfully modified.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-addBinAccessPermissions" />
+                            <label for="req-q-addBinAccessPermissions">
+                                <h3>/bins/[binId]/permissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Add Access Permissions to Bin</h4>
+                                <p class="description">Adds the provided users to the list of access permissions of the bin.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>users[] (form parameter)</dt>
+                                    <dd>A list of crsIds to be granted permission to access and upload into the bin.</dd>
+
+                                    <dt>user (form parameter)</dt>
+                                    <dd>A crsId to be granted permission to access and upload into the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin permissions cannot be modified by the user.</dd>
+
+                                    <dt>Status 202</dt>
+                                    <dd>Permissions successfully added but some users don't have the Dos added.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Permissions successfully added.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteBinAccessPermissions" />
+                            <label for="req-q-deleteBinAccessPermissions">
+                                <h3>/bins/[binId]/permissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Access Permissions from Bin</h4>
+                                <p class="description">Delete the specified users from the bins access permission list.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>users[] (path parameter)</dt>
+                                    <dd>The list of crsIds to be deleted from the list of permissions of the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin permissions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Permissions successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteBinAccessPermission" />
+                            <label for="req-q-deleteBinAccessPermission">
+                                <h3>/bins/[binId]/permissions/[userCrsId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Access Permission from Bin</h4>
+                                <p class="description">Delete the specified user from the bins access permission list.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>user (path parameter)</dt>
+                                    <dd>The crsId to be deleted from the list of permissions of the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin permissions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Permissions successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-addBinMarkingPermissions" />
+                            <label for="req-q-addBinMarkingPermissions">
+                                <h3>/bins/[binId]/marking-permissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Add Marking Permissions to Bin</h4>
+                                <p class="description">Adds the provided relations to the list of marking permissions of the bin.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>markingUsers[] (form parameter)</dt>
+                                    <dd>A list of crsIds to be granted permission to access mark the specified answers from the bin.</dd>
+
+                                    <dt>questionIds[] (form parameter)</dt>
+                                    <dd>A list of question ids whose answers from certain users will become available for marking by other users.</dd>
+
+                                    <dt>questionOwners[] (form parameter)</dt>
+                                    <dd>A list of crsIds whose answers to the specified questions will become available to the marking users.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin permissions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Permissions successfully added.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteBinMarkingPermissions" />
+                            <label for="req-q-deleteBinMarkingPermissions">
+                                <h3>/bins/[binId]/marking-permissions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marking Permissions from Bin</h4>
+                                <p class="description">Deletes the specified relations from the bins marking permission list.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>markingUsers[] (form parameter)</dt>
+                                    <dd>A list of crsIds to be disallowed from marking the specified answers from the bin.</dd>
+
+                                    <dt>questionIds[] (form parameter)</dt>
+                                    <dd>A list of question ids whose answers from certain users will become unavailable for marking by other users.</dd>
+
+                                    <dt>questionOwners[] (form parameter)</dt>
+                                    <dd>A list of crsIds whose answers to the specified questions will become unavailable to the marking users.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin permissions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Permissions successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-addBinQuestions" />
+                            <label for="req-q-addBinQuestions">
+                                <h3>/bins/[binId]/questions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Add Questions to Bin</h4>
+                                <p class="description">Adds the provided questions to the bin.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>name[] (form parameter)</dt>
+                                    <dd>A list of question name to be added to the bin.</dd>
+
+                                    <dt>link[] (form parameter)</dt>
+                                    <dd>A list of links for the specified questions.</dd>
+
+                                    <dt>name (form parameter)</dt>
+                                    <dd>The name of a question to be added to the bin.</dd>
+
+                                    <dt>link (form parameter)</dt>
+                                    <dd>The link for the question.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 400</dt>
+                                    <dd>Invalid question name provided.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin questions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Questions successfully added.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteQuestions" />
+                            <label for="req-q-deleteQuestions">
+                                <h3>/bins/[binId]/questions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Access Permissions from Bin</h4>
+                                <p class="description">Delete the specified users from the bins access permission list.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>questionsId[] (query parameter)</dt>
+                                    <dd>The list of crsIds to be deleted from the list of permissions of the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin questions cannot be modified by the user.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>Unanswered questions have been successfully deleted and returns a list of undeletable questions.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>All questions successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteQuestion" />
+                            <label for="req-q-deleteQuestion">
+                                <h3>/bins/[binId]/questions/[questionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Access Permission from Bin</h4>
+                                <p class="description">Delete the specified user from the bins access permission list.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>questionid (path parameter)</dt>
+                                    <dd>The id of the question to be deleted from the bin.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin questions cannot be modified by the user.</dd>
+
+                                    <dt>Status 200</dt>
+                                    <dd>Question was not deleted because it was answered.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Question successfully deleted.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post global">
+                            <input type="checkbox" id="req-q-importBinQuestions" />
+                            <label for="req-q-importBinQuestions">
+                                <h3>/bins/[binId]/questions/import</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Import Questions from Set to Bin</h4>
+                                <p class="description">Adds all the questions from the provided question set to the bin.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>binid (path parameter)</dt>
+                                    <dd>The id of the queried bin.</dd>
+
+                                    <dt>questionsetid (form parameter)</dt>
+                                    <dd>The id of the questionSet to be improted.</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status 404</dt>
+                                    <dd>Bin does not exist.</dd>
+
+                                    <dt>Status 400</dt>
+                                    <dd>Invalid question name provided.</dd>
+
+                                    <dt>Status 403</dt>
+                                    <dd>Bin questions cannot be modified by the user.</dd>
+
+                                    <dt>Status 204</dt>
+                                    <dd>Questions successfully added.</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+	    <div class="category">
+                <input type="checkbox" id="req-BinMenu" checked />
+                <label for="req-BinMenu">
+                    <h2>Bin Menu &ndash; /bins</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-binSearch" />
+                            <label for="req-q-binSearch">
+                                <h3>/bins</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-binMenuUpload" />
+                            <label for="req-q-binMenuUpload">
+                                <h3>/bins/upload</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Available bins</h4>
+                                <p class="description">List of bins to which the user is allowed to upload.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>None</dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Redirects to /bins forcing ...</dt>
+                                    <dd></dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-binMenuManage" />
+                            <label for="req-q-binMenuManage">
+                                <h3>/bins/manage</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Owned bins</h4>
+                                <p class="description">List of bins owned by the user.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>None</dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Redirects to /bins forcing ...</dt>
+                                    <dd></dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-binMenuMarking" />
+                            <label for="req-q-binMenuMarking">
+                                <h3>/bins/marking</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Markable bins</h4>
+                                <p class="description">List of bins on which the user can mark answers.</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>None</dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Redirects to /bins forcing ...</dt>
+                                    <dd></dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+	    <div class="category">
+                <input type="checkbox" id="req-Marking" checked />
+                <label for="req-Marking">
+                    <h2>Marking Basics &ndash; /marking/bins/[binId]</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request post">
+                            <input type="checkbox" id="req-q-addMarkedSubmission" />
+                            <label for="req-q-addMarkedSubmission">
+                                <h3>/marking/bins/[binId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Add Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteMarkedSubmission" />
+                            <label for="req-q-deleteMarkedSubmission">
+                                <h3>/marking/bins/[binId]/[submissionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-getMarkingStudent" />
+                            <label for="req-q-getMarkingStudent">
+                                <h3>/marking/bins/[binId]/students</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Get Students for Marking</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-getMarkingStudentAnswers" />
+                            <label for="req-q-getMarkingStudentAnswers">
+                                <h3>/marking/bins/[binId]/students/[studentCrsId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+		    	<li class="request post">
+                            <input type="checkbox" id="req-q-annotateStudent" />
+                            <label for="req-q-annotateStudent">
+                                <h3>/marking/bins/[binId]/students/[studentCrsId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Get Students for Marking</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-annotateStudentAnswers" />
+                            <label for="req-q-annotateStudentAnswers">
+                                <h3>/marking/bins/[binId]/students/[studentCrsId]/questions/[questionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-getMarkingQuestion" />
+                            <label for="req-q-getMarkingQuestion">
+                                <h3>/marking/bins/[binId]/questions</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Get Students for Marking</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-getMarkingQuestionAnswers" />
+                            <label for="req-q-getMarkingQuestionAnswers">
+                                <h3>/marking/bins/[binId]/questions/[questionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+		    	<li class="request post">
+                            <input type="checkbox" id="req-q-annotateQuestion" />
+                            <label for="req-q-annotateQuestion">
+                                <h3>/marking/bins/[binId]/questions/[questionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Get Students for Marking</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request post">
+                            <input type="checkbox" id="req-q-annotateQuestionAnswers" />
+                            <label for="req-q-annotateQuestionAnswers">
+                                <h3>/marking/bins/[binId]/questions/[questionId]/student/[studentCrsId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>Delete Marked Submission</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+            <div class="category">
+                <input type="checkbox" id="req-markingdownload" checked />
+                <label for="req-markingdownload">
+                    <h2>Marking download &ndash; /marking/bins/[binId]</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-d" />
+                            <label for="req-q-d">
+                                <h3>/marking/bins/[binId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-sd" />
+                            <label for="req-q-sd">
+                                <h3>/marking/bins/[binId]/students/[studentCrsId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-sqd" />
+                            <label for="req-q-sqd">
+                                <h3>/marking/bins/[binId]/students/[studentCrsId]/questions/[questionId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-qd" />
+                            <label for="req-q-qd">
+                                <h3>/marking/bins/[binId]/questions/[questionId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-qsd" />
+                            <label for="req-q-qsd">
+                                <h3>/marking/bins/[binId]/questions/[questionId]/students/[studentCrsId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+            <div class="category">
+                <input type="checkbox" id="req-SubmissionController" checked />
+                <label for="req-SubmissionController">
+                    <h2>Submissions &ndash; /submissions/[submissionId]</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-viewSubmissions" />
+                            <label for="req-q-viewSubmissions">
+                                <h3>/submissions/[submissionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+                        
+			<li class="request delete">
+                            <input type="checkbox" id="req-q-deleteSubmission" />
+                            <label for="req-q-deleteSubmission">
+                                <h3>/submissions/[submissionId]</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-downloadSubmission" />
+                            <label for="req-q-downloadSubmission">
+                                <h3>/submissions/[submissionId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-downloadSubmissionAnswer" />
+                            <label for="req-q-downloadSubmissionAnswer">
+                                <h3>/submissions/[submissionId]/[answerId]/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+            <div class="category">
+                <input type="checkbox" id="req-Annotated" checked />
+                <label for="req-Annotated">
+                    <h2>Annotated &ndash; /bins/[binId]</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request get">
+                            <input type="checkbox" id="req-q-md" />
+                            <label for="req-q-md">
+                                <h3>/bins/{binId}/marked/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-m" />
+                            <label for="req-q-m">
+                                <h3>/bins/{binId}/marked</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+			<li class="request get">
+                            <input type="checkbox" id="req-q-mid" />
+                            <label for="req-q-mid">
+                                <h3>/bins/{binId}/marked/{markedAnswerId}/download</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+            <div class="category">
+                <input type="checkbox" id="req-DEMONAME" checked />
+                <label for="req-DEMONAME">
+                    <h2>DEMO &ndash; /DEMOLINK</h2>
+                </label>
+
+                <div class="requests">
+                    <ul class="request-list">
+                        
+			<li class="request TYPE">
+                            <input type="checkbox" id="req-q-LABEL" />
+                            <label for="req-q-LABEL">
+                                <h3>/LINK</h3>
+                            </label>
+
+                            <div class="content">
+                                <h4>SUB TITLE</h4>
+                                <p class="description">DESCRIPTION</p>
+
+                                <h5>Parameters</h5>
+                                <dl>
+                                    <dt>PARAMETER OPTIONALLY: (type parameter)</dt>
+                                    <dd>PARAM DETAILS</dd>
+                                </dl>
+
+                                <h5>Response</h5>
+                                <dl>
+                                    <dt>Status XXX</dt>
+                                    <dd>DETAILS</dd>
+                                </dl>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>	
+	    </div>
+
+        </div>
+    </body>
+</html>

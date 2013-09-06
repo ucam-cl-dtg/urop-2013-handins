@@ -5,15 +5,12 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.*;
