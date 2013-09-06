@@ -1,6 +1,8 @@
 package uk.ac.cam.sup.queries;
 
 import org.hibernate.Criteria;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.Context;
 import java.util.List;
 
 public class BinQuery {
+    private static final Long DEFAULT_LIMIT = 10L;
     @QueryParam("name") private String name;
     @QueryParam("owner") private String owner;
     @QueryParam("archived") private Boolean archived;
@@ -29,10 +32,15 @@ public class BinQuery {
     private Criteria criteria;
     
     public BinQuery() {
-        
     }
     
     public void init() {
+        if (limit == null)
+            limit = DEFAULT_LIMIT;
+
+        if (offset == null)
+            offset = 0L;
+
         if (request.getAttribute("name") != null)
             name = (String) request.getAttribute("name");
 
@@ -74,6 +82,29 @@ public class BinQuery {
         
         return (List<Bin>) criteria.list();
     }
+
+    public int count() {
+        Session session = HibernateUtil.getTransaction();
+
+        criteria = session.createCriteria(Bin.class)
+                .createAlias("accessPermissions", "perm")
+                .add(Restrictions.eq("perm.userCrsId", currentUser))
+                .addOrder(Order.desc("id"));
+
+        addName();
+        addOwner();
+        addArchived();
+        addMarkable();
+
+        ScrollableResults scroll = criteria.scroll(ScrollMode.SCROLL_INSENSITIVE);
+        scroll.last();
+        return scroll.getRowNumber() + 1;
+    }
+
+
+    private void addCount() {
+    }
+
     
     private void addName() {
         if (name != null)
@@ -104,5 +135,13 @@ public class BinQuery {
     private void addLimit() {
         if (limit != null)
             criteria.setMaxResults(limit.intValue());
+    }
+
+    public Long getLimit() {
+        return limit;
+    }
+
+    public Long getOffset() {
+        return offset;
     }
 }

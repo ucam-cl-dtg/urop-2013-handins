@@ -1,11 +1,109 @@
 {namespace handins.bin}
 
+/**
+* @param pages
+* @param current
+*/
+{template .paginator}
+  <li class="first arrow unavailable"><a href="" data-bypass>&laquo;</a></li>
+  {foreach $page in $pages }
+    <li {if $current==$page } class="current" {/if} >
+        <a href="" class="page" data-bypass data-page="{$page}">{$page}</a>
+    </li>
+  {/foreach}
+  <li class="arrow last"><a href="" data-bypass>&raquo;</a></li>
 
+{/template}
+/**
+* @param query
+*/
+{template .search}
+<div class="row">
+    <div class="columns">
+        <form action="" method="get">
+            <h3> Search </h3>
+            <div class="row">
+                <div class="name-row columns large-9">
+                    <label> Name </label>
+                    <input type="text" name="name" placeholder="Enter the name..."
+                        {if $query.name} value="{$query.name}" {/if}/>
+                </div>
+                <div class="advance-search" style="display:none;">
+                    <div class="columns large-12">
+                        <label> Owner </label>
+                        <input type="text" name="owner" placeholder="Enter the crsid..."
+                            {if $query.owner}value="{$query.owner}" {/if}/>
+                    </div>
+                    <div class="columns large-6">
+                        <label> Created after: </label>
+                        <input type="text" class="date" name="datecreate_after"
+                            {if $query.datecreated_after} value="{$query.datecreate_after}" {/if}/>
+                    </div>
+
+                    <div class="columns large-6">
+                        <label> Created before: </label>
+                        <input type="text" class="date" name="datecreated_before"
+                            {if $query.datacreated_before} value="{$query.datecreated_before}" {/if}/>
+                    </div>
+
+                    <div class="columns large-6">
+                    <h5> Archived </h5>
+                    <label for="supervisor-radio-x" style="float: left; margin-right: 10px;">
+                        <input type="radio" name="archived" value="" {if not isNonnull($query.archived)} checked="" {/if} id="supervisor-radio-x">
+                        &nbsp;&nbsp;Don't care
+                    </label>
+                    <label for="supervisor-radio-y" style="float: left; margin-right: 10px;">
+                        <input type="radio" name="archived" value="true" {if $query.archived == 'true'} checked="" {/if} id="supervisor-radio-y">
+                        &nbsp;&nbsp;Yes
+                    </label>
+                    <label for="supervisor-radio-n" style="float: left; margin-right: 10px;">
+                        <input type="radio" name="archived" value="false" {if $query.archvied == 'false'} checked="" {/if} id="supervisor-radio-n">
+                        &nbsp;&nbsp;No
+                     </label>
+                    </div>
+                    <div style="clear:both"></div>
+                </div>
+                <div class="right" style="margin-top: 12px">
+                    <input type="submit" class="medium button success" value="Search">
+                </div>
+                <div class="left columns large-9" style="margin-top: 25px">
+                    <a class="toggle-search" data-type="basic">Show Advance Search</a>
+                </div>
+                <input type="hidden" name="type"
+                    {if (not $query.type) or ($query.type == 'basic')}
+                        value="basic"
+                    {else}
+                        value="advance"
+                    {/if} />
+                <div style="clear:both">
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{/template}
 /**
 * This is a soy doc
 * @param bins The bins in which the user can upload
+* @param meta Information about the query
+* @param query The current query information
 */
 {template .index}
+{call handins.bin.search}
+    {param query: $query/}
+{/call}
+<ul class="pagination" data-count="{$meta.count}" data-limit="{$meta.limit}" data-offset="{$meta.offset}">
+</ul>
+
+{call shared.handins.generic.listPanel}
+    {param elems: $bins /}
+{/call}
+
+<ul class="pagination" data-count="{$meta.count}" data-limit="{$meta.limit}" data-offset="{$meta.offset}">
+</ul>
+<!--
 <div class="upload-work">
 
 </div>
@@ -71,5 +169,5 @@
     {literal}
         $(".upload-marked-work-form form").ajaxForm(uploadedSubmission);
     {/literal}
-</script>
+</script>-->
 {/template}

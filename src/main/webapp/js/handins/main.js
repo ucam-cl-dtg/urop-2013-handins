@@ -20,9 +20,10 @@ $(document).on("click", ".upload-work-for-bin", function() {
     var elem = $(this),
         bin = elem.attr("bin");
 
-    loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
+    /*loadModule($('.upload-work').first(), "bins/" + bin, "shared.handins.uploadForm", function() {
         this.slideDown();
-    });
+    });*/
+    router.navigate("bins/" + bin + "/submissions", {trigger: true});
 })
 
 $(".upload-work-form form").ajaxForm(uploadedSubmission);
@@ -228,6 +229,69 @@ function setupAutocomplete() {
     }
 
 }
+function searchForm(evt) {
+    evt.preventDefault();
+    var form = $(this);
+    var inputs = form.find('input[type!="submit"]');
+    var selector = "?";
+    var query = "";
+    var base = Backbone.history.fragment;
+    if (base.indexOf("?") != -1)
+        base = base.slice(0, base.indexOf("?"));
+
+    _.each(inputs, function(input) {
+        var val = $(input).val();
+        if (val == undefined || val == "")
+            return;
+
+        if ($(input).attr('type') == 'radio' && !input.checked)
+            return;
+
+        query += selector + $(input).attr('name') + "=" + escape(val);
+        selector = "&";
+    });
+
+    router.navigate(base + query, {trigger: true})
+
+}
+
+function basicSearch() {
+    $('a.toggle-search').data('type', 'basic').text("Advance Search");
+    $('.advance-search').fadeOut(function() {
+        $('.name-row').removeClass("large-12").addClass("large-9");
+    });
+    $('.main input[name="type"]').val("basic");
+}
+
+function advanceSearch() {
+    $('a.toggle-search').data('type', 'advance').text("Basic Search");
+    $('.advance-search').fadeIn(function() {
+    });
+    $('.main input[name="type"]').val("advance");
+    $('.name-row').removeClass("large-9").addClass("large-12");
+}
+
+function updateSearch() {
+    var type = $('.main input[name="type"]').val();
+    if (type == "basic")
+        basicSearch();
+    else
+        advanceSearch();
+}
+
+function toggleSearch(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    var type = $('.main input[name="type"]').val();
+    if (type == "basic") {
+        $('.main input[name="type"]').val("advance");
+    } else {
+        $('.main input[name="type"]').val("basic");
+    }
+
+    updateSearch();
+}
 
 moduleScripts['handins'] = {
     'marking': {
@@ -241,6 +305,15 @@ moduleScripts['handins'] = {
         }]
     },
     'bin': {
+        'index': [function() {
+            paginate($('.pagination'));
+            $('.main input.date').datepicker({
+                dateFormat: "dd/mm/yy"
+            });
+            $('.main form').submit(searchForm);
+            $('.main a.toggle-search').click(toggleSearch);
+            updateSearch();
+        }],
         'create': [function() {
             $(".create-bin form").ajaxForm(function(data) {
                 var id = data.id;

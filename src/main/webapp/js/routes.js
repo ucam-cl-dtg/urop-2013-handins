@@ -51,7 +51,8 @@ function binList (json) {
 
         return elem;
     });
-    return "shared.handins.generic.listPanel";
+    //return "shared.handins.generic.listPanel";
+    return "handins.bin.index";
 }
 
 function manageBinList (json) {
@@ -62,7 +63,8 @@ function manageBinList (json) {
         elem.type = "bin";
         return elem;
     });
-    return "shared.handins.generic.listPanel";
+    //return "shared.handins.generic.listPanel";
+    return "handins.bin.index";
 }
 
 function markingList(json) {
@@ -71,7 +73,8 @@ function markingList(json) {
         elem.linkTo = "marking/bins/" + elem.id + "/students";
         return elem;
     });
-    return "shared.handins.generic.listPanel";
+    //return "shared.handins.generic.listPanel";
+    return "handins.bin.index"
 
 }
 
@@ -209,6 +212,26 @@ function homepage(json) {
     router.navigate("bins/create", {trigger: true})
     return 'handins.bin.create';
 }
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+function extractQueryOptions(json) {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+
+    json.query = urlParams;
+}
 SOY_GLOBALS = {
     URLPrefix: CONTEXT_PATH
 };
@@ -219,11 +242,11 @@ $(document).ready(function() {
         "bins/:id/submissions": combine(submissionList, binInjector("handins.submission.index")),
         "bins/:binId": "handins.bin.edit",
         "bins/create": "handins.bin.create",
-        "bins/upload": binList,
-        "bins/manage": manageBinList,
+        "bins/upload(?:params)": combine(extractQueryOptions, binList),
+        "bins/manage(?:params)": combine(extractQueryOptions, manageBinList),
+        "bins/marking(?:params)": combine(extractQueryOptions,markingList),
         "marking/bins/:binId/students": combine(binInjector(), marking(true)),
         "marking/bins/:binId/questions": combine(binInjector(), marking(false)),
-        "bins/marking": markingList,
         "test": "main.index2"
 
     })
