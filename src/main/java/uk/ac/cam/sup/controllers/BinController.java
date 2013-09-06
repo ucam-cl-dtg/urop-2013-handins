@@ -100,7 +100,7 @@ public class BinController extends ApplicationController{
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot see bin.")).build();
 
         // Return bin details
-        return bin.toJSON();
+        return ImmutableMap.of("bin", bin.toJSON());
     }
 
     /*
