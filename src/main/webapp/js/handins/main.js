@@ -9,8 +9,17 @@ $(document).on("click", ".delete-element", function() {
             success: function(result) {
                 elem.parents('.delete-me').first().fadeOut();
             },
-            fail: function(err) {
-                console.log(err);
+            error: function(req) {
+                var msg;
+                try {
+                    msg =JSON.parse(req.responseText).message;
+                } catch (err) {
+                }
+                if (msg == undefined)
+                    errorNotification("Couldn't delete");
+                else
+                    errorNotification(msg);
+                console.log(req);
             }
         });
     }
