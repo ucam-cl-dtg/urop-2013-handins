@@ -15,12 +15,9 @@
 
 {/template}
 /**
-* This is a soy doc
-* @param bins The bins in which the user can upload
-* @param meta Information about the query
-* @param query The current query information
+* @param query
 */
-{template .index}
+{template .search}
 <div class="row">
     <div class="columns">
         <form action="" method="get">
@@ -86,6 +83,17 @@
     </div>
 </div>
 
+{/template}
+/**
+* This is a soy doc
+* @param bins The bins in which the user can upload
+* @param meta Information about the query
+* @param query The current query information
+*/
+{template .index}
+{call handins.bin.search}
+    {param query: $query/}
+{/call}
 <ul class="pagination" data-count="{$meta.count}" data-limit="{$meta.limit}" data-offset="{$meta.offset}">
 </ul>
 
