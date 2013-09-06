@@ -13,7 +13,8 @@
 
     <context-param>
         <param-name>cssFiles</param-name>
-        <param-value>/css/pdf-selector.css</param-value>
+        <param-value>/css/pdf-selector.css
+        </param-value>
     </context-param>
 
 	<context-param>
@@ -54,6 +55,7 @@
                      /js/handins/views/marker-overlay.js,
                      /js/handins/views/marker-select-question.js,
                      /js/handins/views/pdf-selecting.js,
+                     /js/handins/pagination.js,
                      /js/handins/pdf-selector.js,
                      /js/handins/automark.js,
                      /js/handins/legacy-selector.js,

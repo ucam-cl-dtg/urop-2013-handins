@@ -228,6 +228,31 @@ function setupAutocomplete() {
     }
 
 }
+function searchForm(evt) {
+    evt.preventDefault();
+    var form = $(this);
+    var inputs = form.find('input[type!="submit"]');
+    var selector = "?";
+    var query = "";
+    var base = Backbone.history.fragment;
+    if (base.indexOf("?") != -1)
+        base = base.slice(0, base.indexOf("?"));
+
+    _.each(inputs, function(input) {
+        var val = $(input).val();
+        if (val == undefined || val == "")
+            return;
+
+        if ($(input).attr('type') == 'radio' && !input.checked)
+            return;
+
+        query += selector + $(input).attr('name') + "=" + escape(val);
+        selector = "&";
+    });
+
+    router.navigate(base + query, {trigger: true})
+
+}
 
 moduleScripts['handins'] = {
     'marking': {
@@ -241,6 +266,10 @@ moduleScripts['handins'] = {
         }]
     },
     'bin': {
+        'index': [function() {
+            paginate($('.pagination'));
+            $('.main form').submit(searchForm);
+        }],
         'create': [function() {
             $(".create-bin form").ajaxForm(function(data) {
                 var id = data.id;
