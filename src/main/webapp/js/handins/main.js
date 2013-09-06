@@ -254,6 +254,29 @@ function searchForm(evt) {
 
 }
 
+function basicSearch() {
+    $('a.toggle-search').data('type', 'basic').text("Advance Search");
+    $('.advance-search').fadeOut();
+}
+
+function advanceSearch() {
+    $('a.toggle-search').data('type', 'advance').text("Basic Search");
+    $('.advance-search').fadeIn();
+}
+
+function toggleSearch(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    var elem = $(this);
+    var type = elem.data("type");
+    if (type == "basic") {
+        advanceSearch();
+    } else {
+        basicSearch();
+    }
+}
+
 moduleScripts['handins'] = {
     'marking': {
         'index': [function () {
@@ -269,6 +292,7 @@ moduleScripts['handins'] = {
         'index': [function() {
             paginate($('.pagination'));
             $('.main form').submit(searchForm);
+            $('.main a.toggle-search').click(toggleSearch);
         }],
         'create': [function() {
             $(".create-bin form").ajaxForm(function(data) {
