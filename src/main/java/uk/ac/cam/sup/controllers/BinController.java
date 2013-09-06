@@ -416,9 +416,7 @@ public class BinController extends ApplicationController{
         // Create the list of questions as json
         List<ImmutableMap> result = new LinkedList<>();
         for (ProposedQuestion question: questions) {
-            result.add(ImmutableMap.of("id", question.getId(),
-                                       "name", question.getName(),
-                                       "bin", binId));
+            result.add(question.toJSON());
         }
 
         return ImmutableMap.of("questions", result);
