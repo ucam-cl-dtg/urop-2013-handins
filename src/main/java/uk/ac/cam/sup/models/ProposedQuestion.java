@@ -83,7 +83,7 @@ public class ProposedQuestion {
         this.link = link;
     }
 
-    public ImmutableMap toJSON() {
+    public ImmutableMap<String,Object> toJSON() {
         ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<String, Object>();
 
         builder.put("id", getId())
