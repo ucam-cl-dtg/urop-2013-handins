@@ -29,7 +29,6 @@ public class ApplicationController {
         return request;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     public boolean isAdmin() {
         return getCurrentUser() == null;
     }
