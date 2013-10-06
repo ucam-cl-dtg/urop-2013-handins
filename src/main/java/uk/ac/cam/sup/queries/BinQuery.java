@@ -1,5 +1,13 @@
 package uk.ac.cam.sup.queries;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -8,16 +16,10 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import uk.ac.cam.sup.HibernateUtil;
+
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 import uk.ac.cam.sup.models.Bin;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 public class BinQuery {
     private static final Long DEFAULT_LIMIT = 10L;
@@ -81,7 +83,7 @@ public class BinQuery {
 
     @SuppressWarnings("unchecked")
     public List<Bin> fetch() {
-        Session session = HibernateUtil.getTransaction();
+        Session session = HibernateUtil.getInstance().getSession();
         
         criteria = session.createCriteria(Bin.class)
                           .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
@@ -104,7 +106,7 @@ public class BinQuery {
     }
 
     public int count() {
-        Session session = HibernateUtil.getTransaction();
+        Session session = HibernateUtil.getInstance().getSession();
 
         criteria = session.createCriteria(Bin.class)
                 .createAlias("accessPermissions", "perm", JoinType.LEFT_OUTER_JOIN)
@@ -135,10 +137,6 @@ public class BinQuery {
         if (after != null)
             criteria.add(Restrictions.ge("dateCreated", after));
     }
-
-    private void addCount() {
-    }
-
     
     private void addName() {
         if (name != null)

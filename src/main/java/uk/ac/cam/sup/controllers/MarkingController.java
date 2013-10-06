@@ -1,19 +1,34 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import uk.ac.cam.sup.HibernateUtil;
+
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.forms.FileUploadForm;
-import uk.ac.cam.sup.models.*;
+import uk.ac.cam.sup.models.Answer;
+import uk.ac.cam.sup.models.Bin;
+import uk.ac.cam.sup.models.BinAccessPermission;
+import uk.ac.cam.sup.models.MarkedAnswer;
+import uk.ac.cam.sup.models.MarkedSubmission;
+import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.tools.FilesManip;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.*;
+import com.google.common.collect.ImmutableMap;
 
 @Path("/marking/bins/{binId}")
 public class MarkingController extends ApplicationController{
@@ -29,7 +44,7 @@ public class MarkingController extends ApplicationController{
                                          @PathParam("binId") long binId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -85,7 +100,7 @@ public class MarkingController extends ApplicationController{
                                          @PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -129,7 +144,7 @@ public class MarkingController extends ApplicationController{
     public Object viewAllStudentSubmissions(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -189,7 +204,7 @@ public class MarkingController extends ApplicationController{
                               @PathParam("studentCrsId") String studentCrsId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -248,7 +263,7 @@ public class MarkingController extends ApplicationController{
                                   @PathParam("studentCrsId") String studentCrsId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -316,7 +331,7 @@ public class MarkingController extends ApplicationController{
     public Object viewAllQuestionSubmissions(@PathParam("binId") long binId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -378,7 +393,7 @@ public class MarkingController extends ApplicationController{
                                @PathParam("questionId") long questionId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -417,7 +432,7 @@ public class MarkingController extends ApplicationController{
                                    @PathParam("questionId") long questionId) {
 
         // Set Hibernate and get user, bin and question
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -468,7 +483,7 @@ public class MarkingController extends ApplicationController{
                                           @PathParam("studentCrsId") String studentCrsId) {
 
         // Set Hibernate and get user, bin and question
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 

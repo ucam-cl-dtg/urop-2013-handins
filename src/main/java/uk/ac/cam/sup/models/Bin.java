@@ -5,16 +5,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.helpers.UserHelper;
 
+import com.google.common.collect.ImmutableMap;
 import com.sun.istack.NotNull;
 
 @Entity
@@ -228,7 +235,7 @@ public class Bin {
      * Only users with permissions can upload files.
      */
     public boolean canAddSubmission(String user) {
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         if (user == null)
             return false;
@@ -280,7 +287,7 @@ public class Bin {
 
     public boolean canAddMarkedSubmission(String user) {
 
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         if (user == null)
             return false;
@@ -301,7 +308,7 @@ public class Bin {
 
     public boolean canSeeAnswer(String user, Answer answer) {
 
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         //TODO will this crash if user is null ?!
         @SuppressWarnings("unchecked")
@@ -333,7 +340,7 @@ public class Bin {
     @Transient
     public boolean isDos(String user) {
 
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         @SuppressWarnings("unchecked")
         List<BinDosAccess> Doses = session.createCriteria(BinDosAccess.class)
@@ -344,8 +351,8 @@ public class Bin {
         return !Doses.isEmpty();
     }
 
-    public static Object toJSON(List<Bin> bins) {
-        List result = new LinkedList();
+    public static List<ImmutableMap<String,Object>> toJSON(List<Bin> bins) {
+        List<ImmutableMap<String,Object>> result = new LinkedList<ImmutableMap<String,Object>>();
 
         for (Bin task: bins)
             //noinspection unchecked
@@ -354,7 +361,7 @@ public class Bin {
         return result;
     }
 
-    public Object toJSON() {
+    public ImmutableMap<String,Object> toJSON() {
         ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<String, Object>();
 
         return builder.put("id", getId())

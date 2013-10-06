@@ -1,6 +1,5 @@
 package uk.ac.cam.sup.models;
 
-import uk.ac.cam.sup.HibernateUtil;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.Session;
 
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.structures.Distribution;
 import uk.ac.cam.sup.tools.PDFManip;
 
@@ -112,7 +112,7 @@ public abstract class Submission<T> {
     public List<Distribution> getSubmissionDistribution() {
 
         // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         List<Distribution> distributionList = new LinkedList<Distribution>();
 

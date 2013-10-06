@@ -3,7 +3,8 @@ package uk.ac.cam.sup.forms;
 import javax.ws.rs.FormParam;
 
 import org.hibernate.Session;
-import uk.ac.cam.sup.HibernateUtil;
+
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.PDFManip;
@@ -18,7 +19,7 @@ public class SplittingForm {
     public boolean validate(UnmarkedSubmission submission) {
 
         try {
-            Session session = HibernateUtil.getSession();
+            Session session = HibernateUtil.getInstance().getSession();
 
             int pages = (new PDFManip(submission.getFilePath())).getPageCount();
 

@@ -1,22 +1,29 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableList;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.models.*;
-import uk.ac.cam.sup.structures.Marking;
-import uk.ac.cam.sup.tools.FilesManip;
-import uk.ac.cam.sup.tools.PDFManip;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import java.util.LinkedList;
-import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
+import uk.ac.cam.sup.models.Answer;
+import uk.ac.cam.sup.models.Bin;
+import uk.ac.cam.sup.models.BinAccessPermission;
+import uk.ac.cam.sup.models.ProposedQuestion;
+import uk.ac.cam.sup.models.UnmarkedSubmission;
+import uk.ac.cam.sup.structures.Marking;
+import uk.ac.cam.sup.tools.FilesManip;
+import uk.ac.cam.sup.tools.PDFManip;
+
+import com.google.common.collect.ImmutableList;
 
 @Path("/marking/bins/{binId}")
 public class MarkingQueryController extends ApplicationController {
@@ -28,7 +35,7 @@ public class MarkingQueryController extends ApplicationController {
     private Object getQuery(long binId, Long questionId, String studentCrsId) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 

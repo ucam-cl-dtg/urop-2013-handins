@@ -1,19 +1,27 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import uk.ac.cam.sup.HibernateUtil;
+
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.models.Answer;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.FilesManip;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.util.*;
+import com.google.common.collect.ImmutableMap;
 
 @Path ("/submissions")
 public class SubmissionController extends ApplicationController{
@@ -30,7 +38,7 @@ public class SubmissionController extends ApplicationController{
     public Object viewSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user and submission
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -66,7 +74,7 @@ public class SubmissionController extends ApplicationController{
     public Object deleteSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user and submission
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -125,7 +133,7 @@ public class SubmissionController extends ApplicationController{
     public Object downloadSubmission(@PathParam("submissionId") long submissionId) {
 
         // Set Hibernate and get user and submission
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -155,7 +163,7 @@ public class SubmissionController extends ApplicationController{
     public Object downloadAnswer(@PathParam("answerId") long answerId) {
 
         // Set Hibernate and get user and answer
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 

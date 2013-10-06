@@ -80,7 +80,8 @@
 
 	<filter>
 		<filter-name>Hibernate</filter-name>
-		<filter-class>uk.ac.cam.sup.HibernateSessionRequestFilter</filter-class>
+		<filter-class>uk.ac.cam.cl.dtg.teaching.hibernate.HibernateSessionRequestFilter
+		</filter-class>
 	</filter>
 
 

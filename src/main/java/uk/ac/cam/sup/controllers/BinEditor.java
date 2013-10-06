@@ -1,26 +1,37 @@
 package uk.ac.cam.sup.controllers;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.resteasy.annotations.Form;
+
 import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.api.DashboardApi;
-import uk.ac.cam.sup.HibernateUtil;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.Question;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionSet;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.QuestionsApiWrapper;
+import uk.ac.cam.cl.dtg.teaching.hibernate.HibernateUtil;
 import uk.ac.cam.sup.forms.BinForm;
 import uk.ac.cam.sup.models.Bin;
 import uk.ac.cam.sup.models.BinAccessPermission;
 import uk.ac.cam.sup.models.BinMarkingPermission;
 import uk.ac.cam.sup.models.ProposedQuestion;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static uk.ac.cam.cl.dtg.teaching.api.QuestionsApi.*;
+import com.google.common.collect.ImmutableMap;
 
 // Documented
 
@@ -40,7 +51,7 @@ public class BinEditor extends ApplicationController {
                               @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -85,7 +96,7 @@ public class BinEditor extends ApplicationController {
             return Response.status(400).entity(ImmutableMap.of("message", "Bad bin details.")).build();
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -121,7 +132,7 @@ public class BinEditor extends ApplicationController {
             newUsers = new String[] {_user};
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -173,7 +184,7 @@ public class BinEditor extends ApplicationController {
                                                @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -216,7 +227,7 @@ public class BinEditor extends ApplicationController {
                                              @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -261,7 +272,7 @@ public class BinEditor extends ApplicationController {
                                                 @QueryParam("token") String token) {
 
         // Set Hibernate and get user and bin
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -275,7 +286,7 @@ public class BinEditor extends ApplicationController {
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete permissions from bin.")).build();
 
         // Check if marking permissions already exists and skip if it does
-        List permissions = session.createCriteria(BinMarkingPermission.class)
+        List<?> permissions = session.createCriteria(BinMarkingPermission.class)
                                   .add(Restrictions.eq("bin", bin))
                                   .add(Restrictions.in("userCrsId", markingUsers))
                                   .add(Restrictions.not(Restrictions.eq("userCrsId", bin.getOwner())))
@@ -333,7 +344,7 @@ public class BinEditor extends ApplicationController {
         }
 
         // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -399,7 +410,7 @@ public class BinEditor extends ApplicationController {
                                      @QueryParam("questionId[]") long[] questionIds) {
 
         // Set Hibernate and get user
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getInstance().getSession();
 
         String user = getCurrentUser();
 
@@ -413,7 +424,7 @@ public class BinEditor extends ApplicationController {
             return Response.status(403).entity(ImmutableMap.of("message", "Cannot delete question from bin.")).build();
 
         // Get the question and delete it or add it to the list of undeletable
-        List<ImmutableMap> unDel = new LinkedList<>();
+        List<ImmutableMap<String,?>> unDel = new LinkedList<ImmutableMap<String,?>>();
         for (long questionId : questionIds) {
             ProposedQuestion proposedQuestion = (ProposedQuestion) session.get(ProposedQuestion.class, questionId);
 
