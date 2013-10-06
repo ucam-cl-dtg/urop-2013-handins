@@ -1,8 +1,0 @@
-
-Add here details about syntax, comments, highlights...
-(after you read it mark the end of the sentence with a (Y) for an approval or a (N) for a denial)
-
-Andi: In front of every function write a brief description of how it should be used.
-Andi: In a highlighted comment we should write tags so that we know the state of the function,
-      every new tag should be mentioned here.
-Andi: I suggest to add a "Done" tag for Classes / functions that are considered to be finished and clear.
