@@ -12,7 +12,7 @@ public class Distribution {
 
     private ProposedQuestion question;
 
-    private Submission submission;
+    private Submission<?> submission;
 
     // Constructors
     public Distribution() {
@@ -56,11 +56,11 @@ public class Distribution {
     }
 
     // Submission
-    public Submission getSubmission() {
+    public Submission<?> getSubmission() {
         return submission;
     }
 
-    public void setSubmission(Submission submission) {
+    public void setSubmission(Submission<?> submission) {
         this.submission = submission;
     }
 }
