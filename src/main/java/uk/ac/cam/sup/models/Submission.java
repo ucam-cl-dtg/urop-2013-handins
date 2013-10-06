@@ -1,17 +1,24 @@
 package uk.ac.cam.sup.models;
 
-import org.hibernate.Session;
-import org.hibernate.annotations.GenericGenerator;
 import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.structures.Distribution;
-import uk.ac.cam.sup.tools.PDFManip;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.Session;
+
+import uk.ac.cam.sup.structures.Distribution;
+import uk.ac.cam.sup.tools.PDFManip;
 
 @MappedSuperclass
 public abstract class Submission<T> {
