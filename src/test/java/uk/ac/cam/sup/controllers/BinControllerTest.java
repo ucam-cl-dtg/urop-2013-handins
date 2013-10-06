@@ -1,25 +1,5 @@
 package uk.ac.cam.sup.controllers;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.hibernate.Session;
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.mock.MockDispatcherFactory;
-import org.jboss.resteasy.mock.MockHttpRequest;
-import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import uk.ac.cam.sup.HibernateUtil;
-import uk.ac.cam.sup.models.Bin;
-import uk.ac.cam.sup.models.BinAccessPermission;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
 
 public class BinControllerTest {
     /*

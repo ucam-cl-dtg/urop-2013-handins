@@ -1,11 +1,5 @@
 package uk.ac.cam.sup.models;
 
-import org.hibernate.Session;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import uk.ac.cam.sup.HibernateUtil;
 
 //TODO add test for admins and dos
 public class BinTest {
