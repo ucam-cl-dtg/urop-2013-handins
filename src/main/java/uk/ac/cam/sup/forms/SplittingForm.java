@@ -1,12 +1,12 @@
 package uk.ac.cam.sup.forms;
 
+import javax.ws.rs.FormParam;
+
 import org.hibernate.Session;
 import uk.ac.cam.sup.HibernateUtil;
 import uk.ac.cam.sup.models.ProposedQuestion;
 import uk.ac.cam.sup.models.UnmarkedSubmission;
 import uk.ac.cam.sup.tools.PDFManip;
-
-import javax.ws.rs.FormParam;
 
 public class SplittingForm {
     @FormParam("id[]") private long[] questionId;
