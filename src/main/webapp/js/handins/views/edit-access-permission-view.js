@@ -10,7 +10,7 @@ var EditAccessPermissionsView = Backbone.View.extend({
             options: {
                 'delete': ''
             }
-        })
+        });
         this.addPermissionView = new GeneralAddView({
             el: this.$('.add-permission-container'),
             text: "Add User",
@@ -41,19 +41,19 @@ var EditAccessPermissionsView = Backbone.View.extend({
         console.log("debug");
     },
     addPermission: function(user) {
-        var addedUser = this.bin.accessPermissions.findWhere({user: user.crsid})
+        var addedUser = this.bin.accessPermissions.findWhere({user: user.crsid});
         if (addedUser)
             return ;
         this.bin.accessPermissions.create({
             user: user.crsid,
             name: user.crsid,
             id: user.crsid
-        })
+        });
     },
 
     render: function() {
-        this.$el.html('<div class="access-permissions-container"></div><div class="add-permission-container"></div>')
+        this.$el.html('<div class="access-permissions-container"></div><div class="add-permission-container"></div>');
         return this;
     }
-})
+});
 
