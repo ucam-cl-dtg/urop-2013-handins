@@ -1,16 +1,22 @@
 package uk.ac.cam.sup.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
-import uk.ac.cam.cl.dtg.ldap.LDAPPartialQuery;
-import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
-import uk.ac.cam.sup.helpers.ArrayHelper;
-
-import javax.ws.rs.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.cam.cl.dtg.ldap.LDAPObjectNotFoundException;
+import uk.ac.cam.cl.dtg.ldap.LDAPPartialQuery;
+import uk.ac.cam.cl.dtg.ldap.LDAPUser;
+import uk.ac.cam.cl.dtg.teaching.api.QuestionsApi;
+import uk.ac.cam.sup.helpers.ArrayHelper;
 
 @Path("/hack")
 public class HackController extends ApplicationController {
@@ -37,7 +43,9 @@ public class HackController extends ApplicationController {
 
     private List<HashMap<String, Object>> searchByCrsid(String query) {
     	try	{
-    		return LDAPPartialQuery.partialUserByCrsid(query);
+    		return LDAPPartialQuery.partialUserByCrsid(query, LDAPUser.INCLUDE_CRSID
+									| LDAPUser.INCLUDE_NAME | LDAPUser.INCLUDE_DISPLAYNAME
+									| LDAPUser.INCLUDE_SURNAME | LDAPUser.INCLUDE_EMAIL);
         } catch (LDAPObjectNotFoundException e){
             log.error("Error performing LDAPQuery: " + e.getMessage());
             return new ArrayList<HashMap<String,Object>>();
