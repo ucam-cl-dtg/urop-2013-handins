@@ -35,26 +35,22 @@ public class HackController extends ApplicationController {
     */
 
 
-    private List<HashMap<String, String>> searchByCrsid(String query) {
-        List<HashMap<String, String>> matches;
-        try {
-            matches = LDAPPartialQuery.partialUserByCrsid(query);
+    private List<HashMap<String, Object>> searchByCrsid(String query) {
+    	try	{
+    		return LDAPPartialQuery.partialUserByCrsid(query);
         } catch (LDAPObjectNotFoundException e){
             log.error("Error performing LDAPQuery: " + e.getMessage());
-            return new ArrayList<>();
+            return new ArrayList<HashMap<String,Object>>();
         }
-        return matches;
     }
 
-    private List<HashMap<String, String>> searchBySurname(String query) {
-        List<HashMap<String, String>> matches;
+    private List<HashMap<String, Object>> searchBySurname(String query) {
         try {
-            matches = LDAPPartialQuery.partialUserBySurname(query);
+            return LDAPPartialQuery.partialUserBySurname(query);
         } catch (LDAPObjectNotFoundException e){
             log.error("Error performing LDAPQuery: " + e.getMessage());
-            return new ArrayList<>();
+            return new ArrayList<HashMap<String,Object>>();
         }
-        return matches;
     }
 
     @Path("/users")
@@ -63,16 +59,10 @@ public class HackController extends ApplicationController {
     public Object listUsers(@QueryParam("term") String query) {
         System.out.println("Query: >>>" + query + "<<<");
         // Perform LDAP search
-        List<HashMap<String, String>> m1 = searchByCrsid(query);
-        List<HashMap<String, String>> m2 = searchBySurname(query);
+        List<HashMap<String, Object>> m1 = searchByCrsid(query);
+        List<HashMap<String, Object>> m2 = searchBySurname(query);
 
-        List<HashMap<String, String>> matches = ArrayHelper.interleave(m1, m2, 15);
-        System.out.println("------------------- crsid -----------");
-        System.out.println(m1);
-        System.out.println("--------------------Surname ---------");
-        System.out.println(m2);
-
-
+        List<HashMap<String, Object>> matches = ArrayHelper.interleave(m1, m2, 15);
         return matches;
     }
 
